@@ -15,8 +15,8 @@
         	<script src="./common/js/solid-auth-client.bundle.js"></script>
         	<script src="./common/js/rdflib.min.js"></script>
         	-->
-        	<script src="https://cdn.jsdelivr.net/npm/solid-auth-client@2.3.0/dist-lib/solid-auth-client.bundle.js"></script>
-        	<script src="https://cdn.jsdelivr.net/npm/rdflib@0.20.1/dist/rdflib.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/solid-auth-client@2.3.0/dist-lib/solid-auth-client.bundle.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/rdflib@0.20.1/dist/rdflib.min.js"></script>
 	</head>
 
 	<body>
@@ -246,11 +246,13 @@
 		// Clears dbms form
 		function clearDBMS() {
 			document.getElementById("dbmsFormID").reset();
+			docNameValue() ;
 		}
 	
 		// Clears file system form
 		function clearfs() {
 			document.getElementById("fsFormID").reset();
+			docNameValue() ;
 		}
 	
 		// This function checks which tab the user is in to determine focus of functions
@@ -681,14 +683,14 @@
 			if (document.getElementById('dbmsTabID').getAttribute('class') == "active") { 
 			    var query = 
 				"PREFIX : <" + graph + "#>\n" 
-				+ "SELECT * \n"
+				+ "SELECT DISTINCT * \n"
 				+ "FROM <" + graph + "> \n" 
 				+ "WHERE {" + " " + subject + " " + predicate + " " + object + " " + "}"
 			} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
 			    var query = 
 				"DEFINE get:soft" + " " + '"soft"' + "\n"
 				+ "PREFIX : <" + graph + "#>\n" 
-				+ "SELECT * \n"
+				+ "SELECT DISTINCT * \n"
 				+ "FROM <" + graph + "> \n" 
 				+ "WHERE {" + " " + subject + " " + predicate + " " + object + " " + "}"
 			}
@@ -721,14 +723,16 @@
 						var table = tabCheckTable("dbmsTableID", "fsTableID") ; // creates table for header
 						var header = table.createTHead(); // creates empty tHead
 						var headRow = header.insertRow(0); // inserts row into tHead
+						var bindings = data.results.bindings;
 						for (var col = 0; col < data.head.vars.length; col++) { // for each column
 							var headCell = headRow.insertCell(col); // inserts new cell at position i in thead
 							headCell.innerHTML = "<b>" + data.head.vars[col] + "</b>"; // adds bold text to thead cell
-							for (var i = 0; i < data.results.bindings.length; i++) { // for each row in json results
+							for (i in bindings) {
+								var binding = bindings[i];
 								var bodyRow = table.insertRow(-1); // create new row
-								for (var j = 0; j < data.head.vars.length; j++) {// for each column in new row
-									var bodyCell = bodyRow.insertCell(0); // add new cell
-									bodyCell.innerHTML = "testval"; // add new value ("test val" will be replaced with actual value when code is finished)
+								for (n in binding) {
+									var bodyCell = bodyRow.insertCell(n); // create new cell in row
+									bodyCell.innerHTML = tableFormat(binding[n].value); // set value of cell
 								}
 							}
 						}
@@ -759,13 +763,13 @@
 			if (document.getElementById('dbmsTabID').getAttribute('class') == "active") { 
 			    var query = 
 				"PREFIX : <" + graph + "#>\n" 
-				+ "SELECT" + " " + subject + " AS ?subject" + " " + predicate + " AS ?predicate" + " " + object + " AS ?object \n"
+				+ "SELECT DISTINCT" + " " + subject + " AS ?subject" + " " + predicate + " AS ?predicate" + " " + object + " AS ?object \n"
 				+ "FROM <" + graph + "> \n" 
 				+ "WHERE {" + " " + subject + " " + predicate + " " + object + " " + "}"
 			} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
 				"DEFINE get:soft" + " " + '"soft"' + "\n"
 				+ "PREFIX : <" + graph + "#>\n" 
-				+ "SELECT" + " " + subject + " AS ?subject" + " " + predicate + " AS ?predicate" + " " + object + " AS ?object \n"
+				+ "SELECT DISTINCT" + " " + subject + " AS ?subject" + " " + predicate + " AS ?predicate" + " " + object + " AS ?object \n"
 				+ "FROM <" + graph + "> \n" 
 				+ "WHERE {" + " " + subject + " " + predicate + " " + object + " " + "}"
 			}
@@ -828,11 +832,11 @@
 			
 			if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
 			    var data_query = 
-				"SELECT * FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
+				"SELECT DISTINCT * FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
 			} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
 				// Use of Sponger Pragma to force document reload during query evaluation
 				var data_query = 
-				"DEFINE get:soft" + " " + '"soft"' + "\n" + "SELECT * FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
+				"DEFINE get:soft" + " " + '"soft"' + "\n" + "SELECT DISTINCT * FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
 			}
 
             var endpoint = tabCheck("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
