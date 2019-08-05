@@ -3,7 +3,7 @@ A basic data entry form that allows data to be created, manipulated, deleted and
 
 VALID INPUT REQUIREMENTS:
 Notes 
-	- Relative URIs (scoped to the deployment document) are presumed for single word values entered into any of the input files
+	- Relative URIs (scoped to Document Name field value) are presumed for single word values entered into any of the input files
 	- CURIES are accepted, if targeting a Virtuoso instance based on the fact that it has preloaded namespaces per DBMS instance
 Subject Field Values
 - Must be a reference (uri) or blank node (cannot be a literal value)
