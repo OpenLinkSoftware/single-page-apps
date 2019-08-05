@@ -771,6 +771,7 @@
 				+ "FROM <" + graph + "> \n" 
 				+ "WHERE {" + " " + subject + " " + predicate + " " + object + " " + "}"
 			} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
+                var query =
 				"DEFINE get:soft" + " " + '"soft"' + "\n"
 				+ "PREFIX : <" + graph + "#>\n" 
 				+ "SELECT DISTINCT" + " " + subject + " AS ?subject" + " " + predicate + " AS ?predicate" + " " + object + " AS ?object \n"
