@@ -12,9 +12,9 @@
 		<!-- Latest compiled JavaScript -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 		<!-- Authentication and RDF procssing library 
-        	<script src="./common/js/solid-auth-client.bundle.js"></script>
-        	<script src="./common/js/rdflib.min.js"></script>
-        	-->
+        <script src="./common/js/solid-auth-client.bundle.js"></script>
+        <script src="./common/js/rdflib.min.js"></script>
+        -->
         <script src="https://cdn.jsdelivr.net/npm/solid-auth-client@2.3.0/dist-lib/solid-auth-client.bundle.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/rdflib@0.20.1/dist/rdflib.min.js"></script>
 	</head>
@@ -718,7 +718,11 @@
 				
 				    refreshTable();
 					
-					// Dynamic generation of table due to existence of variables in blank nodes
+					/*
+                    Dynamic Table for processing JSON Structured Data (via "application/sparql-results+json" document content type)
+                    that enables INSERT to be handled via a 3-tuple subject, predicate, object graph (relation) while query results 
+                    are handled via an N-Tuple structured table (relation).
+                    */
 		            if (data.results.bindings.length > 0){
 						var table = tabCheckTable("dbmsTableID", "fsTableID") ; // creates table for header
 						var header = table.createTHead(); // creates empty tHead
