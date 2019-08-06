@@ -11,12 +11,10 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 		<!-- Latest compiled JavaScript -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-		<!-- Authentication and RDF procssing library 
-        <script src="./common/js/solid-auth-client.bundle.js"></script>
-        <script src="./common/js/rdflib.min.js"></script>
-        -->
-        <script src="https://cdn.jsdelivr.net/npm/solid-auth-client@2.3.0/dist-lib/solid-auth-client.bundle.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/rdflib@0.20.1/dist/rdflib.min.js"></script>
+		<!-- Authentication and RDF procssing library -->
+		<!-- (Old src) <script src="./common/js/solid-auth-client.bundle.js"></script> <script src="./common/js/rdflib.min.js"></script> -->
+		<script src="https://cdn.jsdelivr.net/npm/solid-auth-client@2.3.0/dist-lib/solid-auth-client.bundle.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/rdflib@0.20.1/dist/rdflib.min.js"></script>
 	</head>
 
 	<body>
@@ -68,7 +66,7 @@
 		  					<!-- Start Buttons -->
 		  					<div class=button-wrapper>
 		  					<span>
-							<button id="clearBtnID" type="button" onclick="clearDBMS()" class="btn btn-primary">Clear</button>
+							<button id="clearBtnID" type="button" onclick="clearInput()" class="btn btn-primary">Clear</button>
 		  					<button id="insertBtnID" type="button" onclick="recordGen()" class="btn btn-success">Add</button> 
 		  					<button id="deleteBtnID" type="button" onclick="recordDel()" class="btn btn-danger">Delete</button> 
 		  					<button id="queryBtnID" type="button" onclick="queryGen()" class="btn btn-warning">Query</button> 
@@ -141,7 +139,7 @@
 		  					<!-- Start Buttons -->
 		  					<div class=button-wrapper>
 		  					<span>
-							<button id="clearBtnID" type="button" onclick="clearfs()" class="btn btn-primary">Clear</button>
+							<button id="clearBtnID" type="button" onclick="clearInput()" class="btn btn-primary">Clear</button>
 							<button id="turtleBtnID2" type="button" onclick="turtleGen()" class="btn btn-success">Add</button>
 							<button id="turtleBtnID2" type="button" onclick="turtleDel()" class="btn btn-danger">Delete</button>
 		  					<button id="queryBtnID2" type="button" onclick="queryGen()" class="btn btn-warning">Query</button> 
@@ -242,17 +240,22 @@
 				document.getElementById("docNameID2").value = solid_storage_value ;	
 			}
 		}
-
-		// Clears dbms form
-		function clearDBMS() {
-			document.getElementById("dbmsFormID").reset();
-			docNameValue() ;
-		}
-	
-		// Clears file system form
-		function clearfs() {
-			document.getElementById("fsFormID").reset();
-			docNameValue() ;
+		
+		// Clears subject, predicate, object input fields
+		function clearInput() {
+			if (document.getElementById('dbmsTabID').getAttribute('class') == "active"){
+				var curDocName = document.getElementById("docNameID").value ; // Stores current value of docName
+				var curEndpoint = document.getElementById("endpointID").value ; // Stores current value of endpoint
+				document.getElementById("dbmsFormID").reset(); // Resets entire form
+				document.getElementById("docNameID").value = curDocName ; // Added so docname is not reset
+				document.getElementById("endpointID").value = curEndpoint ; // Added so endpoint is not reset
+			} else if (document.getElementById('fsTabID').getAttribute('class') == "active"){
+				var curDocName = document.getElementById("docNameID2").value ;
+				var curEndpoint = document.getElementById("endpointID2").value ;
+				document.getElementById("fsFormID").reset();
+				document.getElementById("docNameID2").value = curDocName ;
+				document.getElementById("endpointID2").value = curEndpoint ;
+			}
 		}
 	
 		// This function checks which tab the user is in to determine focus of functions
@@ -327,6 +330,7 @@
 			}
 		}
 		
+		// Function checks if input contains a language tag
 		function langTag(str) {
 			const langexp = /@[a-zA-Z][a-zA-Z]/ ; // regexp for languge tag ex. @en
 			if (langexp.test(str)) {
@@ -729,15 +733,21 @@
 						var headRow = header.insertRow(0); // inserts row into tHead
 						var bindings = data.results.bindings;
 						for (var col = 0; col < data.head.vars.length; col++) { // for each column
+							console.log("col = " + col)
 							var headCell = headRow.insertCell(col); // inserts new cell at position i in thead
 							headCell.innerHTML = "<b>" + data.head.vars[col] + "</b>"; // adds bold text to thead cell
-							for (i in bindings) {
-								var binding = bindings[i];
-								var bodyRow = table.insertRow(-1); // create new row
-								for (n in binding) {
-									var bodyCell = bodyRow.insertCell(n); // create new cell in row
-									bodyCell.innerHTML = tableFormat(binding[n].value); // set value of cell
-								}
+							}
+						for (i in bindings) {
+							// console.log("i = " + i)
+							var curr = 0 ; // curr is used to keep track of correct cell position
+							var binding = bindings[i];
+							var bodyRow = table.insertRow(-1); // create new row
+							for (n in binding) {
+							//	console.log("n = " + n)
+							//	console.log("curr = " + curr)
+								var bodyCell = bodyRow.insertCell(curr); // create new cell in row
+								bodyCell.innerHTML = tableFormat(binding[n].value); // set value of cell
+								curr += 1 ;
 							}
 						}
 		            }	
@@ -771,7 +781,7 @@
 				+ "FROM <" + graph + "> \n" 
 				+ "WHERE {" + " " + subject + " " + predicate + " " + object + " " + "}"
 			} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
-                var query =
+				var query = 
 				"DEFINE get:soft" + " " + '"soft"' + "\n"
 				+ "PREFIX : <" + graph + "#>\n" 
 				+ "SELECT DISTINCT" + " " + subject + " AS ?subject" + " " + predicate + " AS ?predicate" + " " + object + " AS ?object \n"
