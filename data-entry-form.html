@@ -18,6 +18,8 @@
 	</head>
 
 	<body>
+	<!-- Button feedback spinner -->
+	<div id="spinner"></div>
 	<!-- Start of tabs container -->
 	<div class="container">
 	  <!-- Create tabs menu -->
@@ -168,6 +170,8 @@
 	  </div>
 	<!-- End of tabs container -->
 	</div>
+	
+	<!-- Error Display CSS -->
 	<style>
 		/* sets input field red if invalid */
 		.error {
@@ -184,6 +188,53 @@
 		  word-wrap: break-word;
 		}
 	</style>
+	
+	<!-- Spinner CSS -->
+	<style>
+		
+		#spinner{
+		    position:fixed;
+		    width:100%;
+		    left:0;right:0;top:0;bottom:0;
+		    background-color: rgba(255,255,255,0.7);
+		    z-index:9999;
+		    display:none;
+		}
+
+		@keyframes spin {
+		  from {
+		      transform: rotate(0deg);
+		  } to {
+		      transform: rotate(360deg);
+		  }
+		}
+		
+		#spinner::after {
+		    content:'';
+		    display:block;
+		    position:absolute;
+		    left:48%;top:40%;
+		    width:40px;height:40px;
+		    border-style:solid;
+		    border-color:black;
+		    border-top-color:transparent;
+		    border-width: 4px;
+		    border-radius:50%;
+		    -webkit-animation: spin .8s linear infinite;
+		    animation: spin .8s linear infinite;
+		}
+	</style>
+	
+	<!-- Spinner Javascript -->
+	<script>
+		function showSpinner() {
+		  document.getElementById("spinner").className = "show";
+		}
+		
+		function hideSpinner() {
+		  document.getElementById("spinner").className = document.getElementById("spinner").className.replace("show", "");
+		}
+	</script>
 
 	<!-- These Functions Modify the Onscreen Display -->
 	<script>
@@ -358,7 +409,12 @@
 					return str // If string begins and ends with single quote return it as is
 				} else if (str.charAt(0) == '"' && str.charAt(str.length-1) == '"') {
 					return str ;	
-				} else if (str.indexOf(' ') >= 0){
+				} 
+                // Added by KI -- handle typed literals with ^^
+                  else if (str.includes("^^")) {
+                    return str; // Case: input is a typed literal. Solution: return it as is
+				} 
+                else if (str.indexOf(' ') >= 0){
 					if (str.charAt(0) != '"' && str.charAt(0) != "'") {
 						return '"' + str + '"' ;
 					} else {
@@ -484,8 +540,8 @@
 		async function validateObject() {
 			var range = await predicateRange() ; // function waits until range is a value rather than a promise
 			var str = tabCheck("objectID", "objectID2") ;
-		
-			if (str.includes('"') || str.includes("'")) {
+
+            if (str.includes('"') || str.includes("'") ) {
 				range = true ;
 			}
 		
@@ -497,8 +553,8 @@
 				} else if (str.charAt(0) == '<' && str.charAt(1) == '#' && str.charAt(str.length-1) == '>') { 
 					return str ; // Case: input is already a relative uri. Solution: return it as is
 				} else if (str.includes(":")) {
-					return str; // Case: input is a curie. Solution: return it as is
-				} 
+					return str; // Case: input is a curie. Solution: return it as is               		
+                } 
 				else {
 					if (str.charAt(0) == '<' && str.charAt(str.length-1) == '>') {
 						var newStr = str.slice(1,-1); // Case: input is quoted uri. Solution: must be unquotted to be recognize as a uri by regexp
@@ -583,6 +639,7 @@
 	
 		//SPARQL INSERT SCRIPT
 	    async function recordGen() {
+			showSpinner() ;
 		    var subject = validateSubject() ;
 			var predicate = validatePredicate() ;
 			var object = await validateObject() ; // insert function awaits object value before proceeding
@@ -618,16 +675,20 @@
 				if (resp.status >= 200 && resp.status <= 300) {
 					console.log(resp.status + " - " + resp.statusText) ;
 					updateTable() ;
+					hideSpinner() ;
 				} else {
 					console.log("Error " + resp.status +" - " + resp.statusText) ;
+					hideSpinner() ;
 				}
 			} catch(e) {
+				hideSpinner() ;
 				console.error('Insert Failed:', e) ;
 			}			     
 		}
 	
      	//SPARQL DELETE SCRIPT
 	   	async function recordDel() {
+			showSpinner() ;
      	    var subject = validateSubject() ;
      	    var predicate = validatePredicate() ;
      		var object = nonvalidatedObject() ;
@@ -664,11 +725,14 @@
 				if (resp.status >= 200 && resp.status <= 300) {
 					console.log(resp.status + " - " + resp.statusText);
 					updateTable() ;
+					hideSpinner() ;
 				}
 				else {
 					console.log("Error " + resp.status +" - " + resp.statusText) ;
+					hideSpinner() ;
 				}	
 			} catch(e) {
+				hideSpinner() ;
 				console.error('Delete Failed:', e) ;
 			}
 		
@@ -678,6 +742,7 @@
 		This function is required because blank node queries can 
 		require n number of columns. */
 		async function bnQueryGen() {
+			showSpinner() ;
 		    var subject = validateSubject() ;
 			var predicate = validatePredicate() ;
 			var object = nonvalidatedObject() ;
@@ -733,30 +798,29 @@
 						var headRow = header.insertRow(0); // inserts row into tHead
 						var bindings = data.results.bindings;
 						for (var col = 0; col < data.head.vars.length; col++) { // for each column
-							console.log("col = " + col)
 							var headCell = headRow.insertCell(col); // inserts new cell at position i in thead
 							headCell.innerHTML = "<b>" + data.head.vars[col] + "</b>"; // adds bold text to thead cell
 							}
 						for (i in bindings) {
-							// console.log("i = " + i)
 							var curr = 0 ; // curr is used to keep track of correct cell position
 							var binding = bindings[i];
 							var bodyRow = table.insertRow(-1); // create new row
 							for (n in binding) {
-							//	console.log("n = " + n)
-							//	console.log("curr = " + curr)
 								var bodyCell = bodyRow.insertCell(curr); // create new cell in row
 								bodyCell.innerHTML = tableFormat(binding[n].value); // set value of cell
 								curr += 1 ;
 							}
 						}
+						hideSpinner() ;
 		            }	
 		            else{
+						hideSpinner() ;
 						throw new Error("No Data Returned");
 						console.log("No data returned by query");
 		            }
 				})
 			} catch(e) {
+				hideSpinner() ;
 				console.error('Query Failed:', e) ;
 			}		   
 			
@@ -764,6 +828,7 @@
 	
 		// This function updates table to show results of a query
 		async function queryGen() {
+			showSpinner() ;
 		    var subject = validateSubject() ;
 			var predicate = validatePredicate() ;
 			var object = nonvalidatedObject() ;
@@ -830,19 +895,23 @@
 						    cell2.innerHTML = tableFormat(predicate);
 						    cell3.innerHTML = tableFormat(object);	
 						}
+						hideSpinner() ;
 		            }
 		            else{
+						hideSpinner() ;
 						throw new Error("No Data Returned");
 						console.log("No data returned by query");
 		            }
 				})
 			} catch(e) {
+				hideSpinner() ;
 				console.error('Query Failed:', e) ;
 			}		   
 		}
 	
 		// This function fetches the query results and returns them in json
 	    async function updateTable() {
+			showSpinner() ;
 			var graph = tabCheck("docNameID", "docNameID2") ;
 			
 			if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
@@ -894,12 +963,14 @@
 						    cell2.innerHTML = tableFormat(predicate);
 						    cell3.innerHTML = tableFormat(object);	
 						}
-		            }
-		            else{
+						hideSpinner() ;
+		            } else{
+						hideSpinner() ;
 						console.log("No data found by lookup");
 		            }
 				})	
 			} catch(e) {
+				hideSpinner() ;
 				console.error('Table Refresh Failed:', e) ;
 			}		  
 	    }
@@ -951,6 +1022,7 @@
 		}
 	
 		async function turtleGen() {
+			showSpinner() ;
 		    var subject = validateSubject() ;
 			var predicate = validatePredicate() ;
 			var object = await validateObject() ; // insert function awaits object value before proceeding
@@ -977,18 +1049,22 @@
 			try {
 		        var resp = await fetch(url, options);
 				if (resp.status >= 200 && resp.status <= 300) {
+					hideSpinner() ;
 					console.log(resp.status + " - " + resp.statusText);
 					updateTable() ;
 				}
 				else {
+					hideSpinner() ;
 					console.log("Error " + resp.status +" - " + resp.statusText) ;
 				}
 			} catch (e) {
+				hideSpinner() ;
 				console.error('Request Failed:', e) ;
 			}			
 		}
 		
 		async function turtleDel() {
+			showSpinner() ;
 		    var subject = validateSubject() ;
 			var predicate = validatePredicate() ;
 			var object = nonvalidatedObject() ; // insert function awaits object value before proceeding
@@ -1015,13 +1091,16 @@
 			try {
 		        var resp = await fetch(url, options);
 				if (resp.status >= 200 && resp.status <= 300) {
+					hideSpinner() ;
 					console.log(resp.status + " - " + resp.statusText);
 					updateTable() ;
 				}
 				else {
+					hideSpinner() ;
 					console.log("Error " + resp.status +" - " + resp.statusText) ;
 				}
 			} catch (e) {
+				hideSpinner() ;
 				console.error('Request Failed:', e) ;
 			}			
 		}
