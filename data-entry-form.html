@@ -304,6 +304,8 @@
 
 	                  solid_storage = await fetchProfile(session.webId);
 	                  sessionStorage.setItem('solid_storage', solid_storage);
+	                  // Added by Sergey -- re async call handling for solid_storage assignment
+                      await docNameValue()
 	                }
 
 	              } else {
@@ -312,6 +314,7 @@
 	                loggedHref.title = ''
 	                solid_storage = null;
 	                sessionStorage.removeItem('solid_storage');
+	                await docNameValue()
 	              }
 	            })
 		});
@@ -335,6 +338,7 @@
 			}
 		}
 		
+
 		// Clears subject, predicate, object input fields
 		function clearInput() {
 			if (document.getElementById('dbmsTabID').getAttribute('class') == "active"){
