@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -28,7 +27,7 @@
 		<li id="aboutTabID"><a data-toggle="tab" href="#aboutID">About</a></li>
 		<!-- Start Dropdown -->
 		<li class="pull-right" class="dropdown">
-		    <a class="dropdown-toggle" style="max-height: 10px" data-toggle="dropdown" href="#"> 
+		    <a class="dropdown-toggle" style="max-height: 40px" data-toggle="dropdown" href="#"> 
 			<span class="glyphicon glyphicon-cog"></span>
 		    <span class="caret"></span></a>
 			
@@ -43,7 +42,12 @@
 			  </div>
 			  <!-- Reasoning and Inference -->
 			  <div class="checkbox">
-			    <label><input id="riID" type="checkbox" value="">Reasoning & Inference</label>
+			    <label><input id="riID" type="checkbox" value="">owl:sameAs Reasoning & Inference</label>
+			  </div>
+			  <!-- Inference Rule Name -->
+			  <div class="checkbox">
+			    <label><input id="ruleNameID" type="checkbox" value="">Inference Rule</label> <br>
+				<input type="text" style="max-width: 130px" value="urn:ifp:inference:rule" id="infRuleNameID">
 			  </div>
 			  <!-- Console Print Commands Checkbox  -->
 			  <div class="checkbox">
@@ -191,7 +195,7 @@
 		<!-- Start About Tab -->
 	    <div id="aboutID" class="tab-pane fade">
 		  	<div class="container">
-				<p style="padding-top: 10px"> Generic SPARQL Data Entry Form 5.0.7 <br>
+				<p style="padding-top: 10px"> Generic SPARQL Data Entry Form 1.0.4<br>
 					Description: Simple Data Entry Form that helps unravel the power of RDF and SPARQL with regards to Structured Data creation and interaction. <br> 
 					Creator: <a href="https://jordan.solid.openlinksw.com:8444/profile/card#me">Jordan Idehen</a> (<a href="https://github.com/jidehen#this">Github</a>, <a href="https://www.linkedin.com/in/jordan-idehen-143934157/#this">LinkedIn</a>) <br>
 					Supervisor: <a href="https://github.com/OpenLinkSoftware#this">OpenLink Software</a> 
@@ -304,7 +308,7 @@
 
 	                  solid_storage = await fetchProfile(session.webId);
 	                  sessionStorage.setItem('solid_storage', solid_storage);
-	                  // Added by Sergey -- re async call handling for solid_storage assignment
+                      // Added by Sergey -- re async call handling for solid_storage assignment
                       await docNameValue()
 	                }
 
@@ -314,7 +318,6 @@
 	                loggedHref.title = ''
 	                solid_storage = null;
 	                sessionStorage.removeItem('solid_storage');
-	                await docNameValue()
 	              }
 	            })
 		});
@@ -338,7 +341,6 @@
 			}
 		}
 		
-
 		// Clears subject, predicate, object input fields
 		function clearInput() {
 			if (document.getElementById('dbmsTabID').getAttribute('class') == "active"){
@@ -475,8 +477,10 @@
 			} else if (document.getElementById('fsTabID').getAttribute('class') == "active"){
 				var str = document.getElementById("subjectID2").value ;
 			}
-		
-			if (regexp.test(str) && !isBlankNode(str)) {
+			
+			if (str.charAt(0) == '<' && str.charAt(str.length-1) == '>') {
+				return str ;
+			} else if (regexp.test(str) && !isBlankNode(str)) {
 				return '<' + str + '>' ; // Case: input is a uri. Solution: quote it
 			} else if (str.charAt(0) == "#") {
 				return '<' + str + '>' ; // Case: input is an unquoted relative uri. Solution: quote it
@@ -488,10 +492,7 @@
 				return str ; // checks if input is a variable for deletion
 			}
 			else {
-				if (str.charAt(0) == '<' && str.charAt(str.length-1) == '>') {
-					var newStr = str.slice(1,-1); // Case: input is quoted uri. Solution: must be unquotted to be recognize as a uri by regexp
-					return formatSubject(newStr) ;
-				} else if (isBlankNode(str)) {
+				 if (isBlankNode(str)) {
 					return isBlankNode(str) ; // Case: input is a blank node. Solution: return it as is
 				} else {
 					return ':' + str ; // Case: input is not a uri or a blank node. Solution: make it a relative uri
@@ -617,7 +618,7 @@
 		}
 	
 		// This function formats the Object input. Comments are inline
-		async function validateObject() {
+		async function validateObject(str) {
 			var range = await predicateRange() ; // function waits until range is a value rather than a promise
 			var str = tabCheck("objectID", "objectID2") ;
 		
@@ -626,7 +627,10 @@
 			}
 		
 			if (!range) {
-				if (regexp.test(str) && !isBlankNode(str)) {
+				if (str.charAt(0) == '<' && str.charAt(str.length-1) == '>') { //Case: input is already qutoed uri. Return as is
+					return str
+				} else if (regexp.test(str) && !isBlankNode(str)) {
+					console.log("CASE 1 HIT")
 					return '<' + str + '>' ; // Case: input is a uri. Solution: quote it
 				} else if (str.charAt(0) == "#") {
 					return '<' + str + '>' ; // Case: input is an unquoted relative uri. Solution: quote it
@@ -636,12 +640,7 @@
 					return str; // Case: input is a curie. Solution: return it as is
 				} 
 				else {
-					if (str.charAt(0) == '<' && str.charAt(str.length-1) == '>') {
-						var newStr = str.slice(1,-1); // Case: input is quoted uri. Solution: must be unquotted to be recognize as a uri by regexp
-						return validateObject(newStr) ;
-					} else {
-						return ':' + str ; // Case: input is not a uri or a blank node. Solution: make it a relative uri
-					}
+					return ':' + str ; // Case: input is not a uri or a blank node. Solution: make it a relative uri
 		        }
 			} 
 			else {
@@ -768,7 +767,7 @@
 	        };
 		
 			try {
-		        var resp = await fetch(url, options);
+		        var resp = await fetch(url,options);
 				if (resp.status >= 200 && resp.status <= 300) {
 					console.log(resp.status + " - " + resp.statusText) ;
 					updateTable() ;
@@ -822,7 +821,7 @@
                                 body: delete_cmd,
             };
 			try {
-				var resp = await fetch(url, options);
+				var resp = await fetch(url,options);
 				if (resp.status >= 200 && resp.status <= 300) {
 					console.log(resp.status + " - " + resp.statusText);
 					updateTable() ;
@@ -867,7 +866,9 @@
 			}
 			
 			if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
-				query = "define input:same-as" + '"yes" \n' + query ;
+				query = "DEFINE input:same-as" + '"yes" \n' + query ;
+			} else if (document.getElementById("ruleNameID").checked == true) {
+				query = "DEFINE input:inference" + ' ' + "'" + document.getElementById("infRuleNameID").value + "'" + ' \n' + query ;
 			}
 			
 			
@@ -889,7 +890,7 @@
 	                            crossDomain: true,
 	                        };
 			try {
-		        var resp = await fetch(url, options)
+		        var resp = await fetch(url,options)
 			
 				.then((res) => res.json())
 		        .then( data =>{
@@ -924,7 +925,6 @@
 		            }	
 		            else{
 						hideSpinner() ;
-						throw new Error("No Data Returned");
 						console.log("No data returned by query");
 		            }
 				})
@@ -965,7 +965,9 @@
 			}
 			
 			if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
-				query = "define input:same-as" + '"yes" \n' + query ;
+				query = "DEFINE input:same-as" + '"yes" \n' + query ;
+			} else if (document.getElementById("ruleNameID").checked == true) {
+				query = "DEFINE input:inference" + ' ' + "'" + document.getElementById("infRuleNameID").value + "'" + ' \n' + query ;
 			}
 			
 			var endpoint = tabCheck("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
@@ -986,7 +988,7 @@
 	                            crossDomain: true,
 	                        };
 			try {
-		        var resp = await fetch(url, options)
+		        var resp = await fetch(url,options)
 			
 				.then((res) => res.json())
 		        .then( data =>{
@@ -1039,7 +1041,6 @@
 		            }
 		            else{
 						hideSpinner() ;
-						throw new Error("No Data Returned");
 						console.log("No data returned by query");
 		            }
 				})
@@ -1065,7 +1066,9 @@
 			}
 			
 			if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
-				data_query = "define input:same-as" + '"yes" \n' + data_query ;
+				data_query = "DEFINE input:same-as" + '"yes" \n' + data_query ;
+			} else if (document.getElementById("ruleNameID").checked == true) {
+				data_query = "DEFINE input:inference" + ' ' + "'" + document.getElementById("infRuleNameID").value + "'" + ' \n' + data_query ;
 			}
 
             var endpoint = tabCheck("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
@@ -1088,7 +1091,7 @@
 	                        };
 			
 			try {
-		        var resp = await fetch(url, options)
+		        var resp = await fetch(url,options)
 	
 				.then((res) => res.json())
 		        .then( data =>{
@@ -1183,7 +1186,7 @@
 	        };
 		
 			try {
-				const resp = await fetch(url, options); // resp awaits completion of fetch 
+				const resp = await fetch(url,options); // resp awaits completion of fetch 
 			
 				if (resp.status >= 200 && resp.status <= 300) {
 					console.log(resp.status + " - " + resp.statusText);
@@ -1228,7 +1231,7 @@
 	        };
 		
 			try {
-		        var resp = await fetch(url, options);
+		        var resp = await solid.auth.fetch(url,options);
 				if (resp.status >= 200 && resp.status <= 300) {
 					hideSpinner() ;
 					console.log(resp.status + " - " + resp.statusText);
@@ -1273,7 +1276,7 @@
 	        };
 		
 			try {
-		        var resp = await fetch(url, options);
+		        var resp = await solid.auth.fetch(url,options);
 				if (resp.status >= 200 && resp.status <= 300) {
 					hideSpinner() ;
 					console.log(resp.status + " - " + resp.statusText);
@@ -1337,7 +1340,7 @@
                              crossDomain: true,
                          };
            try {
-               var resp = await solid.auth.fetch(url, options);
+               var resp = await solid.auth.fetch(url,options);
                if (resp.ok) {
  		  var body = await resp.text();
  		  var contentType = resp.headers.get('content-type');
