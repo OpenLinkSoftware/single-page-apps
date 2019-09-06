@@ -980,11 +980,11 @@
 			
 			if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
 			    var query = 
-				"SELECT DISTINCT COUNT(*) AS ?count FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
+				"SELECT COUNT(*) AS ?count FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
 			} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
 				// Use of Sponger Pragma to force document reload during query evaluation
 				var query = 
-				"DEFINE get:soft" + " " + '"soft"' + "\n" + "SELECT DISTINCT COUNT(*) AS ?count FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
+				"DEFINE get:soft" + " " + '"soft"' + "\n" + "SELECT COUNT(*) AS ?count FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
 			}
 			
 			if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
