@@ -1,6 +1,3 @@
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -11,7 +8,7 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 		<!-- Latest compiled JavaScript -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-		<!-- Authentication and RDF procssing library -->
+		<!-- Authentication and RDF processing library -->
 		<script src="./common/js/solid-auth-client.bundle.js"></script> 
 	    <!-- <script src="https://cdn.jsdelivr.net/npm/solid-auth-client@2.3.0/dist-lib/solid-auth-client.bundle.js"></script> -->
 		<!-- <script src="./common/js/rdflib.min.js"></script> -->
@@ -96,13 +93,13 @@
 		  				<form id="dbmsFormID" class="form" method="post">
 		  					<div class="form-group">
 		  						<label for="subjectID">Subject</label>
-		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="If the subject is not a URI it will be used as the fragment identifier of a Relative URI."></span> 
+		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="If the subject is not a URI, it will be used as the fragment identifier of a Relative URI."></span> 
 		  						<input type="text" class="form-control" placeholder="Subject" id="subjectID">
 		  						<p class="errorMessage" id="subjectErrorID" ></p>
 		  					</div>
 		  					<div class="form-group">
 		  						<label for="predicateID">Predicate</label>
-		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The predicate can either be a URI (ex. http://xmlns.com/foaf/0.1/name) or a curie (ex. foaf:name) because these are preloaded in Virtuoso."></span> 
+		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The predicate can either be a URI (e.g., http://xmlns.com/foaf/0.1/name) or a curie (e.g., foaf:name) because these are preloaded in Virtuoso."></span> 
 		  						<input type="text" class="form-control" placeholder="Predicate" id="predicateID">
 		  						<p class="errorMessage" id="predicateErrorID" ></p>
 		  					</div>
@@ -167,13 +164,13 @@
 		  				<form id="fsFormID" class="form" method="post">
 		  					<div class="form-group">
 		  						<label for="subjectID2">Subject</label>
-		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="If the subject is not a URI it will be used as the fragment identifier of a Relative URI."></span> 
+		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="If the subject is not a URI, it will be used as the fragment identifier of a Relative URI."></span> 
 		  						<input type="text" class="form-control" placeholder="Subject" id="subjectID2">
 		  						<p class="errorMessage" id="subjectErrorID2" ></p>
 		  					</div>
 		  					<div class="form-group">
 		  						<label for="predicateID2">Predicate</label>
-		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The predicate can either be a URI (ex. http://xmlns.com/foaf/0.1/name) or a curie (ex. foaf:name) because these are preloaded in Virtuoso."></span> 
+		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The predicate can either be a URI (e.g., http://xmlns.com/foaf/0.1/name) or a curie (e.g., foaf:name) because these are preloaded in Virtuoso."></span> 
 		  						<input type="text" class="form-control" placeholder="Predicate" id="predicateID2">
 		  						<p class="errorMessage" id="predicateErrorID2" ></p>
 		  					</div>
@@ -357,8 +354,8 @@
 		});
 		
 		/* Gets the solid storage from window > application > session storage 
-		so it can be used as the document name for functions 
-		function is called when page is loaded/reloaded */
+		so it can be used as the document name for functions. 
+		Function is called when page is loaded/reloaded. */
 		async function docNameValue() {
 			solid_storage = await sessionStorage.getItem("solid_storage")
 			var solid_storage_value = solid_storage + "mydata.ttl" ;
@@ -434,22 +431,22 @@
 		// Regular Expression for URIs
 		const regexp = /(https|http|mailto|tel|dav|ftp|ftps|urn)[:^/s]/i;
 
-		// This function validates the uri used for PATCH
+		// This function validates the URI used for PATCH
 		document.getElementById("docNameID2").addEventListener("input", docNameValidation);
 		function docNameValidation() {
 			var str = document.getElementById("docNameID2").value ;
 		 
 			try {
-				if (regexp.test(str)) { //removes error for valid uri
+				if (regexp.test(str)) { //removes error for valid URI
 					errorMessage("docNameErrorID2", "") ; 
 					removeInputColor('docNameID2') ;
 				} else {
 					setInputColor("docNameID2") ;
-					errorMessage("docNameErrorID2", "Document name must be a full uri for patch method") ; 
-					throw new Error("Document Name must be a full uri for patch method"); // Throws error because input is not a valid uri
+					errorMessage("docNameErrorID2", "Document name must be a full URI for patch method") ; 
+					throw new Error("Document Name must be a full URI for patch method"); // Throws error because input is not a valid URI
 				}
 			} catch(e) {
-				console.error('Invalid uri', e) ;
+				console.error('Invalid URI', e) ;
 			}
 		}
 	
@@ -466,7 +463,7 @@
 		
 		// Function checks if input contains a language tag
 		function langTag(str) {
-			const langexp = /@[a-zA-Z][a-zA-Z]/ ; // regexp for languge tag ex. @en
+			const langexp = /@[a-zA-Z][a-zA-Z]/ ; // regexp for language tag, e.g., @en
 			if (langexp.test(str)) {
 				return true ;
 			} else {
@@ -492,7 +489,7 @@
 				} else if (str.includes("^^")) {
 					return str ;
 				} else if (str.charAt(0) == "'" && str.charAt(str.length-1) == "'") {
-					return str // If string begins and ends with single quote return it as is
+					return str // If string begins and ends with single quote, return it as is
 				} else if (str.charAt(0) == '"' && str.charAt(str.length-1) == '"') {
 					return str ;	
 				} else if (str.indexOf(' ') >= 0){
@@ -519,11 +516,11 @@
 			if (str.charAt(0) == '<' && str.charAt(str.length-1) == '>') {
 				return str ;
 			} else if (regexp.test(str) && !isBlankNode(str)) {
-				return '<' + str + '>' ; // Case: input is a uri. Solution: quote it
+				return '<' + str + '>' ; // Case: input is a URI. Solution: quote it
 			} else if (str.charAt(0) == "#") {
-				return '<' + str + '>' ; // Case: input is an unquoted relative uri. Solution: quote it
+				return '<' + str + '>' ; // Case: input is an unquoted relative URI. Solution: quote it
 			} else if (str.charAt(0) == '<' && str.charAt(1) == '#' && str.charAt(str.length-1) == '>') { 
-				return str ; // Case: input is already a relative uri. Solution: return it as is
+				return str ; // Case: input is already a relative URI. Solution: return it as is
 			} else if (str.includes(":")) {
 				return str ; // Case: input is a curie. Solution: return it as is
 			} else if (str.charAt(0) == "?") {
@@ -533,7 +530,7 @@
 				 if (isBlankNode(str)) {
 					return isBlankNode(str) ; // Case: input is a blank node. Solution: return it as is
 				} else {
-					return ':' + str ; // Case: input is not a uri or a blank node. Solution: make it a relative uri
+					return ':' + str ; // Case: input is not a URI or a blank node. Solution: make it a relative URI
 				}
 	        }
 		}
@@ -594,11 +591,11 @@
 		function formatPredicate() {
 			var str = checkValue("predicateID", "predicateID2") ;
 			if (regexp.test(str) && !isBlankNode(str)) {
-				return '<' + str + '>' ; // Case: input is a uri. Solution: quote it
+				return '<' + str + '>' ; // Case: input is a URI. Solution: quote it
 			} else if (str.charAt(0) == "#") {
-				return '<' + str + '>' ; // Case: input is an unquoted relative uri. Solution: quote it
+				return '<' + str + '>' ; // Case: input is an unquoted relative URI. Solution: quote it
 			} else if (str.charAt(0) == '<' && str.charAt(1) == '#' && str.charAt(str.length-1) == '>') { 
-				return str ; // Case: input is already a relative uri. Solution: return it as is
+				return str ; // Case: input is already a relative URI. Solution: return it as is
 			} else if (str.includes(":")) {
 				return str; // Case: input is a curie. Solution: return it as is
 			} else if (str.charAt(0) == "?") {
@@ -606,10 +603,10 @@
 			}
 			else {
 				if (str.charAt(0) == '<' && str.charAt(str.length-1) == '>') {
-					var newStr = str.slice(1,-1); // Case: input is quoted uri. Solution: must be unquotted to be recognize as a uri by regexp
+					var newStr = str.slice(1,-1); // Case: input is quoted URI. Solution: must be unquoted to be recognized as a URI by regexp
 					return formatPredicate(newStr) ;
 				} else {
-					return ':' + str ; // Case: input is not a uri or a blank node. Solution: make it a relative uri
+					return ':' + str ; // Case: input is not a URI or a blank node. Solution: make it a relative URI
 				}
 	        }
 		}
@@ -665,19 +662,19 @@
 			}
 		
 			if (!range) {
-				if (str.charAt(0) == '<' && str.charAt(str.length-1) == '>') { //Case: input is already qutoed uri. Return as is
+				if (str.charAt(0) == '<' && str.charAt(str.length-1) == '>') { //Case: input is already quoted URI. Return it as is
 					return str
 				} else if (regexp.test(str) && !isBlankNode(str)) {
-					return '<' + str + '>' ; // Case: input is a uri. Solution: quote it
+					return '<' + str + '>' ; // Case: input is a URI. Solution: quote it
 				} else if (str.charAt(0) == "#") {
-					return '<' + str + '>' ; // Case: input is an unquoted relative uri. Solution: quote it
+					return '<' + str + '>' ; // Case: input is an unquoted relative URI. Solution: quote it
 				} else if (str.charAt(0) == '<' && str.charAt(1) == '#' && str.charAt(str.length-1) == '>') { 
-					return str ; // Case: input is already a relative uri. Solution: return it as is
+					return str ; // Case: input is already a relative URI. Solution: return it as is
 				} else if (str.includes(":")) {
 					return str; // Case: input is a curie. Solution: return it as is
 				} 
 				else {
-					return ':' + str ; // Case: input is not a uri or a blank node. Solution: make it a relative uri
+					return ':' + str ; // Case: input is not a URI or a blank node. Solution: make it a relative URI
 		        }
 			} 
 			else {
@@ -690,23 +687,23 @@
 			var str = checkValue("objectID", "objectID2") ;
 		
 			if (regexp.test(str) && !isBlankNode(str)) {
-				return '<' + str + '>' ; // Case: input is a uri. Solution: quote it
+				return '<' + str + '>' ; // Case: input is a URI. Solution: quote it
 			} else if (str.charAt(0) == "#") {
-				return '<' + str + '>' ; // Case: input is an unquoted relative uri. Solution: quote it
+				return '<' + str + '>' ; // Case: input is an unquoted relative URI. Solution: quote it
 			} else if (str.charAt(0) == '<' && str.charAt(1) == '#' && str.charAt(str.length-1) == '>') { 
-				return str ; // Case: input is already a relative uri. Solution: return it as is
+				return str ; // Case: input is already a relative URI. Solution: return it as is
 			} else if (str.includes(":")) {
 				return str; // Case: input is a curie. Solution: return it as is
 			} else if (str.charAt(0) == "?") {
 				return str ; // checks if input is a variable for deletion
 			} else if (str.charAt(0) == '<' && str.charAt(str.length-1) == '>') {
-					var newStr = str.slice(1,-1); // Case: input is quoted uri. Solution: must be unquotted to be recognize as a uri by regexp
+					var newStr = str.slice(1,-1); // Case: input is quoted URI. Solution: must be unquoted to be recognized as a URI by regexp
 					return nonvalidatedObject(newStr) ;
 			} else if (str.includes('"') || str.includes("'") || str.indexOf(' ') >= 0) {
 				return formatLiteral(str) ; // Case: input is a quoted literal value
 			}
 			else {
-				return ':' + str ; // Case: input is not a uri or a blank node. Solution: make it a relative uri
+				return ':' + str ; // Case: input is not a URI or a blank node. Solution: make it a relative URI
 				} 			
 		}
 		
@@ -738,7 +735,7 @@
 				}
 			} 
 			
-			if (tableexp.test(str)) { // if str is an absolute or relative uri
+			if (tableexp.test(str)) { // if str is an absolute or relative URI
 				str = '<a href="' + str + '">' + strLabel + '</a>'
 				return str
 			}
@@ -747,7 +744,7 @@
 			}
 		}
 		
-		// This function is used to referesh the table when view data is clicked
+		// This function is used to refresh the table when view data is clicked
 		function refreshTable() {
 			var table = checkId("dbmsTableID", "fsTableID") ;
 
@@ -980,11 +977,11 @@
 			
 			if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
 			    var query = 
-				"SELECT COUNT(*) AS ?count FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
+				"SELECT (COUNT(*) AS ?count) FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
 			} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
 				// Use of Sponger Pragma to force document reload during query evaluation
 				var query = 
-				"DEFINE get:soft" + " " + '"soft"' + "\n" + "SELECT COUNT(*) AS ?count FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
+				"DEFINE get:soft" + " " + '"soft"' + "\n" + "SELECT (COUNT(*) AS ?count) FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
 			}
 			
 			if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
@@ -1426,7 +1423,7 @@
 			await buttonDisplay() ;  
 		}
 	
-		// This function fetches the query results and returns them in json
+		// This function fetches the query results and returns them in JSON
 	    async function updateTable() {
 			resultMode = "all" ;
 			await setLimit() ;
@@ -1554,11 +1551,11 @@
 			+"}" 		
 			
             var endpoint = checkValue("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
-			// This sets the url for retrieving the json
+			// This sets the URL for retrieving the JSON
 	        let url = endpoint + encodeURIComponent(range_query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ; 
 
 			if (document.getElementById("cmdID").checked == true) {
-		        console.log("Recieving Predicate Range From: " + url);
+		        console.log("Receiving Predicate Range From: " + url);
 				console.log("Query" + range_query);
 			}
 	        
