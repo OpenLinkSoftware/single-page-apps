@@ -1,0 +1,1223 @@
+l
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title> Downloads Form </title>
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+		<!-- jQuery library -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<!-- Latest compiled JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+		<!-- Authentication and RDF procssing library -->
+		<script src="./common/js/solid-auth-client.bundle.js"></script> 
+	    <!-- <script src="https://cdn.jsdelivr.net/npm/solid-auth-client@2.3.0/dist-lib/solid-auth-client.bundle.js"></script> -->
+		<!-- <script src="./common/js/rdflib.min.js"></script> -->
+		<script src="https://cdn.jsdelivr.net/npm/rdflib@0.20.1/dist/rdflib.min.js"></script>
+	</head>
+
+	<body onload="onLoad()">
+	<!-- Button feedback spinner -->
+	<div id="spinner"></div>
+	<!-- Start of tabs container -->
+	<div class="container">
+	  <!-- Create tabs menu -->
+	  <ul class="nav nav-tabs">
+		<!-- Start Options Dropdown -->
+		<li class="pull-right" class="dropdown">
+		    <a class="dropdown-toggle" style="max-height: 10px" data-toggle="dropdown" href="#"> 
+			<span class="glyphicon glyphicon-cog"></span>
+		    <span class="caret"></span></a>
+			
+		    <ul class="dropdown-menu">
+			  <!-- Place holder -->
+			  <div class="checkbox">
+			    <label><input id="placeholderID" type="checkbox" value="">Placeholder</label>
+			  </div>
+                          <!-- Console Print Commands Checkbox  -->
+                          <div class="checkbox">
+                            <label><input id="cmdID" type="checkbox" value="">Console Log Commands</label>
+                          </div>
+		    </ul>
+		  </li>
+		  <!-- End Dropdown -->
+		  <a id="logged-href" href="" title="" style="margin-top: 5px; margin-left: 15px;" class="pull-right" class="hidden"><img id="uid-icon" src="./common/uid.png"></a>
+		  <li class="pull-right"> <button id="loginID" style="margin-top: 5px" type="button" onclick="authLogin()" class="hidden btn btn-primary">Login</button> </li>
+		  <li class="pull-right"><button id="logoutID" style="margin-top: 5px" type="button" onclick="authLogout()" class="hidden btn btn-danger">Logout</button></li>
+		  
+	  </ul>
+	  <!-- End of tabs menu -->
+  
+	  <div class="container">
+		  				<h1 style="text-align:center">Heading?</h1>
+                                                <span id="messageSpanID"></span>
+		  				<form id="downloadFormID" class="form" method="post">
+		  					<div class="form-group">
+		  	    <div class="row">
+		  	        <div class="col-xs-6">
+
+                                                                <label for="applicationNameID">Application Name </label>
+                                                                <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Select the data consuming application."></span>
+                                                                <select id="applicationNameID" class="form-control" name="applicationName" onchange="appNameSelected(this)">
+                                                                <option value="selectMessage" selected> -- select an application -- </option>
+                                                                </select>
+		  						<p class="errorMessage" id="applicationNameErrorID" ></p>
+                                                                <label for="applicationVersion">Full Version (if known)</label>
+                                                                <br />
+		  						<input size="20" id="applicationVersionID" name="applicationVersion"></input>
+		  	        </div>
+		  	        <div class="col-xs-6">
+	                                                        <label for="appHostOsFamID">Application Host OS Family</label>
+                                                                <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Select an operating system family."></span>
+                                                                <select id="appHostOsFamID" class="form-control" name="appHostOsFam" onchange="appHostOsFamSelected(this)" >
+                                                                <option value="selectMessage" disabled selected> -- select operating system family -- </option>
+                                                                </select>
+		  						<p class="errorMessage" id="appHostOsFamErrorID" ></p>
+
+	                                                        <label for="appHostOsID">Application Host OS</label>
+                                                                <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Select an operating system."></span>
+                                                                <select id="appHostOsID" class="form-control" disabled name="appHostOs" onchange="appHostOsSelected(this)" >
+                                                                <option value="selectMessage" disabled selected> -- select operating system -- </option>
+                                                                </select>
+		  						<p class="errorMessage" id="appHostOsErrorID" ></p>
+                                                                <label for="appHostOsVersion">Full Version (if known)</label>
+                                                                <br />
+		  						<input size="20" id="appHostOsVersionID" name="appHostOsVersion"></input>
+		  	        </div>
+		  	    </div>
+                                <hr>
+		  	    <div class="row">
+		  	        <div class="col-xs-6">
+                                                                <label for="databaseServerFamID">Database Server Type </label>
+                                                                <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Select the database server type."></span>
+                                                                <select id="databaseServerFamID" class="form-control" name="databaseServerFam" onchange="databaseServerFamSelected(this)" >
+                                                                <option value="selectMessage" disabled selected> -- select the database server type -- </option>
+                                                                </select>
+		  						<p class="errorMessage" id="databaseServerFamErrorID" ></p>
+
+                                                                <label for="databaseServerID">Database Server </label>
+                                                                <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Select the database server."></span>
+                                                                <select id="databaseServerID" class="form-control" name="databaseServer" onchange="databaseServerSelected(this)" >
+                                                                <option value="selectMessage" disabled selected> -- select the database server -- </option>
+                                                                </select>
+		  						<p class="errorMessage" id="databaseServerErrorID" ></p>
+                                                                <label for="dbmsVersion">Full Version (if known)</label>
+                                                                <br />
+		  						<input size="20" id="dbmsVersionID" name="dbmsVersion"></input>
+		  	        </div>
+		  	        <div class="col-xs-6">
+	                                                        <label for="dbmsHostOsFamID">Database Server Host OS Family</label>
+                                                                <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Select an operating system family."></span>
+                                                                <select id="dbmsHostOsFamID" class="form-control" name="dbmsHostOsFam" onchange="dbmsHostOsFamSelected(this)" >
+                                                                <option value="selectMessage" disabled selected> -- select operating system family -- </option>
+                                                                </select>
+		  						<p class="errorMessage" id="dbmsHostOsFamErrorID" ></p>
+
+	                                                        <label for="dbmsHostOsID">Database Server Host OS</label>
+                                                                <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Select an operating system."></span>
+                                                                <select id="dbmsHostOsID" class="form-control" disabled name="dbmsHostOs" onchange="dbmsHostOsSelected(this)" >
+                                                                <option value="selectMessage" disabled selected> -- select operating system -- </option>
+                                                                </select>
+		  						<p class="errorMessage" id="dbmsHostOsErrorID" ></p>
+                                                                <label for="dbmsHostOsVersion">Full Version (if known)</label>
+                                                                <br />
+		  						<input size="20" id="dbmsHostOsVersionID" name="dbmsHostOsVersion"></input>
+		  	        </div>
+		  	    </div>
+                                <hr>
+		  					<!-- Start Buttons -->
+		  					<div class=button-wrapper>
+		  					<span>
+							<button id="clearBtnID" type="button" onclick="clearInput()" class="btn btn-primary">Clear</button>
+		  					<button id="downloadBtnID" type="button" onclick="findDownloads()" class="btn btn-success" disabled>Find downloads</button>
+							</span>
+		  					</div>
+		  					<!-- End Buttons -->
+		  				</form>
+		  				<!-- End of Form Div -->
+				
+		  	    </div>
+                            <div>
+                            <span id="resultAreaID"> </span>
+		  	    </div>
+		
+	  </div>
+	</div>
+	
+	<!-- Error Display CSS -->
+	<style>
+		/* sets input field red if invalid */
+		.error {
+		  border:2px solid red;
+		}
+	
+		/* sets error message color red */
+		.errorMessage {
+			color:red;
+		}
+	
+		/* wraps text in table */
+		td {
+		  word-wrap: break-word;
+		}
+	</style>
+	
+	<!-- Spinner CSS -->
+	<style>
+		#spinner{
+		    position:fixed;
+		    width:100%;
+		    left:0;right:0;top:0;bottom:0;
+		    background-color: rgba(255,255,255,0.7);
+		    z-index:9999;
+		    display:none;
+		}
+
+		@keyframes spin {
+		  from {
+		      transform: rotate(0deg);
+		  } to {
+		      transform: rotate(360deg);
+		  }
+		}
+		
+		#spinner::after {
+		    content:'';
+		    display:block;
+		    position:absolute;
+		    left:48%;top:40%;
+		    width:40px;height:40px;
+		    border-style:solid;
+		    border-color:black;
+		    border-top-color:transparent;
+		    border-width: 4px;
+		    border-radius:50%;
+		    -webkit-animation: spin .8s linear infinite;
+		    animation: spin .8s linear infinite;
+		}
+	</style>
+	
+	<!-- Dropdown menu CSS-->
+	<style>
+		.dropdown-menu {
+		   padding-left: 15px;
+		}
+		.glyphicon.glyphicon-cog {
+		    font-size: 20px;
+		}
+	</style>
+	
+	<!-- Spinner Javascript -->
+	<script>
+		function showSpinner() {
+		  document.getElementById("spinner").className = "show";
+		}
+		
+		function hideSpinner() {
+		  document.getElementById("spinner").className = document.getElementById("spinner").className.replace("show", "");
+		}
+	</script>
+
+	<!-- These Functions Modify the Onscreen Display -->
+	<script>
+                var solid_storage = null; 
+
+		//Tooltip activation function
+		$(document).ready(function(){
+		    $('[data-toggle="tooltip"]').tooltip({
+		        placement : 'right'
+		    }); 
+
+		  const loginButton = document.getElementById('loginID');
+		  const logoutButton = document.getElementById('logoutID');
+
+		  solid.auth.trackSession(async (session) => {
+	              const loggedHref = document.getElementById('logged-href')
+	              const loggedIn = !!session
+	              loginButton.classList.toggle('hidden', loggedIn)
+	              logoutButton.classList.toggle('hidden', !loggedIn)
+	              if (loggedIn) {
+	                if (session.webId) {
+	                  loggedHref.classList.remove('hidden')
+	                  loggedHref.href = session.webId
+	                  loggedHref.title = session.webId
+
+	                  solid_storage = await fetchProfile(session.webId);
+	                  sessionStorage.setItem('solid_storage', solid_storage);
+	                }
+
+	              } else {
+	                loggedHref.classList.add('hidden')
+	                loggedHref.href = ''
+	                loggedHref.title = ''
+	                solid_storage = null;
+	                sessionStorage.removeItem('solid_storage');
+	              }
+	            })
+		});
+		
+	</script>
+
+	<!-- These Functions are Used to Display Validation Errors -->
+	<script>
+		// Function is used to remove input field border color
+		function setInputColor(id) {
+			document.getElementById(id).className = document.getElementById(id).className + " error";  // this adds the error class
+		}
+	
+		// Function is used to remove input field border color
+		function removeInputColor(id) {
+			document.getElementById(id).className = "form-control"; // removes error class
+		}
+	
+		// Function is used to display error message
+		function errorMessage(id, error) {
+			document.getElementById(id).innerHTML = error ; 
+		}
+	</script>
+
+	<!-- These Functions Handle the Form Validation -->
+	<script>
+
+	</script>
+	
+	<!-- These Functions Handle the Functionality of the Page -->
+	<script>
+
+                //var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
+                //var endpoint = "https://localhost/sparql?default-graph-uri=&query=" ;
+                var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
+                var graph = "urn:openlink:download:search:record" ;
+
+                function onLoad() {
+                          clearInput()
+                }
+
+                function clearInput(){
+                  document.getElementById("messageSpanID").textContent = "";
+                  resultAreaReset();
+                  applicationNameSelectorReset();
+                  appHostOsFamSelectorReset();
+                  appHostOsSelectorReset();
+                  databaseServerFamSelectorReset();
+                  databaseServerSelectorReset();
+                  dbmsHostOsFamSelectorReset();
+                  dbmsHostOsSelectorReset();
+                  applicationVersionReset();
+                  appHostOsVersionReset();
+                  dbmsVersionReset();
+                  dbmsHostOsVersionReset();
+                  populateApplicationNameSelector();
+                  populateAppHostOsFamSelector();
+                  populateDatabaseServerSelector();
+                  populateDbmsHostOsFamSelector();
+                  checkAllSelected();
+                }
+
+                function applicationVersionReset () {
+                  var applicationVersion = document.getElementById("applicationVersionID");
+                  applicationVersion.value = "";
+                }
+
+                function appHostOsVersionReset () {
+                  var appHostOsVersion = document.getElementById("appHostOsVersionID");
+                  appHostOsVersion.value = "";
+                }
+
+                function dbmsVersionReset () {
+                  var dbmsVersion = document.getElementById("dbmsVersionID");
+                  dbmsVersion.value = "";
+                }
+
+                function dbmsHostOsVersionReset () {
+                  var dbmsHostOsVersion = document.getElementById("dbmsHostOsVersionID");
+                  dbmsHostOsVersion.value = "";
+                }
+
+                function resultAreaReset() {
+                  var resultArea = document.getElementById("resultAreaID");
+                  var child = resultArea.lastElementChild;  
+                  while (child) { 
+                    resultArea.removeChild(child); 
+                    child = resultArea.lastElementChild; 
+                  } 
+                }
+
+                function applicationNameSelectorReset() {
+                    var applicationName = document.getElementById("applicationNameID");
+ 
+                    applicationName.innerHTML = '';
+                    var selectOption = document.createElement('option');
+                    selectOption.value = 'selectMessage';
+                    selectOption.innerHTML = ' -- select an application -- ';
+                    selectOption.disabled = true;
+                    selectOption.selected = true;
+                    applicationName.appendChild(selectOption);
+                }
+  
+                function appHostOsFamSelectorReset() {
+                    var appHostOsFam = document.getElementById("appHostOsFamID");
+
+                    appHostOsFam.innerHTML = '';
+                    var selectOption = document.createElement('option');
+                    selectOption.value = 'selectMessage';
+                    selectOption.innerHTML = ' -- select operating system family -- ';
+                    selectOption.disabled = true;
+                    selectOption.selected = true;
+                    appHostOsFam.appendChild(selectOption);
+                    appHostOsFam.disabled = true;
+                }
+
+                function appHostOsSelectorReset() {
+                    var appHostOs = document.getElementById("appHostOsID");
+
+                    appHostOs.innerHTML = '';
+                    var selectOption = document.createElement('option');
+                    selectOption.value = 'selectMessage';
+                    selectOption.innerHTML = ' -- select operating system -- ';
+                    selectOption.disabled = true;
+                    selectOption.selected = true;
+                    appHostOs.appendChild(selectOption);
+                    appHostOs.disabled = true;
+                }
+
+                function databaseServerFamSelectorReset() {
+                    var databaseServerFam = document.getElementById("databaseServerFamID");
+ 
+                    databaseServerFam.innerHTML = '';
+                    var selectOption = document.createElement('option');
+                    selectOption.value = 'selectMessage';
+                    selectOption.innerHTML = ' -- select a database server type -- ';
+                    selectOption.disabled = true;
+                    selectOption.selected = true;
+                    databaseServerFam.appendChild(selectOption);
+                }
+
+                function databaseServerSelectorReset() {
+                    var databaseServer = document.getElementById("databaseServerID");
+ 
+                    databaseServer.innerHTML = '';
+                    var selectOption = document.createElement('option');
+                    selectOption.value = 'selectMessage';
+                    selectOption.innerHTML = ' -- select a database server -- ';
+                    selectOption.disabled = true;
+                    selectOption.selected = true;
+                    databaseServer.appendChild(selectOption);
+                }
+
+                function dbmsHostOsFamSelectorReset() {
+                    var dbmsHostOsFam = document.getElementById("dbmsHostOsFamID");
+
+                    dbmsHostOsFam.innerHTML = '';
+                    var selectOption = document.createElement('option');
+                    selectOption.value = 'selectMessage';
+                    selectOption.innerHTML = ' -- select operating system family -- ';
+                    selectOption.disabled = true;
+                    selectOption.selected = true;
+                    dbmsHostOsFam.appendChild(selectOption);
+                    dbmsHostOsFam.disabled = true;
+                }
+
+                function dbmsHostOsSelectorReset() {
+                    var dbmsHostOs = document.getElementById("dbmsHostOsID");
+
+                    dbmsHostOs.innerHTML = '';
+                    var selectOption = document.createElement('option');
+                    selectOption.value = 'selectMessage';
+                    selectOption.innerHTML = ' -- select operating system -- ';
+                    selectOption.disabled = true;
+                    selectOption.selected = true;
+                    dbmsHostOs.appendChild(selectOption);
+                    dbmsHostOs.disabled = true;
+                }
+                async function populateApplicationNameSelector() {
+                       showSpinner() ;
+
+                       applicationNameSelectorReset();
+                       applicationVersionReset();
+
+                       var query =     
+                           "prefix oplsof: <http://www.openlinksw.com/ontology/software#> \n"
+                           + "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
+                           + "select distinct \n"
+                           + "  ?applicationProgram \n"
+                           + "  ?applicationProgramLabel \n"
+                           + "where { \n"
+                           + " ?applicationProgram a oplsof:ApplicationProgram . \n"
+                           + " ?applicationProgram rdfs:label ?applicationProgramLabel . \n"
+                           + "}" ;
+
+                       let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
+                       const options = {
+                                    method: 'GET',
+                                    headers: {
+                                               'Content-type': 'application/sparql-results+json; charset=UTF-8',
+                                                                                 },
+                                    credentials: 'include',
+                                    mode: 'cors',
+                                    crossDomain: true,
+                                };
+                        try {
+                        var resp = await fetch(url, options)
+                        
+                                .then((res) => res.json())
+                        .then( data =>{
+                            if (data.results.bindings.length > 0){
+                                var applicationName = document.getElementById("applicationNameID");
+                                var applications = data.results.bindings;
+                                for (i in applications) {
+                                    var opt = document.createElement('option');
+                                    opt.value = applications[i].applicationProgram.value;
+                                    opt.innerHTML = applications[i].applicationProgramLabel.value;
+                                    applicationName.appendChild(opt);
+                                }
+                                applicationName.style.display = '';
+                                applicationName.disabled = false;
+                                hideSpinner() ;
+                            }
+                            else {
+                                hideSpinner() ;
+                                throw new Error("No applications found");
+                                console.log("No applications found");
+                            }
+                                })
+                       } catch(e) {
+                                hideSpinner() ;
+                                console.error('Query Failed getting applications ', e) ;
+                                alert('Query Failed getting applications ' + e)
+                        }                  
+
+                }
+
+                async function populateDatabaseServerSelector() {
+                       showSpinner() ;
+
+                       databaseServerFamSelectorReset();
+                       databaseServerSelectorReset();
+                       dbmsVersionReset();
+
+                       var query =     
+                           "prefix oplsof: <http://www.openlinksw.com/ontology/software#> \n"
+                           + "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
+                           + "select distinct \n"
+                           + "  ?databaseServer \n"
+                           + "  xsd:string(?name) as ?databaseServerLabel \n"
+                           + "where { \n"
+                           + " ?databaseServer a oplsof:DbmsFamily . \n"
+                           + " ?databaseServer <http://schema.org/name> ?name . \n" 
+                           + " ?databaseServer oplsof:hasDatabaseEngine ?databaseServerFamily . \n"
+                           + "} order by ?databaseServerLabel" ;
+                       //var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
+                       let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
+                       const options = {
+                                    method: 'GET',
+                                    headers: {
+                                               'Content-type': 'application/sparql-results+json; charset=UTF-8',
+                                                                                 },
+                                    credentials: 'include',
+                                    mode: 'cors',
+                                    crossDomain: true,
+                                };
+                        try {
+                        var resp = await fetch(url, options)
+                        
+                                .then((res) => res.json())
+                        .then( data =>{
+                            if (data.results.bindings.length > 0){
+                                var databaseServerFam = document.getElementById("databaseServerFamID");
+                                var results = data.results.bindings;
+                                for (i in results) {
+                                    var opt = document.createElement('option');
+                                    opt.value = results[i].databaseServer.value;
+                                    opt.innerHTML = results[i].databaseServerLabel.value;
+                                    databaseServerFam.appendChild(opt);
+                                }
+                                databaseServerFam.style.display = '';
+                                databaseServerFam.disabled = false;
+                                hideSpinner() ;
+                            }
+                            else {
+                                hideSpinner() ;
+                                throw new Error("No database servers found");
+                                console.log("No database servers found");
+                            }
+                                })
+                       } catch(e) {
+                                hideSpinner() ;
+                                console.error('Query Failed getting database servers ', e) ;
+                                alert('Query Failed getting database servers ' + e)
+                        }                  
+
+                }
+
+                async function populateAppHostOsFamSelector() {
+                       showSpinner() ;
+
+                       appHostOsFamSelectorReset();
+                       appHostOsVersionReset();
+
+                       var query =     
+                           "prefix oplsof: <http://www.openlinksw.com/ontology/software#> \n"
+                           + "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
+                           + "select distinct \n"
+                           + "  ?opsysFamily \n"
+                           + "   xsd:string(?name) as ?opsysFamilyLabel \n"
+                           + "where { \n"
+                           + " ?opsysFamily a oplsof:OpsysFamily . \n"
+                           + " ?opsysFamily rdfs:label ?name . \n" 
+                           + " ?opsysFamily oplsof:hasOperatingSystem ?os . \n" 
+                           + "} order by ?opsysFamilyLabel" ;
+                       //var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
+                       let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
+                       const options = {
+                                    method: 'GET',
+                                    headers: {
+                                               'Content-type': 'application/sparql-results+json; charset=UTF-8',
+                                                                                 },
+                                    credentials: 'include',
+                                    mode: 'cors',
+                                    crossDomain: true,
+                                };
+                        try {
+                        var resp = await fetch(url, options)
+                        
+                                .then((res) => res.json())
+                        .then( data =>{
+                            if (data.results.bindings.length > 0){
+                                var opsysFamily = document.getElementById("appHostOsFamID");
+                                var results = data.results.bindings;
+                                for (i in results) {
+                                    var opt = document.createElement('option');
+                                    opt.value = results[i].opsysFamily.value;
+                                    opt.innerHTML = results[i].opsysFamilyLabel.value;
+                                    opsysFamily.appendChild(opt);
+                                }
+                                opsysFamily.style.display = '';
+                                opsysFamily.disabled = false;
+                                hideSpinner() ;
+                            }
+                            else {
+                                hideSpinner() ;
+                                throw new Error("No operating system families found");
+                                console.log("No operating system families found");
+                            }
+                                })
+                       } catch(e) {
+                                hideSpinner() ;
+                                console.error('Query Failed getting operating system families ', e) ;
+                                alert('Query Failed getting operating system families ' + e)
+                        }                  
+
+                }
+
+                async function populateDbmsHostOsFamSelector() {
+                       showSpinner() ;
+
+                       dbmsHostOsFamSelectorReset();
+                       dbmsHostOsVersionReset();
+
+                       var query =     
+                           "prefix oplsof: <http://www.openlinksw.com/ontology/software#> \n"
+                           + "prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
+                           + "select distinct \n"
+                           + "  ?opsysFamily \n"
+                           + "   xsd:string(?name) as ?opsysFamilyLabel \n"
+                           + "where { \n"
+                           + " ?opsysFamily a oplsof:OpsysFamily . \n"
+                           + " ?opsysFamily rdfs:label ?name . \n" 
+                           + " ?opsysFamily oplsof:hasOperatingSystem ?os . \n" 
+                           + "} order by ?opsysFamilyLabel" ;
+                       //var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
+                       let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
+                       const options = {
+                                    method: 'GET',
+                                    headers: {
+                                               'Content-type': 'application/sparql-results+json; charset=UTF-8',
+                                                                                 },
+                                    credentials: 'include',
+                                    mode: 'cors',
+                                    crossDomain: true,
+                                };
+                        try {
+                        var resp = await fetch(url, options)
+                        
+                                .then((res) => res.json())
+                        .then( data =>{
+                            if (data.results.bindings.length > 0){
+                                var opsysFamily = document.getElementById("dbmsHostOsFamID");
+                                var results = data.results.bindings;
+                                for (i in results) {
+                                    var opt = document.createElement('option');
+                                    opt.value = results[i].opsysFamily.value;
+                                    opt.innerHTML = results[i].opsysFamilyLabel.value;
+                                    opsysFamily.appendChild(opt);
+                                }
+                                opsysFamily.style.display = '';
+                                opsysFamily.disabled = false;
+                                hideSpinner() ;
+                            }
+                            else {
+                                hideSpinner() ;
+                                throw new Error("No operating system families found");
+                                console.log("No operating system families found");
+                            }
+                                })
+                       } catch(e) {
+                                hideSpinner() ;
+                                console.error('Query Failed getting operating system families ', e) ;
+                                alert('Query Failed getting operating system families ' + e)
+                        }                  
+
+                }
+
+                async function dbmsHostOsFamSelected(opsysFamily) {
+                       showSpinner() ;
+
+                       dbmsHostOsSelectorReset();
+                       resultAreaReset();
+                       dbmsHostOsVersionReset();
+
+                       var query =     
+                           "DEFINE input:same-as \"yes\" \n"
+                           + "prefix oplsof: <http://www.openlinksw.com/ontology/software#> \n"
+                           + "select distinct \n"
+                           + "  ?opSystem \n"
+                           + "  xsd:string(?name) as ?opSystemLabel \n"
+                           + " where { \n"
+                           + " ?opSystem a oplsof:OperatingSystem . \n"
+                           + " ?opSystem oplsof:OperatingSystemCommercialName ?name . \n"
+                           + " ?opsysFamily oplsof:hasOperatingSystem ?opSystem .  \n"
+                           + " filter (?opsysFamily = <" + opsysFamily.value + ">) . \n"
+                           + "} order by ?opSystem ";
+                       //var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
+                       let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
+                       const options = {
+                                    method: 'GET',
+                                    headers: {
+                                               'Content-type': 'application/sparql-results+json; charset=UTF-8',
+                                                                                 },
+                                    credentials: 'include',
+                                    mode: 'cors',
+                                    crossDomain: true,
+                                };
+                        try {
+                        var resp = await fetch(url, options)
+                        
+                                .then((res) => res.json())
+                        .then( data =>{
+                            if (data.results.bindings.length > 0){
+                                var dbmsHostOs = document.getElementById("dbmsHostOsID");
+                                var results = data.results.bindings;
+                                for (i in results) {
+                                    var opt = document.createElement('option');
+                                    opt.value = results[i].opSystem.value;
+                                    if (results[i].opSystemLabel)
+                                      opt.innerHTML = results[i].opSystemLabel.value;
+                                    else 
+                                      opt.innerHTML = results[i].opSystem.value;
+                                    dbmsHostOs.appendChild(opt);
+                                }
+                                dbmsHostOs.style.display = '';
+                                dbmsHostOs.disabled = false;
+                                hideSpinner() ;
+                            }
+                            else {
+                                hideSpinner() ;
+                                throw new Error("No operating systems found");
+                                console.log("No operating systems found");
+                            }
+                                })
+                        } catch(e) {
+                                hideSpinner() ;
+                                console.error('Query Failed getting operating system families ', e) ;
+                                alert('Query Failed getting operating system families ' + e)
+                        }                  
+                }
+
+
+                async function appHostOsFamSelected(opsysFamily) {
+                       showSpinner() ;
+
+                       appHostOsSelectorReset();
+                       resultAreaReset();
+                       appHostOsVersionReset();
+
+                       var query =     
+                           "DEFINE input:same-as \"yes\" \n"
+                           + "prefix oplsof: <http://www.openlinksw.com/ontology/software#> \n"
+                           + "select distinct \n"
+                           + "  ?opSystem \n"
+                           + "  xsd:string(?name) as ?opSystemLabel \n"
+                           + " where { \n"
+                           + " ?opSystem a oplsof:OperatingSystem . \n"
+                           + " ?opSystem oplsof:OperatingSystemCommercialName ?name . \n"
+                           + " ?opsysFamily oplsof:hasOperatingSystem ?opSystem .  \n"
+                           + " filter (?opsysFamily = <" + opsysFamily.value + ">) . \n"
+                           + "} order by ?opSystem ";
+                       //var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
+                       //var endpoint = "https://localhost/sparql?default-graph-uri=&query=" ;
+                       let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
+                       const options = {
+                                    method: 'GET',
+                                    headers: {
+                                               'Content-type': 'application/sparql-results+json; charset=UTF-8',
+                                                                                 },
+                                    credentials: 'include',
+                                    mode: 'cors',
+                                    crossDomain: true,
+                                };
+                        try {
+                        var resp = await fetch(url, options)
+                        
+                                .then((res) => res.json())
+                        .then( data =>{
+                            if (data.results.bindings.length > 0){
+                                var appHostOs = document.getElementById("appHostOsID");
+                                var results = data.results.bindings;
+                                for (i in results) {
+                                    var opt = document.createElement('option');
+                                    opt.value = results[i].opSystem.value;
+                                    if (results[i].opSystemLabel)
+                                      opt.innerHTML = results[i].opSystemLabel.value;
+                                    else 
+                                      opt.innerHTML = results[i].opSystem.value;
+                                    appHostOs.appendChild(opt);
+                                }
+                                appHostOs.style.display = '';
+                                appHostOs.disabled = false;
+                                hideSpinner() ;
+                            }
+                            else {
+                                hideSpinner() ;
+                                throw new Error("No operating systems found");
+                                console.log("No operating systems found");
+                            }
+                                })
+                        } catch(e) {
+                                hideSpinner() ;
+                                console.error('Query Failed getting operating system families ', e) ;
+                                alert('Query Failed getting operating system families ' + e)
+                        }                  
+                }
+
+                async function databaseServerFamSelected(databaseServerFam) {
+                       showSpinner() ;
+
+                       databaseServerSelectorReset();
+                       resultAreaReset();
+                       dbmsVersionReset();
+
+                       var query =     
+                           "prefix oplsof: <http://www.openlinksw.com/ontology/software#> \n"
+                           + "select distinct \n"
+                           + "  ?databaseServer \n"
+                           + "  xsd:string(?name) as ?databaseServerLabel \n"
+                           + "where { \n"
+                           + " ?databaseServer a oplsof:DbmsEngine . \n"
+                           + " ?databaseServer <http://schema.org/name> ?name . \n" 
+                           + " ?databaseServer oplsof:hasDatabaseFamily ?databaseServerFamily . \n"
+                           + " filter (?databaseServerFamily = <" + databaseServerFam.value + ">) . \n"
+                           + "} order by ?databaseServerLabel" ;
+                       //var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
+                       let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
+                       const options = {
+                                    method: 'GET',
+                                    headers: {
+                                               'Content-type': 'application/sparql-results+json; charset=UTF-8',
+                                                                                 },
+                                    credentials: 'include',
+                                    mode: 'cors',
+                                    crossDomain: true,
+                                };
+                        try {
+                        var resp = await fetch(url, options)
+                        
+                                .then((res) => res.json())
+                        .then( data =>{
+                            if (data.results.bindings.length > 0){
+                                var databaseServer = document.getElementById("databaseServerID");
+                                var results = data.results.bindings;
+                                for (i in results) {
+                                    var opt = document.createElement('option');
+                                    opt.value = results[i].databaseServer.value;
+                                    opt.innerHTML = results[i].databaseServerLabel.value;
+                                    databaseServer.appendChild(opt);
+                                }
+                                databaseServer.style.display = '';
+                                databaseServer.disabled = false;
+                                hideSpinner() ;
+                            }
+                            else {
+                                hideSpinner() ;
+                                throw new Error("No database engines found");
+                                console.log("No database engines found");
+                            }
+                                })
+                       } catch(e) {
+                                hideSpinner() ;
+                                console.error('Query Failed getting database engines ', e) ;
+                                alert('Query Failed getting database engines ' + e)
+                        }                  
+
+                }
+
+                async function appNameSelected(appName) {
+                  resultAreaReset();
+                  checkAllSelected();
+                }
+
+                async function appHostOsSelected(appHostOs) {
+                  resultAreaReset();
+                  checkAllSelected();
+                }
+
+                async function databaseServerSelected(databaseServer) {
+                  resultAreaReset();
+                  checkAllSelected();
+                }
+
+                async function dbmsHostOsSelected(dbmsHostOs) {
+                  resultAreaReset();
+                  checkAllSelected();
+                }
+
+                function checkAllSelected() {
+                  applicationName =  document.getElementById("applicationNameID");
+                  appHostOsFam =  document.getElementById("appHostOsFamID");
+                  appHostOs =  document.getElementById("appHostOsID");
+                  databaseServerFam =  document.getElementById("databaseServerFamID");
+                  databaseServer =  document.getElementById("databaseServerID");
+                  dbmsHostOsFam =  document.getElementById("dbmsHostOsFamID");
+                  dbmsHostOs =  document.getElementById("dbmsHostOsID");
+
+                  if (applicationName.value == 'selectMessage' ||
+                      appHostOsFam.value == 'selectMessage' ||
+                      appHostOs.value == 'selectMessage' ||
+                      databaseServerFam.value == 'selectMessage' ||
+                      databaseServer.value == 'selectMessage' ||
+                      dbmsHostOsFam.value == 'selectMessage' ||
+                      dbmsHostOs.value == 'selectMessage')
+                    //return;
+                    document.getElementById("downloadBtnID").disabled = true;
+                  else 
+                    //findDownloads();
+                    document.getElementById("downloadBtnID").disabled = false;
+                }
+
+                function findDownloads() {
+                       showSpinner() ;
+
+                       resultAreaReset();
+                       recordSearch();
+
+                       getMTAgentInstallers();
+                       getLiteInstallers();
+                }
+
+              
+                async function recordSearch() {
+
+                       applicationName = document.getElementById("applicationNameID");
+                       applicationVersion = document.getElementById("applicationVersionID");
+                       appHostOs = document.getElementById("appHostOsID");
+                       appHostOsVersion = document.getElementById("appHostOsVersionID");
+                       databaseServer = document.getElementById("databaseServerID");
+                       dbmsVersion = document.getElementById("dbmsVersionID");
+                       dbmsHostOs = document.getElementById("dbmsHostOsID");
+                       dbmsHostOsVersion = document.getElementById("dbmsHostOsVersionID");
+                       
+                       var searchURI = window.location.origin + '/search/' + Date.now();
+                       
+                       var insert_cmd = 
+                         "PREFIX schema: <http://schema.org/>\n" 
+                         + "PREFIX ecrm: <http://www.openlinksw.com/ontology/ecrm#>\n" 
+                         + "INSERT INTO GRAPH <" + graph + "> \n{\n" 
+                         + "<" + searchURI + "> a ecrm:DownloadSearch ; \n"
+                         + "ecrm:hasDatabaseEngine <" + databaseServer.value + "> ; \n"
+                         + "ecrm:hasDbmsVersion \"" + dbmsVersion.value + "\" ; \n"
+                         + "ecrm:hasApplication <" + applicationName.value + "> ; \n"
+                         + "ecrm:hasApplicationVersion \"" + applicationVersion.value + "\" ; \n"
+                         + "ecrm:hasServer <" + dbmsHostOs.value + "> ; \n"
+                         + "ecrm:hasServerVersion \"" + dbmsHostOsVersion.value + "\" ; \n"
+                         + "ecrm:hasClient <" + appHostOs.value + "> ; \n"
+                         + "ecrm:hasClientVersion \"" + appHostOsVersion.value + "\" ; \n"
+                         + "ecrm:hasTimestamp `bif:curutcdatetime()` . \n"
+                         + "}";
+                        
+                       //var endpoint = document.getElementById("endpointID").value ;
+                       //var sparul_endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
+                       //var sparul_endpoint = "https://localhost/sparql" ;
+                       var sparul_endpoint = "https://ods-qa.openlinksw.com/sparql" ;
+
+                       let url = sparul_endpoint;
+                        
+                       if (document.getElementById("cmdID").checked == true) {
+                        console.log("endpoint for Target SPARUL Service: " + endpoint);
+                        console.log(insert_cmd);        
+                       }
+                        
+                       const options = {
+                                    method: 'POST',
+                                    headers: {
+                                               'Content-type': 'application/sparql-update; charset=UTF-8',
+                                                                                 },
+                                    credentials: 'include',
+                                    mode: 'cors',
+                                    crossDomain: true,
+                                    body: insert_cmd,
+                       };
+                
+                       try {
+                      var resp = await fetch(url,options);
+                                if (resp.status >= 200 && resp.status <= 300) {
+                                        console.log(resp.status + " - " + resp.statusText) ;
+                                        hideSpinner() ;
+                                } else {
+                                        throw new Error("Error " + resp.status +" - " + resp.statusText) ;
+                                        hideSpinner() ;
+                                }
+
+                       } catch(e) {
+                                hideSpinner() ;
+                                console.error('Insert Failed', e) ;
+                                alert('Insert Failed ' + e)
+                       }  
+
+ 
+                }
+
+                async function getMTAgentInstallers() {
+
+                       databaseServerFam = document.getElementById("databaseServerFamID");
+                       databaseServer = document.getElementById("databaseServerID");
+                       appHostOs = document.getElementById("appHostOsID");
+                       dbmsHostOs = document.getElementById("dbmsHostOsID");
+
+                       var query =     
+                           "DEFINE input:same-as \"yes\" \n"
+                           + "select distinct ?version ?title ?url \n"
+                           + "where { \n"
+                           + "?installer a <http://www.openlinksw.com/ontology/installers#InstallerArchive> . \n"
+                           + "?installer <http://schema.org/name> ?title . \n"
+                           + "?installer <http://schema.org/downloadUrl> ?url . \n"
+                           + "?installer <http://www.openlinksw.com/ontology/software#hasDatabaseEngine> <" + databaseServer.value + "> . \n"
+                           + "?installer <http://www.openlinksw.com/ontology/software#hasOperatingSystem> <" + dbmsHostOs.value + "> . \n"
+                           + "?installer <http://www.openlinksw.com/ontology/installers#hasInstallerArchiveCategory> <http://data.openlinksw.com/oplweb/component_category/MTServerDBInstaller#this> . \n"
+                           + "?installer <http://www.openlinksw.com/ontology/products#versionText> ?version . \n"
+                           + "} order by ?version ";
+                       //var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
+                       let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
+
+                       const options = {
+                                    method: 'GET',
+                                    headers: {
+                                               'Content-type': 'application/sparql-results+json; charset=UTF-8',
+                                                                                 },
+                                    credentials: 'include',
+                                    mode: 'cors',
+                                    crossDomain: true,
+                                };
+                        try {
+                        var resp = await fetch(url, options)
+                                .then((res) => res.json())
+                        .then( data =>{
+                            if (data.results.bindings.length > 0){
+                                var resultArea = document.getElementById("resultAreaID");
+                                var results = data.results.bindings;
+                                var heading = document.createElement('h2');
+                                heading.innerHTML = "Multitier Agent Installers"; 
+                                var list = document.createElement('ul');
+                                for (i in results) {
+                                    var item = document.createElement('li');
+                                    var link = document.createElement('a');
+                                    link.innerHTML = results[i].title.value;
+                                    link.href = results[i].url.value;
+                                    item.innerHTML = "Release " + results[i].version.value + " ";
+                                    item.appendChild(link);
+                                    list.appendChild(item);
+                                }
+                                resultArea.appendChild(heading);
+                                resultArea.appendChild(list);
+                                hideSpinner() ;
+                            }
+                            else {
+                                //throw new Error("No MT downloads found");
+                                console.log("No MT downloads found");
+                                var resultArea = document.getElementById("resultAreaID");
+                                var heading = document.createElement('h2');
+                                heading.innerHTML = "Multitier Agent Installers"; 
+                                var infoMessage = document.createElement('p');
+                                infoMessage.innerHTML = "No multitier downloads found";
+                                resultArea.appendChild(heading);
+                                resultArea.appendChild(infoMessage);
+                                hideSpinner() ;
+                            }
+                        })
+                        } catch(e) {
+                                console.error('Error getting lite installers ', e) ;
+                                alert('Error getting installers ' + e)
+                        }                  
+                }
+
+
+                async function getLiteInstallers() {
+
+                       databaseServerFam = document.getElementById("databaseServerFamID");
+                       databaseServer = document.getElementById("databaseServerID");
+                       appHostOs = document.getElementById("appHostOsID");
+                       dbmsHostOs = document.getElementById("dbmsHostOsID");
+
+                       var query =     
+                           "DEFINE input:same-as \"yes\" \n"
+                           + "select distinct ?version ?title ?url \n"
+                           + "where { \n"
+                           + "?installer a <http://www.openlinksw.com/ontology/installers#InstallerArchive> . \n"
+                           + "?installer <http://schema.org/name> ?title . \n"
+                           + "?installer <http://schema.org/downloadUrl> ?url . \n"
+                           + "?installer <http://www.openlinksw.com/ontology/software#hasDatabaseEngine> <" + databaseServer.value + "> . \n"
+                           + "?installer <http://www.openlinksw.com/ontology/software#hasOperatingSystem> <" + appHostOs.value + "> . \n"
+                           + "?installer <http://www.openlinksw.com/ontology/installers#hasInstallerArchiveCategory> <http://data.openlinksw.com/oplweb/component_category/STLiteInstaller#this> . \n"
+                           + "?installer <http://www.openlinksw.com/ontology/products#versionText> ?version . \n"
+                           + "} order by ?version ";
+                       //var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
+                       let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
+
+                       const options = {
+                                    method: 'GET',
+                                    headers: {
+                                               'Content-type': 'application/sparql-results+json; charset=UTF-8',
+                                                                                 },
+                                    credentials: 'include',
+                                    mode: 'cors',
+                                    crossDomain: true,
+                                };
+                        try {
+                        var resp = await fetch(url, options)
+                                .then((res) => res.json())
+                        .then( data =>{
+                            if (data.results.bindings.length > 0){
+                                var resultArea = document.getElementById("resultAreaID");
+                                var results = data.results.bindings;
+                                var heading = document.createElement('h2');
+                                heading.innerHTML = "Lite Installers"; 
+                                var list = document.createElement('ul');
+                                for (i in results) {
+                                    var item = document.createElement('li');
+                                    var link = document.createElement('a');
+                                    link.innerHTML = results[i].title.value;
+                                    link.href = results[i].url.value;
+                                    item.innerHTML = "Release " + results[i].version.value + " ";
+                                    item.appendChild(link);
+                                    list.appendChild(item);
+                                }
+                                resultArea.appendChild(heading);
+                                resultArea.appendChild(list);
+                                hideSpinner() ;
+                            }
+                            else {
+                                //throw new Error("No lite downloads found");
+                                console.log("No lite downloads found");
+                                var resultArea = document.getElementById("resultAreaID");
+                                var heading = document.createElement('h2');
+                                heading.innerHTML = "Lite Installers"; 
+                                var infoMessage = document.createElement('p');
+                                infoMessage.innerHTML = "No lite downloads found";
+                                resultArea.appendChild(heading);
+                                resultArea.appendChild(infoMessage);
+                                hideSpinner() ;
+                            }
+                        })
+                        } catch(e) {
+                                console.error('Error getting lite installers ', e) ;
+                                alert('Error getting installers ' + e)
+                        }                  
+                }
+
+	</script>
+	<!-- These functions are used for Authentication -->
+	<script>
+        async function fetchProfile(webId) {
+           try {
+             var rc = await loadProfile(webId);
+
+             var uriObj = new URL(webId)
+             uriObj.hash = uriObj.search = uriObj.query = '';
+
+             var base = uriObj.toString()
+             const kb = $rdf.graph()
+
+             $rdf.parse(rc.profile, kb, base, rc.content_type);
+
+             const LDP = $rdf.Namespace("http://www.w3.org/ns/ldp#");
+             const PIM = $rdf.Namespace("http://www.w3.org/ns/pim/space#");
+
+             const s_webId = $rdf.sym(webId)
+
+             uriObj.pathname = '/';
+             var ret = uriObj.toString();
+
+             var store = kb.any(s_webId, PIM('storage'));
+             var inbox = kb.any(s_webId, LDP('inbox'));
+             if (inbox)
+               ret = inbox.value;
+             else if (store)
+               ret = store.value;
+
+             return ret;
+           } catch(e) {
+			   console.error('Error', e)
+			   alert('Error ', e)
+			   return null;
+           }
+        }
+
+        async function loadProfile(url) {
+           const options = {
+                             method: 'GET',
+                             headers: {'Accept': 'text/turtle, application/ld+json'},
+                             credentials: 'include',
+                             mode: 'cors',
+                             crossDomain: true,
+                         };
+           try {
+               var resp = await solid.auth.fetch(url, options);
+               if (resp.ok) {
+ 		  var body = await resp.text();
+ 		  var contentType = resp.headers.get('content-type');
+ 		  return {profile: body, contentType};
+               } 
+ 	      else {
+ 	        console.log("Error " + resp.status +" - " + resp.statusText)
+               }
+           } 
+ 	  catch(e) {
+		  console.error('Request failed', e)
+		  alert('Request failed ', e)
+           }
+        }
+
+        async function authLogin() {
+            const popupUri = './common/popup.html'
+
+            const session = await solid.auth.popupLogin({ popupUri })
+            if (session) {
+                // Make authenticated request to the server to establish a session cookie
+               const {status} = await solid.auth.fetch(location, { method: 'HEAD' })
+
+               if (status === 401) {
+                   alert(`Invalid login.\n\nDid you set ${session.idp} as your OIDC provider in your profile ${session.webId}?`)
+                   await solid.auth.logout()
+               }
+               // Now that we have a cookie, reload to display the authenticated page
+               location.reload()
+            }
+        }
+       
+        async function authLogout () {
+            await solid.auth.logout()
+            location.reload()
+        }
+	</script>
+  </body>
+</html>
+
