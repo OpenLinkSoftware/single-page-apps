@@ -1,4 +1,3 @@
-l
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -44,6 +43,7 @@ l
 		  <a id="logged-href" href="" title="" style="margin-top: 5px; margin-left: 15px;" class="pull-right" class="hidden"><img id="uid-icon" src="./common/uid.png"></a>
 		  <li class="pull-right"> <button id="loginID" style="margin-top: 5px" type="button" onclick="authLogin()" class="hidden btn btn-primary">Login</button> </li>
 		  <li class="pull-right"><button id="logoutID" style="margin-top: 5px" type="button" onclick="authLogout()" class="hidden btn btn-danger">Logout</button></li>
+		  <li class="pull-right"><a id="permalinkID">Permalink</a></li>
 		  
 	  </ul>
 	  <!-- End of tabs menu -->
@@ -289,8 +289,32 @@ l
                 var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
                 var graph = "urn:openlink:download:search:record" ;
 
+                var initialApplicationName = "";
+                var initialDatabaseServerFam = "";
+                var initialDatabaseServer = "";
+                var initialAppHostOsFam = "";
+                var initialAppHostOs = "";
+                var initialDbmsHostOsFam = "";
+                var initialDbmsHostOs = "";
+
                 function onLoad() {
-                          clearInput()
+                  // check for params - if so set the dropdowns and get the downloads
+                  var queryString = window.location.search;
+                  var params = new URLSearchParams(queryString);
+                  var getResults = params.get("getResults");
+
+                  if (getResults == "true") {
+                       initialApplicationName = decodeURIComponent(params.get("applicationName"));
+                       initialDatabaseServerFam = decodeURIComponent(params.get("databaseServerFam"));
+                       initialDatabaseServer = decodeURIComponent(params.get("databaseServer"));
+                       initialAppHostOsFam = decodeURIComponent(params.get("appHostOsFam"));
+                       initialAppHostOs = decodeURIComponent(params.get("appHostOs"));
+                       initialDbmsHostOsFam = decodeURIComponent(params.get("dbmsHostOsFam"));
+                       initialDbmsHostOs = decodeURIComponent(params.get("dbmsHostOs"));
+                       handlePermalink();
+                  } else {
+                    clearInput()
+                  }
                 }
 
                 function clearInput(){
@@ -861,6 +885,108 @@ l
 
                 }
 
+                async function handlePermalink() {
+                  var applicationName = document.getElementById("applicationNameID");
+                  var appHostOsFam = document.getElementById("appHostOsFamID");
+                  var appHostOs = document.getElementById("appHostOsID");
+                  var databaseServerFam = document.getElementById("databaseServerFamID");
+                  var databaseServer = document.getElementById("databaseServerID");
+                  var dbmsHostOsFam = document.getElementById("dbmsHostOsFamID");
+                  var dbmsHostOs = document.getElementById("dbmsHostOsID");
+
+                  document.getElementById("messageSpanID").textContent = "";
+                  resultAreaReset();
+                  applicationNameSelectorReset();
+                  appHostOsFamSelectorReset();
+                  appHostOsSelectorReset();
+                  databaseServerFamSelectorReset();
+                  databaseServerSelectorReset();
+                  dbmsHostOsFamSelectorReset();
+                  dbmsHostOsSelectorReset();
+                  applicationVersionReset();
+                  appHostOsVersionReset();
+                  dbmsVersionReset();
+                  dbmsHostOsVersionReset();
+                  await populateApplicationNameSelector();
+                  await populateAppHostOsFamSelector();
+                  await populateDatabaseServerSelector();
+                  await populateDbmsHostOsFamSelector();
+
+                  if (initialApplicationName != "") {
+                    applicationName.value = initialApplicationName;
+                    initialApplicationName = "";
+                  }
+
+                  if (initialAppHostOsFam != "") {
+                    appHostOsFam.value = initialAppHostOsFam;
+                    initialAppHostOsFam = "";
+                    await appHostOsFamSelected(appHostOsFam);
+                  }
+
+                  if (initialAppHostOs != "") {
+                    appHostOs.value = initialAppHostOs;
+                    initialAppHostOs = "";
+                  }
+
+                  if (initialDatabaseServerFam != "") {
+                    databaseServerFam.value = initialDatabaseServerFam;
+                    initialDatabaseServerFam = "";
+                    await databaseServerFamSelected(databaseServerFam);
+                  }
+
+                  if (initialDatabaseServer != "") {
+                    databaseServer.value = initialDatabaseServer;
+                    initialDatabaseServer = "";
+                  }
+
+                  if (initialDbmsHostOsFam != "") {
+                    dbmsHostOsFam.value = initialDbmsHostOsFam;
+                    initialDbmsHostOsFam = "";
+                    await dbmsHostOsFamSelected(dbmsHostOsFam);
+                  }
+
+                  if (initialDbmsHostOs != "") {
+                    dbmsHostOs.value = initialDbmsHostOs;
+                    initialDbmsHostOs = "";
+                  }
+
+                  checkAllSelected();
+                  findDownloads();
+                }
+
+
+                async function initializeApplicationNameSelector() {
+                  var applicationName = document.getElementById("applicationNameID");
+                  if (initialApplicationName != "") {
+                    applicationName.value = initialApplicationName;
+                    initialApplicationName = "";
+                  }
+                }
+
+                async function initializeAppHostOsFamSelector() {
+                  var opsysFamily = document.getElementById("appHostOsFamID");
+                  if (initialAppHostOsFam != "") {
+                    opsysFamily.value = initialAppHostOsFam;
+                    initialAppHostOsFam = "";
+                  }
+                }
+
+                async function initializeDatabaseServerSelector() {
+                  var databaseServerFam = document.getElementById("databaseServerFamID");
+                  if (initialDatabaseServerFam != "") {
+                    databaseServerFam.value = initialDatabaseServerFam;
+                    initialDatabaseServerFam = "";
+                  }
+                }
+
+                async function initializeDbmsHostOsFamSelector() {
+                  var opsysFamily = document.getElementById("dbmsHostOsFamID");
+                  if (initialDbmsHostOsFam != "") {
+                    opsysFamily.value = initialDbmsHostOsFam;
+                    initialDbmsHostOsFam = "";
+                  }
+                }
+
                 async function appNameSelected(appName) {
                   resultAreaReset();
                   checkAllSelected();
@@ -896,12 +1022,14 @@ l
                       databaseServerFam.value == 'selectMessage' ||
                       databaseServer.value == 'selectMessage' ||
                       dbmsHostOsFam.value == 'selectMessage' ||
-                      dbmsHostOs.value == 'selectMessage')
+                      dbmsHostOs.value == 'selectMessage') {
                     //return;
                     document.getElementById("downloadBtnID").disabled = true;
-                  else 
+                    resetPermalink();
+                  } else {
                     //findDownloads();
                     document.getElementById("downloadBtnID").disabled = false;
+                  }
                 }
 
                 function findDownloads() {
@@ -912,6 +1040,7 @@ l
 
                        getMTAgentInstallers();
                        getLiteInstallers();
+                       updatePermalink();
                 }
 
               
@@ -1133,6 +1262,32 @@ l
                         }                  
                 }
 
+                function resetPermalink () {
+                       permalink = document.getElementById("permalinkID");
+                       permalink.href = window.location.href;
+                }
+
+                function updatePermalink () {
+
+                       var permalink = document.getElementById("permalinkID");
+                       var applicationName = document.getElementById("applicationNameID");
+                       var appHostOsFam = document.getElementById("appHostOsFamID");
+                       var appHostOs = document.getElementById("appHostOsID");
+                       var databaseServerFam = document.getElementById("databaseServerFamID");
+                       var databaseServer = document.getElementById("databaseServerID");
+                       var dbmsHostOsFam = document.getElementById("dbmsHostOsFamID");
+                       var dbmsHostOs = document.getElementById("dbmsHostOsID");
+
+                       permalink.href = window.location.origin + window.location.pathname;
+                       permalink.href = permalink.href + "?getResults=true&";
+                       permalink.href = permalink.href + "applicationName=" +  encodeURIComponent(applicationName.value) + "&";
+                       permalink.href = permalink.href + "appHostOsFam=" +  encodeURIComponent(appHostOsFam.value) + "&";
+                       permalink.href = permalink.href + "appHostOs=" +  encodeURIComponent(appHostOs.value) + "&";
+                       permalink.href = permalink.href + "databaseServerFam=" +  encodeURIComponent(databaseServerFam.value) + "&";
+                       permalink.href = permalink.href + "databaseServer=" +  encodeURIComponent(databaseServer.value) + "&";
+                       permalink.href = permalink.href + "dbmsHostOsFam=" +  encodeURIComponent(dbmsHostOsFam.value) + "&";
+                       permalink.href = permalink.href + "dbmsHostOs=" +  encodeURIComponent(dbmsHostOs.value);
+                }
 	</script>
 	<!-- These functions are used for Authentication -->
 	<script>
