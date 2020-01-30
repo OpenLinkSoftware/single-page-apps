@@ -13,6 +13,8 @@
 	    <!-- <script src="https://cdn.jsdelivr.net/npm/solid-auth-client@2.3.0/dist-lib/solid-auth-client.bundle.js"></script> -->
 		<!-- <script src="./common/js/rdflib.min.js"></script> -->
 		<script src="https://cdn.jsdelivr.net/npm/rdflib@0.20.1/dist/rdflib.min.js"></script>
+                <!-- Structured data island describing the app -->
+		<script id="dataIslandID" type="application/ld+json"></script>
 	</head>
 
 	<body onload="onLoad()">
@@ -298,6 +300,37 @@
                 var initialDbmsHostOs = "";
 
                 function onLoad() {
+
+                  // build the data island
+                  $("#dataIslandID").text(function() {
+                    return JSON.stringify({
+                      "@context": {
+                        "schema": "http://schema.org/",
+                        "xsd": "http://www.w3.org/2001/XMLSchema#"
+                      },
+                      "@graph": [
+                        {
+                          "@type": "schema:WebPage",
+                          "@id": window.location.origin + window.location.pathname,
+                          "schema:description": "Single page application that allows searching for downloads suitable to a specified environment.",
+                          "schema:name": "OpenLink Downloads Search",
+                          "schema:publisher": "http://www.openlinksw.com/#this" ,
+                          "schema:relatedLink": [
+                            "https://www.openlinksw.com" ,
+                            "https://virtuoso.openlinksw.com" ,
+                            "https://uda.openlinksw.com" ,
+                            "http://osds.openlinksw.com" ,
+                            "http://ods.openlinksw.com" ,
+                            "http://ode.openlinksw.com" ,
+                            "http://osdb.openlinksw.com" ,
+                            "http://osde.openlinksw.com" ,
+                            "http://youid.openlinksw.com" 
+                          ]
+                        }
+                      ]
+                      });
+                  });
+
                   // check for params - if so set the dropdowns and get the downloads
                   var queryString = window.location.search;
                   var params = new URLSearchParams(queryString);
