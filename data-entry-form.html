@@ -1,6 +1,4 @@
 
-<!-- TODO - Add button feedback -->
-
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -12,8 +10,9 @@
 		<!-- Latest compiled JavaScript -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 		<!-- Authentication and RDF procssing library -->
-		<!-- (Old src) <script src="./common/js/solid-auth-client.bundle.js"></script> <script src="./common/js/rdflib.min.js"></script> -->
-		<script src="https://cdn.jsdelivr.net/npm/solid-auth-client@2.3.0/dist-lib/solid-auth-client.bundle.js"></script>
+		<script src="./common/js/solid-auth-client.bundle.js"></script> 
+	    <!-- <script src="https://cdn.jsdelivr.net/npm/solid-auth-client@2.3.0/dist-lib/solid-auth-client.bundle.js"></script> -->
+		<!-- <script src="./common/js/rdflib.min.js"></script> -->
 		<script src="https://cdn.jsdelivr.net/npm/rdflib@0.20.1/dist/rdflib.min.js"></script>
 	</head>
 
@@ -24,8 +23,62 @@
 	<div class="container">
 	  <!-- Create tabs menu -->
 	  <ul class="nav nav-tabs">
-	    <li class="active" id="dbmsTabID"><a data-toggle="tab" href="#dbmsID">DBMS</a></li>
-	    <li id="fsTabID"><a data-toggle="tab" href="#fsID">File System</a></li>
+		<li class="active" id="dbmsTabID"><a data-toggle="tab" href="#dbmsID">DBMS</a></li>
+		<li id="fsTabID"><a data-toggle="tab" href="#fsID">File System</a></li>
+		<li id="aboutTabID"><a data-toggle="tab" href="#aboutID">About</a></li>
+		<!-- Start Dropdown -->
+		<li class="pull-right" class="dropdown">
+		    <a class="dropdown-toggle" style="max-height: 40px" data-toggle="dropdown" href="#"> 
+			<span class="glyphicon glyphicon-cog"></span>
+		    <span class="caret"></span></a>
+			
+		    <ul class="dropdown-menu">
+			  <!-- Faceted Browser Links Checkbox  -->
+			  <div class="checkbox">
+			    <label><input id="fctID" type="checkbox" value="">Faceted Browser Links</label>
+			  </div>
+			  <!-- Full URI Query Results -->
+			  <div class="checkbox">
+			    <label><input id="uriID" type="checkbox" value="">Shortened URI Results</label>
+			  </div>
+			  <!-- Reasoning and Inference -->
+			  <div class="checkbox">
+			    <label><input id="riID" type="checkbox" value="">owl:sameAs Reasoning & Inference</label>
+			  </div>
+			  <!-- Inference Rule Name -->
+			  <div class="checkbox">
+			    <label><input id="ruleNameID" type="checkbox" value="">Inference Rule</label> <br>
+				<input type="text" style="max-width: 250px" value="urn:ifp:inference:rule" id="infRuleNameID">
+			  </div>
+			  <!-- Console Print Commands Checkbox  -->
+			  <div class="checkbox">
+			    <label><input id="cmdID" type="checkbox" value="">Console Log Commands</label>
+			  </div>
+  			  <!-- Number of Results per Page -->
+			  <div class="form-group">
+				  <label style="font-weight: normal" for="resultsID">Results per Page:</label>
+				  <input type="text" style="max-width: 250px" value="5" id="resultsID">
+			  </div>
+			  <h5> Return Data As: </h4>
+			  <!-- Default Download Type -->
+			  <div class="radio">
+			    <label><input id="defaultID" type="radio" name="radiogroup" checked>Default (JSON)</label>
+			  </div>
+  			  <!-- CSV Download Checkbox  -->
+			  <div class="radio">
+			    <label><input id="csvID" type="radio" name="radiogroup">CSV</label>
+			  </div>
+  			  <!-- XML Download Checkbox  -->
+			  <div class="radio">
+			    <label><input id="xmlID" type="radio" name="radiogroup">XML</label>
+			  </div>
+		    </ul>
+		  </li>
+		  <!-- End Dropdown -->
+		  <a id="logged-href" href="" title="" style="margin-top: 5px; margin-left: 15px; max-height: 35px" class="pull-right" class="hidden"><img id="uid-icon" src="./common/uid.png"></a>
+		  <li class="pull-right"> <button id="loginID" style="margin-top: 5px" type="button" onclick="authLogin()" class="hidden btn btn-primary">Login</button> </li>
+		  <li class="pull-right"><button id="logoutID" style="margin-top: 5px" type="button" onclick="authLogout()" class="hidden btn btn-danger">Logout</button></li>
+		  
 	  </ul>
 	  <!-- End of tabs menu -->
   
@@ -75,15 +128,6 @@
 		  					<button id="dataBtnID" type="button" onclick="updateTable()" class="btn btn-info">All Data</button>
 							</span>
 		  					</div>
-							<!-- Start Authentication Buttons -->
-							<br/>
-							<div class="button-wrapper">
-							<button id="loginID" type="button" onclick="authLogin()" class="hidden btn btn-primary">Login</button> 
-							<button id="logoutID" type="button" onclick="authLogout()" class="hidden btn btn-danger">Logout</button> 
-			                <span>&nbsp&nbsp</span>
-							<a id="logged-href" href="" title="" class="hidden"><img id="uid-icon" src="./common/uid.png"></a>
-							</div>
-							<!-- End Authentication Buttons -->
 		  					<!-- End Buttons -->
 		  				</form>
 		  				<!-- End of Form Div -->
@@ -97,6 +141,13 @@
 		  				    <!-- Table is empty because it is created by the updateTable, queryGen, or bnQueryGen method -->
 		  					</div>
 		  				</table>
+						<div class="button-wrapper">
+							<button id="firstBtnID" type="button" onclick="first()" style="background-color: #99A3A4; color: #FDFEFE; margin-right: 5px" class="btn pull-left">First</button>
+							<button id="prevBtnID" type="button" onclick="previous()" style="background-color: #99A3A4; color: #FDFEFE" class="btn pull-left">Prev</button>
+							<button id="lastBtnID" type="button" onclick="last()" style="background-color: #99A3A4; color: #FDFEFE; margin-left: 5px" class="btn pull-right">Last</button>
+							
+							<button id="nextBtnID" type="button" onclick="next()" style="background-color: #99A3A4; color: #FDFEFE" class="btn pull-right ">Next</button>
+						</div>
 		  	        </div>
 		  			<!--Table Div End (Right Side) -->
 		  	    </div>
@@ -142,8 +193,8 @@
 		  					<div class=button-wrapper>
 		  					<span>
 							<button id="clearBtnID" type="button" onclick="clearInput()" class="btn btn-primary">Clear</button>
-							<button id="turtleBtnID2" type="button" onclick="turtleGen()" class="btn btn-success">Add</button>
-							<button id="turtleBtnID2" type="button" onclick="turtleDel()" class="btn btn-danger">Delete</button>
+							<button id="insertBtnID2" type="button" onclick="turtleGen()" class="btn btn-success">Add</button>
+							<button id="deleteBtnID2" type="button" onclick="turtleDel()" class="btn btn-danger">Delete</button>
 		  					<button id="queryBtnID2" type="button" onclick="queryGen()" class="btn btn-warning">Query</button> 
 		  					<button id="dataBtnID2" type="button" onclick="updateTable()" class="btn btn-info">All Data</button>
 		  				    </span>
@@ -161,12 +212,30 @@
 		  				    <!-- Table is empty because it is created by the updateTable method -->
 		  					</div>
 		  				</table>
+						<div class="button-wrapper">
+							<button id="firstBtnID2" type="button" onclick="first()" style="background-color: #99A3A4; color: #FDFEFE; margin-right: 5px" class="btn pull-left disabled">First</button>
+							<button id="prevBtnID2" type="button" onclick="previous()" style="background-color: #99A3A4; color: #FDFEFE" class="btn pull-left disabled">Prev</button>
+							<button id="lastBtnID2" type="button" onclick="last()" style="background-color: #99A3A4; color: #FDFEFE; margin-left: 5px" class="btn pull-right disabled">Last</button>
+							
+							<button id="nextBtnID2" type="button" onclick="next()" style="background-color: #99A3A4; color: #FDFEFE" class="btn pull-right disabled">Next</button>
+						</div>
 		  	        </div>
 		  			<!--Table Div End (Right Side) -->
 		  	    </div>
 		  	</div>
 	    </div>
 		<!-- End File System Tab -->
+		<!-- Start About Tab -->
+	    <div id="aboutID" class="tab-pane fade">
+		  	<div class="container">
+				<p style="padding-top: 10px"> Generic SPARQL Data Entry Form 1.0.4<br>
+					Description: Simple Data Entry Form that helps unravel the power of RDF and SPARQL with regards to Structured Data creation and interaction. <br> 
+					Creator: <a href="https://jordan.solid.openlinksw.com:8444/profile/card#me">Jordan Idehen</a> (<a href="https://github.com/jidehen#this">Github</a>, <a href="https://www.linkedin.com/in/jordan-idehen-143934157/#this">LinkedIn</a>) <br>
+					Supervisor: <a href="https://github.com/OpenLinkSoftware#this">OpenLink Software</a> <br>
+					License: Public Domain  
+				</p>
+			</div>
+		<!-- End About Tab -->
 	  </div>
 	<!-- End of tabs container -->
 	</div>
@@ -191,7 +260,6 @@
 	
 	<!-- Spinner CSS -->
 	<style>
-		
 		#spinner{
 		    position:fixed;
 		    width:100%;
@@ -222,6 +290,17 @@
 		    border-radius:50%;
 		    -webkit-animation: spin .8s linear infinite;
 		    animation: spin .8s linear infinite;
+		}
+	</style>
+	
+	<!-- Dropdown menu CSS-->
+	<style>
+		.dropdown-menu {
+		   padding-left: 15px;
+		   width: 250px;
+		}
+		.glyphicon.glyphicon-cog {
+		    font-size: 20px;
 		}
 	</style>
 	
@@ -263,6 +342,7 @@
 
 	                  solid_storage = await fetchProfile(session.webId);
 	                  sessionStorage.setItem('solid_storage', solid_storage);
+                      await docNameValue()
 	                }
 
 	              } else {
@@ -281,7 +361,9 @@
 		async function docNameValue() {
 			solid_storage = await sessionStorage.getItem("solid_storage")
 			var solid_storage_value = solid_storage + "mydata.ttl" ;
-			console.log('solid storage: ' + solid_storage); 
+			if (document.getElementById("cmdID").checked == true) {
+				console.log('solid storage: ' + solid_storage); 
+			}
 			
 			if (solid_storage == null) {
 				document.getElementById("docNameID").value = "urn:records:test" ;
@@ -310,7 +392,7 @@
 		}
 	
 		// This function checks which tab the user is in to determine focus of functions
-		function tabCheck(id1, id2) {
+		function checkValue(id1, id2) {
 			if (document.getElementById('dbmsTabID').getAttribute('class') == "active"){
 				return document.getElementById(id1).value ;
 			} else if (document.getElementById('fsTabID').getAttribute('class') == "active"){
@@ -319,7 +401,7 @@
 		}
 	
 		// This function checks which tab the user is in to determine table to display data (different because of .value)
-		function tabCheckTable(id1, id2) {
+		function checkId(id1, id2) {
 			if (document.getElementById('dbmsTabID').getAttribute('class') == "active"){
 				return document.getElementById(id1) ;
 			} else if (document.getElementById('fsTabID').getAttribute('class') == "active"){
@@ -349,7 +431,7 @@
 	<!-- These Functions Handle the Form Validation -->
 	<script>
 		// Regular Expression for URIs
-		const regexp = /^(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/;
+		const regexp = /(https|http|mailto|tel|dav|ftp|ftps|urn)[:^/s]/i;
 
 		// This function validates the uri used for PATCH
 		document.getElementById("docNameID2").addEventListener("input", docNameValidation);
@@ -409,12 +491,7 @@
 					return str // If string begins and ends with single quote return it as is
 				} else if (str.charAt(0) == '"' && str.charAt(str.length-1) == '"') {
 					return str ;	
-				} 
-                // Added by KI -- handle typed literals with ^^
-                  else if (str.includes("^^")) {
-                    return str; // Case: input is a typed literal. Solution: return it as is
-				} 
-                else if (str.indexOf(' ') >= 0){
+				} else if (str.indexOf(' ') >= 0){
 					if (str.charAt(0) != '"' && str.charAt(0) != "'") {
 						return '"' + str + '"' ;
 					} else {
@@ -433,8 +510,10 @@
 			} else if (document.getElementById('fsTabID').getAttribute('class') == "active"){
 				var str = document.getElementById("subjectID2").value ;
 			}
-		
-			if (regexp.test(str)) {
+			
+			if (str.charAt(0) == '<' && str.charAt(str.length-1) == '>') {
+				return str ;
+			} else if (regexp.test(str) && !isBlankNode(str)) {
 				return '<' + str + '>' ; // Case: input is a uri. Solution: quote it
 			} else if (str.charAt(0) == "#") {
 				return '<' + str + '>' ; // Case: input is an unquoted relative uri. Solution: quote it
@@ -446,10 +525,7 @@
 				return str ; // checks if input is a variable for deletion
 			}
 			else {
-				if (str.charAt(0) == '<' && str.charAt(str.length-1) == '>') {
-					var newStr = str.slice(1,-1); // Case: input is quoted uri. Solution: must be unquotted to be recognize as a uri by regexp
-					return formatSubject(newStr) ;
-				} else if (isBlankNode(str)) {
+				 if (isBlankNode(str)) {
 					return isBlankNode(str) ; // Case: input is a blank node. Solution: return it as is
 				} else {
 					return ':' + str ; // Case: input is not a uri or a blank node. Solution: make it a relative uri
@@ -459,27 +535,49 @@
 	
 		// If the subject is quoted or contains a space this function throws and error
 		document.getElementById("subjectID").addEventListener("input", validateSubject);
+		document.getElementById("subjectID2").addEventListener("input", validateSubject);
 		function validateSubject() {
-			var str = tabCheck("subjectID", "subjectID2") ;
-		
-			try {
-				if (isBlankNode(str)) { // removes error message for complete blank node
-					errorMessage("subjectErrorID", "") ; 
-					removeInputColor('subjectID') ;
-					return formatSubject();
-				} else if (str.includes('"') || str.includes("'")) {
-					setInputColor("subjectID") ;
-					errorMessage("subjectErrorID", "Subject cannot contain a literal value unless it is a blank node") ; 
-					throw new Error("Subject cannot be a literal value"); // Throws error because input is a literal value
-				} else if (str.indexOf(' ') >= 0){
-					setInputColor('subjectID') ;
-					errorMessage("subjectErrorID", "Subject cannot contain spaces unless it is a blank node") ; 
-					throw new Error("Subject cannot contain spaces");
-				} 
-				else {
-					errorMessage("subjectErrorID", "") ; 
-					removeInputColor("subjectID") ;
-					return formatSubject(); // Returns formatted subject because it is valid
+			var str = checkValue("subjectID", "subjectID2") ;
+
+			try {	
+				if (document.getElementById('dbmsTabID').getAttribute('class') == "active") { 
+					if (isBlankNode(str)) { // removes error message for complete blank node
+						errorMessage("subjectErrorID", "") ; 
+						removeInputColor('subjectID') ;
+						return formatSubject();
+					} else if (str.includes('"') || str.includes("'")) {
+						setInputColor("subjectID") ;
+						errorMessage("subjectErrorID", "Subject cannot contain a literal value unless it is a blank node") ; 
+						throw new Error("Subject cannot be a literal value"); // Throws error because input is a literal value
+					} else if (str.indexOf(' ') >= 0){
+						setInputColor('subjectID') ;
+						errorMessage("subjectErrorID", "Subject cannot contain spaces unless it is a blank node") ; 
+						throw new Error("Subject cannot contain spaces");
+					} 
+					else {
+						errorMessage("subjectErrorID", "") ; 
+						removeInputColor("subjectID") ;
+						return formatSubject(); // Returns formatted subject because it is valid
+					}
+				} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
+					if (isBlankNode(str)) { // removes error message for complete blank node
+						errorMessage("subjectErrorID2", "") ; 
+						removeInputColor('subjectID2') ;
+						return formatSubject();
+					} else if (str.includes('"') || str.includes("'")) {
+						setInputColor("subjectID2") ;
+						errorMessage("subjectErrorID2", "Subject cannot contain a literal value unless it is a blank node") ; 
+						throw new Error("Subject cannot be a literal value"); // Throws error because input is a literal value
+					} else if (str.indexOf(' ') >= 0){
+						setInputColor('subjectID2') ;
+						errorMessage("subjectErrorID2", "Subject cannot contain spaces unless it is a blank node") ; 
+						throw new Error("Subject cannot contain spaces");
+					} 
+					else {
+						errorMessage("subjectErrorID2", "") ; 
+						removeInputColor("subjectID2") ;
+						return formatSubject(); // Returns formatted subject because it is valid
+					}
 				}
 			} catch(e) {
 				console.error('Invalid Subject', e) ;
@@ -489,9 +587,8 @@
 	
 		// This function formats the Predicate input. Comments are inline
 		function formatPredicate() {
-			var str = tabCheck("predicateID", "predicateID2") ;
-		
-			if (regexp.test(str)) {
+			var str = checkValue("predicateID", "predicateID2") ;
+			if (regexp.test(str) && !isBlankNode(str)) {
 				return '<' + str + '>' ; // Case: input is a uri. Solution: quote it
 			} else if (str.charAt(0) == "#") {
 				return '<' + str + '>' ; // Case: input is an unquoted relative uri. Solution: quote it
@@ -514,22 +611,39 @@
 	
 		// If the predicate is quoted, contains, or is a blank node a space this function throws and error
 		document.getElementById("predicateID").addEventListener("input", validatePredicate);
+		document.getElementById("predicateID2").addEventListener("input", validatePredicate);
 		function validatePredicate() {
-			var str = tabCheck("predicateID", "predicateID2") ;
+			var str = checkValue("predicateID", "predicateID2") ;
 		
 			try {
-				if (str.includes('"') || str.includes("'")) {
-					setInputColor('predicateID') ;
-					errorMessage("predicateErrorID", "Predicate cannot be a literal value") ;
-					throw new Error("Predicate cannot be a literal value"); // Throws error because input is a literal value
-				} else if (str.indexOf(' ') >= 0){
-					setInputColor('predicateID') ;
-					errorMessage("predicateErrorID", "Predicate cannot contain spaces") ; 
-					throw new Error("Predicate cannot contain spaces"); // Throws error because input subject can't contain spaces
-				} else {
-					removeInputColor('predicateID') ;
-					errorMessage("predicateErrorID", "") ; 
-					return formatPredicate(); // Returns formatted subject because it is valid
+				if (document.getElementById('dbmsTabID').getAttribute('class') == "active"){
+					if (str.includes('"') || str.includes("'")) {
+						setInputColor('predicateID') ;
+						errorMessage("predicateErrorID", "Predicate cannot be a literal value") ;
+						throw new Error("Predicate cannot be a literal value"); // Throws error because input is a literal value
+					} else if (str.indexOf(' ') >= 0){
+						setInputColor('predicateID') ;
+						errorMessage("predicateErrorID", "Predicate cannot contain spaces") ; 
+						throw new Error("Predicate cannot contain spaces"); // Throws error because input subject can't contain spaces
+					} else {
+						removeInputColor('predicateID') ;
+						errorMessage("predicateErrorID", "") ; 
+						return formatPredicate(); // Returns formatted subject because it is valid
+					}
+				} else if (document.getElementById('fsTabID').getAttribute('class') == "active"){
+					if (str.includes('"') || str.includes("'")) {
+						setInputColor('predicateID2') ;
+						errorMessage("predicateErrorID2", "Predicate cannot be a literal value") ;
+						throw new Error("Predicate cannot be a literal value"); // Throws error because input is a literal value
+					} else if (str.indexOf(' ') >= 0){
+						setInputColor('predicateID2') ;
+						errorMessage("predicateErrorID2", "Predicate cannot contain spaces") ; 
+						throw new Error("Predicate cannot contain spaces"); // Throws error because input subject can't contain spaces
+					} else {
+						removeInputColor('predicateID2') ;
+						errorMessage("predicateErrorID2", "") ; 
+						return formatPredicate(); // Returns formatted subject because it is valid
+					}
 				}
 			} catch(e) {
 				console.error('Invalid Predicate', e) ;
@@ -537,43 +651,43 @@
 		}
 	
 		// This function formats the Object input. Comments are inline
-		async function validateObject() {
+		async function validateObject(str) {
 			var range = await predicateRange() ; // function waits until range is a value rather than a promise
-			var str = tabCheck("objectID", "objectID2") ;
-
-            if (str.includes('"') || str.includes("'") ) {
+			var str = checkValue("objectID", "objectID2") ;
+		
+			if (str.includes('"') || str.includes("'")) {
 				range = true ;
 			}
 		
 			if (!range) {
-				if (regexp.test(str)) {
+				if (str.charAt(0) == '<' && str.charAt(str.length-1) == '>') { //Case: input is already qutoed uri. Return as is
+					return str
+				} else if (regexp.test(str) && !isBlankNode(str)) {
+					console.log("CASE 1 HIT")
 					return '<' + str + '>' ; // Case: input is a uri. Solution: quote it
 				} else if (str.charAt(0) == "#") {
 					return '<' + str + '>' ; // Case: input is an unquoted relative uri. Solution: quote it
 				} else if (str.charAt(0) == '<' && str.charAt(1) == '#' && str.charAt(str.length-1) == '>') { 
 					return str ; // Case: input is already a relative uri. Solution: return it as is
 				} else if (str.includes(":")) {
-					return str; // Case: input is a curie. Solution: return it as is               		
-                } 
+					return str; // Case: input is a curie. Solution: return it as is
+				}
 				else {
-					if (str.charAt(0) == '<' && str.charAt(str.length-1) == '>') {
-						var newStr = str.slice(1,-1); // Case: input is quoted uri. Solution: must be unquotted to be recognize as a uri by regexp
-						return validateObject(newStr) ;
-					} else {
-						return ':' + str ; // Case: input is not a uri or a blank node. Solution: make it a relative uri
-					}
+					return ':' + str ; // Case: input is not a uri or a blank node. Solution: make it a relative uri
 		        }
 			} 
-			else {
+			if (isBlankNode(str)){
+					return str; // Case : blank node
+			} else {
 				return formatLiteral(str);			
 	        }
 		}
 	
 		// This function formats the Object input. Comments are inline
 		function nonvalidatedObject() {
-			var str = tabCheck("objectID", "objectID2") ;
+			var str = checkValue("objectID", "objectID2") ;
 		
-			if (regexp.test(str)) {
+			if (regexp.test(str) && !isBlankNode(str)) {
 				return '<' + str + '>' ; // Case: input is a uri. Solution: quote it
 			} else if (str.charAt(0) == "#") {
 				return '<' + str + '>' ; // Case: input is an unquoted relative uri. Solution: quote it
@@ -588,27 +702,53 @@
 					return nonvalidatedObject(newStr) ;
 			} else if (str.includes('"') || str.includes("'") || str.indexOf(' ') >= 0) {
 				return formatLiteral(str) ; // Case: input is a quoted literal value
+			} else if (isBlankNode(str)){
+					return str; // Case : blank node
 			}
 			else {
 				return ':' + str ; // Case: input is not a uri or a blank node. Solution: make it a relative uri
 				} 			
 		}
+		
+	</script>
 	
+	<!-- These functions handle the data table -->
+	<script>
+		
+		// update table on tab switch
+		$('.nav-tabs').find('a').on('shown.bs.tab', function () {
+			updateTable() ;
+		});
+		
 		// This function allows hyperlinks to be used in the table
 		function tableFormat(str) {
-			if (regexp.test(str) || str.charAt(0) == "#") {
-				str = '<a href="' + str + '">' + str + '</a>'
+			// Regular Expression for URIs in table specifically
+			const tableexp = /(https|http|mailto|tel|dav|ftp|ftps)[:^/s]/i;
+			var graph = checkValue("docNameID", "docNameID2") ;
+			var strLabel = str ; // variable for what is show on screen in the href
+			
+			if (document.getElementById("uriID").checked == true) { //if user wants short URIs
+				if (str.includes(graph)) { //if str is in fct format it still includes the docname
+					strLabel = strLabel.replace(graph, ""); //remove the docName from string
+				}
+				if (str.includes("https://linkeddata.uriburner.com/describe/?url=")) {// of str is in fct format
+					strLabel = strLabel.replace("https://linkeddata.uriburner.com/describe/?url=", "");
+					strLabel = strLabel.replace("%23", "#");
+				}
+			} 
+			
+			if (tableexp.test(str)) { // if str is an absolute or relative uri
+				str = '<a href="' + str + '">' + strLabel + '</a>'
 				return str
 			}
 			else {
-				return str
+				return strLabel
 			}
-
 		}
-	
+		
 		// This function is used to referesh the table when view data is clicked
 		function refreshTable() {
-			var table = tabCheckTable("dbmsTableID", "fsTableID") ;
+			var table = checkId("dbmsTableID", "fsTableID") ;
 
 			for (var i = document.getElementById(table.id).rows.length; i > 0; i--) {
 				document.getElementById(table.id).deleteRow(i -1);
@@ -617,7 +757,7 @@
 	
 		// This function is used to create header row of table
 		function createHeader() {
-			var table = tabCheckTable("dbmsTableID", "fsTableID") ;
+			var table = checkId("dbmsTableID", "fsTableID") ;
 			
 			var header = table.createTHead(); // creates empty tHead
 			var row = header.insertRow(0); // inserts row into tHead
@@ -630,7 +770,233 @@
 			cell1.innerHTML = "<b>Predicate</b>";
 			cell2.innerHTML = "<b>Object</b>";
 		}
+		
+		var limit = Number("0") ;
+		var offset = Number("0") ;
+		var tableSize = Number(setTableSize()) ;
+		var resultMode = null ;
+		
+		// This function sets the limit based on input and adjusts offset accordingly 
+		function setLimit() { // reset offset when limit is changed 
+			if (limit != document.getElementById("resultsID").value) {
+				offset = Number("0") ;
+			}
+			limit = Number(document.getElementById("resultsID").value) ;
+		}
+		
+		// this function hides or shows buttons
+		function buttonDisplay() {
+			var firstButton = checkId("firstBtnID", "firstBtnID2") ;
+			var nextButton = checkId("nextBtnID", "nextBtnID2") ;
+			var prevButton = checkId("prevBtnID", "prevBtnID2") ;
+			var lastButton = checkId("lastBtnID", "lastBtnID2") ;
+			var remainder = tableSize - limit ;
+			
+			if (offset < remainder) { // if there is a next page
+				if (nextButton.classList.contains('disabled')) { // show next button
+					nextButton.classList.remove('disabled') ;
+				}
+				if (lastButton.classList.contains('disabled')) { // show last button
+					lastButton.classList.remove('disabled') ;
+				}
+			} else { // if there is not a next page
+				if (!nextButton.classList.contains('disabled')) { // hide next button
+					nextButton.classList.add('disabled') ;
+				}
+				if (!lastButton.classList.contains('disabled')) { // hide last button
+					lastButton.classList.add('disabled') ;
+				}
+			}
+			
+			if (offset > 0) { // if there is a previous page
+				if (prevButton.classList.contains('disabled')) { // show prev button
+					prevButton.classList.remove('disabled') ;
+				}
+				if (firstButton.classList.contains('disabled')) { // show first button
+					firstButton.classList.remove('disabled') ;
+				}
+			} else { // if there is not a previous page
+				if (!prevButton.classList.contains('disabled')) { // hide prev button
+					prevButton.classList.add('disabled') ;
+				}
+				if (!firstButton.classList.contains('disabled')) { // hide first button
+					firstButton.classList.add('disabled') ;
+				}
+			}
+		}
+		
+		// This function goes to next page in table
+		function next() {
+			var nextButton = checkId("nextBtnID", "nextBtnID2") ;
+			var prevButton = checkId("prevBtnID", "prevBtnID2") ;
+			var remainder = tableSize - limit ;
+			
+			if (nextButton.classList.contains('disabled')) { // stop action if button is disabled
+				return false ;
+			}
+			
+			if (offset < remainder) { // if there is a next page
+				offset += parseInt(limit) ;
+				buttonDisplay() ;
+			}
+			
+			// refresh table
+			if (resultMode == "bn") {
+				bnQueryGen() ;
+			} else if (resultMode == "query") {
+				queryGen() ;
+			} else {
+				updateTable() ;
+			}
+		}
+		
+		// this function goes to previous page in table
+		function previous() {
+			var nextButton = checkId("nextBtnID", "nextBtnID2") ;
+			var prevButton = checkId("prevBtnID", "prevBtnID2") ;
+			var remainder = tableSize - limit ;
+			
+			if (prevButton.classList.contains('disabled')) { // stop action if button is disabled
+				return false ;
+			}
+			
+			if (offset > 0) { // if there is a previous page
+				offset -= parseInt(limit) ;
+				buttonDisplay() ;
+			}
+			
+			// refresh table
+			if (resultMode == "bn") {
+				bnQueryGen() ;
+			} else if (resultMode == "query") {
+				queryGen() ;
+			} else {
+				updateTable() ;
+			}
+		}
+		
+		// this function goes to the first page
+		function first() {
+			var firstButton = checkId("firstBtnID", "firstBtnID2") ;
+			var prevButton = checkId("prevBtnID", "prevBtnID2") ;
+			
+			if (firstButton.classList.contains('disabled')) { // stop action if button is disabled
+				return false ;
+			}
+			
+			if (offset > 0) {
+				offset = Number("0") ;
+
+				// refresh table
+				if (resultMode == "bn") {
+					bnQueryGen() ;
+				} else if (resultMode == "query") {
+					queryGen() ;
+				} else {
+					updateTable() ;
+				}
+				
+				buttonDisplay() ;
+			} else {
+				if (!firstButton.classList.contains('disabled')) { // hide first button
+					firstButton.classList.add('disabled') ;
+				}	
+			}
+		}
+		
+		function last() {
+			var lastButton = checkId("lastBtnID", "lastBtnID2") ;
+			var nextButton = checkId("nextBtnID", "nextBtnID2") ;
+			var div = Math.floor(tableSize / limit) ;
+			var mod = Math.floor(tableSize % limit) ;
+			
+			if (lastButton.classList.contains('disabled')) { // stop action if button is disabled
+				return false ;
+			}
+			
+			if (mod != 0) {
+				console.log("CASE 1")
+				var remainder = tableSize - mod ;
+			} else { // if limit even divides into tableSize
+				console.log("CASE 2")
+				var remainder = (div - 1) * limit
+			}
+			
+			if (offset < remainder) {
+				offset = Number(remainder) ;
+				
+				// refresh table
+				if (resultMode == "bn") {
+					bnQueryGen() ;
+				} else if (resultMode == "query") {
+					queryGen() ;
+				} else {
+					updateTable() ;
+				}
+				
+				buttonDisplay() ;
+			} else {
+				if (!lastButton.classList.contains('disabled')) { // hide last button
+					lastButton.classList.add('disabled') ;
+				}
+			}
+		}
+		
+		// This sets the size of the current table
+	    async function setTableSize() {
+			var graph = checkValue("docNameID", "docNameID2") ;
+			
+			if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
+			    var query = 
+				"SELECT DISTINCT COUNT(*) AS ?count FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
+			} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
+				// Use of Sponger Pragma to force document reload during query evaluation
+				var query = 
+				"DEFINE get:soft" + " " + '"soft"' + "\n" + "SELECT DISTINCT COUNT(*) AS ?count FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
+			}
+			
+			if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
+				query = "DEFINE input:same-as" + '"yes" \n' + query ;
+			} else if (document.getElementById("ruleNameID").checked == true) {
+				query = "DEFINE input:inference" + ' ' + "'" + document.getElementById("infRuleNameID").value + "'" + ' \n' + query ;
+			}
+
+            var endpoint = checkValue("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
+	        let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
+
+			if (document.getElementById("cmdID").checked == true) {
+		        console.log("Retrieving Table Length From: " + url);
+				console.log("Query: " + query);
+			}
+	        
+	        const options = {
+	                            method: 'GET',
+	                            headers: {
+	                                       'Content-type': 'application/sparql-results+json; charset=UTF-8',
+										 },
+	                            credentials: 'include',
+	                            mode: 'cors',
+	                            crossDomain: true,
+	                        };
+			
+			try {
+		        var resp = await fetch(url,options)
 	
+				.then((res) => res.json())
+		        .then( data =>{
+					
+		            if (data.results.bindings.length > 0){
+						tableSize = Number(data.results.bindings[0].count.value) ;
+		            } else{
+						console.log("Table size is 0");
+		            }
+				})	
+			} catch(e) {
+				hideSpinner() ;
+				console.error('Table Size Failed', e) ;
+				alert('Table Size Failed ' + e);
+			}	
+	    }
 	</script>
 	
 	<!-- These Functions Handle the Functionality of the Page -->
@@ -639,6 +1005,7 @@
 	
 		//SPARQL INSERT SCRIPT
 	    async function recordGen() {
+			await setLimit() ;
 			showSpinner() ;
 		    var subject = validateSubject() ;
 			var predicate = validatePredicate() ;
@@ -656,9 +1023,12 @@
 			
 			var endpoint = document.getElementById("endpointID").value ;
 	        let url = endpoint ;
-
-	        console.log("endpoint for Target SPARUL Service: " + endpoint);
-	        console.log(insert_cmd);
+			
+			if (document.getElementById("cmdID").checked == true) {
+		        console.log("endpoint for Target SPARUL Service: " + endpoint);
+		        console.log(insert_cmd);	
+			}
+			
 	        const options = {
 	                            method: 'POST',
 	                            headers: {
@@ -671,23 +1041,27 @@
 	        };
 		
 			try {
-		        var resp = await fetch(url, options);
+		        var resp = await fetch(url,options);
 				if (resp.status >= 200 && resp.status <= 300) {
 					console.log(resp.status + " - " + resp.statusText) ;
 					updateTable() ;
 					hideSpinner() ;
 				} else {
-					console.log("Error " + resp.status +" - " + resp.statusText) ;
+					throw new Error("Error " + resp.status +" - " + resp.statusText) ;
 					hideSpinner() ;
 				}
 			} catch(e) {
 				hideSpinner() ;
-				console.error('Insert Failed:', e) ;
-			}			     
+				console.error('Insert Failed', e) ;
+				alert('Insert Failed ' + e)
+			}		
+			await setTableSize() ;   
+			await buttonDisplay() ;  
 		}
 	
      	//SPARQL DELETE SCRIPT
 	   	async function recordDel() {
+			await setLimit() ;
 			showSpinner() ;
      	    var subject = validateSubject() ;
      	    var predicate = validatePredicate() ;
@@ -707,9 +1081,12 @@
 
             var endpoint = document.getElementById("endpointID").value ;
             let url = endpoint ;
-
-            console.log("endpoint for Target SPARUL Service: " + endpoint);
-            console.log(delete_cmd);
+			
+			if (document.getElementById("cmdID").checked == true) {
+	            console.log("endpoint for Target SPARUL Service: " + endpoint);
+	            console.log(delete_cmd);
+			}
+            
             const options = {
                                 method: 'POST',
                                 headers: {
@@ -721,32 +1098,76 @@
                                 body: delete_cmd,
             };
 			try {
-				var resp = await fetch(url, options);
+				var resp = await fetch(url,options);
 				if (resp.status >= 200 && resp.status <= 300) {
 					console.log(resp.status + " - " + resp.statusText);
 					updateTable() ;
 					hideSpinner() ;
 				}
 				else {
-					console.log("Error " + resp.status +" - " + resp.statusText) ;
+					throw new Error("Error " + resp.status +" - " + resp.statusText) ;
 					hideSpinner() ;
 				}	
 			} catch(e) {
 				hideSpinner() ;
-				console.error('Delete Failed:', e) ;
+				console.error('Delete Failed', e) ;
+				alert('Delete Failed ' + e)
 			}
-		
+			await setTableSize() ;
+			await buttonDisplay() ;  
 	   	}
+
+		// function used to return data as CSV or XML
+		function downloadResults() {
+			resultMode = "csv" ;
+			var graph = checkValue("docNameID", "docNameID2") ;
+			
+			if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
+			    var data_query = 
+				"SELECT DISTINCT * FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
+			} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
+				// Use of Sponger Pragma to force document reload during query evaluation
+				var data_query = 
+				"DEFINE get:soft" + " " + '"soft"' + "\n" + "SELECT DISTINCT * FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
+			}
+			
+			if (limit >= 1) { // if results per page is active
+				data_query = data_query + "\n" + "OFFSET " + offset + "\n" + "LIMIT " + limit ;
+			} 
+			
+			if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
+				data_query = "DEFINE input:same-as" + '"yes" \n' + data_query ;
+			} else if (document.getElementById("ruleNameID").checked == true) {
+				data_query = "DEFINE input:inference" + ' ' + "'" + document.getElementById("infRuleNameID").value + "'" + ' \n' + data_query ;
+			}
+
+            var endpoint = checkValue("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
+			if (document.getElementById("csvID").checked == true) {
+		        var downloadURL = endpoint + encodeURIComponent(data_query) + "&should-sponge=&format=text%2Fcsv" ;
+			} else if (document.getElementById("xmlID").checked == true) {
+				var downloadURL = endpoint + encodeURIComponent(data_query) + "&should-sponge=&format=application%2Fsparql-results%2Bxml" ;
+			}
+	        
+			
+			if (document.getElementById("cmdID").checked == true) {
+		        console.log("Retrieving CSV From: " + downloadURL);
+				console.log("Query: " + data_query);
+			}
+			
+			window.open(downloadURL) ;
+		}
 		
 		/* Generates blank node queries and displays table reflecting them.
 		This function is required because blank node queries can 
 		require n number of columns. */
 		async function bnQueryGen() {
+			resultMode = "bn" ;
+			await setLimit() ;
 			showSpinner() ;
 		    var subject = validateSubject() ;
 			var predicate = validatePredicate() ;
 			var object = nonvalidatedObject() ;
-			var graph = tabCheck("docNameID", "docNameID2") ;
+			var graph = checkValue("docNameID", "docNameID2") ;
 			
 			
 			if (document.getElementById('dbmsTabID').getAttribute('class') == "active") { 
@@ -764,12 +1185,29 @@
 				+ "WHERE {" + " " + subject + " " + predicate + " " + object + " " + "}"
 			}
 			
-			var endpoint = tabCheck("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
+			if (limit >= 1) { // if results per page is active
+				query = query + "\n" + "OFFSET " + offset + "\n" + "LIMIT " + limit ;
+			} 
+			
+			if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
+				query = "DEFINE input:same-as" + '"yes" \n' + query ;
+			} else if (document.getElementById("ruleNameID").checked == true) {
+				query = "DEFINE input:inference" + ' ' + "'" + document.getElementById("infRuleNameID").value + "'" + ' \n' + query ;
+			}
+			
+			// CSV download
+			if (document.getElementById("csvID").checked == true || document.getElementById("xmlID").checked == true) {
+		        await downloadResults() ;
+			}
+			
+			var endpoint = checkValue("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
 	        let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
 			
-	        console.log("SPARQL Query: " + query);
-			console.log("Query URL: " + url)
-		
+			if (document.getElementById("cmdID").checked == true) {
+		        console.log("SPARQL Query: " + query);
+				console.log("Query URL: " + url)
+			}
+	        
 	        const options = {
 	                            method: 'GET',
 	                            headers: {
@@ -780,7 +1218,7 @@
 	                            crossDomain: true,
 	                        };
 			try {
-		        var resp = await fetch(url, options)
+		        var resp = await fetch(url,options)
 			
 				.then((res) => res.json())
 		        .then( data =>{
@@ -793,7 +1231,7 @@
                     are handled via an N-Tuple structured table (relation).
                     */
 		            if (data.results.bindings.length > 0){
-						var table = tabCheckTable("dbmsTableID", "fsTableID") ; // creates table for header
+						var table = checkId("dbmsTableID", "fsTableID") ; // creates table for header
 						var header = table.createTHead(); // creates empty tHead
 						var headRow = header.insertRow(0); // inserts row into tHead
 						var bindings = data.results.bindings;
@@ -815,24 +1253,27 @@
 		            }	
 		            else{
 						hideSpinner() ;
-						throw new Error("No Data Returned");
 						console.log("No data returned by query");
 		            }
 				})
 			} catch(e) {
 				hideSpinner() ;
-				console.error('Query Failed:', e) ;
+				console.error('Query Failed', e) ;
+				alert('Query Failed ' + e)
 			}		   
-			
+			await setTableSize() ;
+			await buttonDisplay() ;  
 		}
 	
 		// This function updates table to show results of a query
 		async function queryGen() {
+			resultMode = "query" ;
+			await setLimit() ;
 			showSpinner() ;
 		    var subject = validateSubject() ;
 			var predicate = validatePredicate() ;
 			var object = nonvalidatedObject() ;
-			var graph = tabCheck("docNameID", "docNameID2") ;	
+			var graph = checkValue("docNameID", "docNameID2") ;	
 			
 			if (isBlankNode(subject) || isBlankNode(object)) {
 				bnQueryGen(); // if query includes blank node call bnQueryGen function
@@ -854,11 +1295,28 @@
 				+ "WHERE {" + " " + subject + " " + predicate + " " + object + " " + "}"
 			}
 			
-			var endpoint = tabCheck("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
+			if (limit >= 1) { // if results per page is active
+				query = query + "\n" + "OFFSET " + offset + "\n" + "LIMIT " + limit ;
+			} 
+			
+			if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
+				query = "DEFINE input:same-as" + '"yes" \n' + query ;
+			} else if (document.getElementById("ruleNameID").checked == true) {
+				query = "DEFINE input:inference" + ' ' + "'" + document.getElementById("infRuleNameID").value + "'" + ' \n' + query ;
+			}
+			
+			// CSV download
+			if (document.getElementById("csvID").checked == true || document.getElementById("xmlID").checked == true) {
+		        await downloadResults() ;
+			}
+			
+			var endpoint = checkValue("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
 	        let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
-
-	        console.log("SPARQL Query: " + query);
-			console.log("Query URL: " + url)
+			
+			if (document.getElementById("cmdID").checked == true) {
+		        console.log("SPARQL Query: " + query);
+				console.log("Query URL: " + url);
+			}
 		
 	        const options = {
 	                            method: 'GET',
@@ -870,7 +1328,7 @@
 	                            crossDomain: true,
 	                        };
 			try {
-		        var resp = await fetch(url, options)
+		        var resp = await fetch(url,options)
 			
 				.then((res) => res.json())
 		        .then( data =>{
@@ -879,12 +1337,36 @@
 					createHeader();
 
 		            if (data.results.bindings.length > 0){
-						var table = tabCheckTable("dbmsTableID", "fsTableID") ;
+						var table = checkId("dbmsTableID", "fsTableID") ;
 						var object = nonvalidatedObject() ;
-						for (var i = 0; i < data.results.bindings.length; i++) {	
-							subject = data.results.bindings[i].subject.value ;
-							predicate = data.results.bindings[i].predicate.value ;
-							object = data.results.bindings[i].object.value ;	
+						for (var i = 0; i < data.results.bindings.length; i++) {
+							var subject = data.results.bindings[i].subject.value ;
+							var predicate = data.results.bindings[i].predicate.value ;
+							var object = data.results.bindings[i].object.value ;
+							if (document.getElementById("fctID").checked == true) { //if fct checkbox is checked
+								if (subject.includes(graph) || regexp.test(subject)) { //if subject is not a literal value
+									subject = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].subject.value ;
+									subject = subject.replace("#", "%23"); // replaces # with %23 for fct results
+								}
+								
+								if (predicate.includes(graph) || regexp.test(predicate)) { //if subject is not a literal value
+									predicate = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].predicate.value ;
+									predicate = predicate.replace("#", "%23");
+								}
+								
+								if (object.includes(graph) || regexp.test(object)) {
+									object = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].object.value ;
+									object = object.replace("#", "%23");
+								} else { //if object is literal value
+									object = data.results.bindings[i].object.value ;
+								}
+								
+							} else {
+								subject = data.results.bindings[i].subject.value ;
+								predicate = data.results.bindings[i].predicate.value ;
+								object = data.results.bindings[i].object.value ;
+							}
+								
 
 							var row = table.insertRow(-1);
 						    var cell1 = row.insertCell(0);
@@ -899,20 +1381,24 @@
 		            }
 		            else{
 						hideSpinner() ;
-						throw new Error("No Data Returned");
 						console.log("No data returned by query");
 		            }
 				})
 			} catch(e) {
 				hideSpinner() ;
-				console.error('Query Failed:', e) ;
-			}		   
+				console.error('Query Failed', e) ;
+				alert('Query Failed ' + e)
+			}	
+			await setTableSize() ;
+			await buttonDisplay() ;  
 		}
 	
 		// This function fetches the query results and returns them in json
 	    async function updateTable() {
+			resultMode = "all" ;
+			await setLimit() ;
 			showSpinner() ;
-			var graph = tabCheck("docNameID", "docNameID2") ;
+			var graph = checkValue("docNameID", "docNameID2") ;
 			
 			if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
 			    var data_query = 
@@ -922,11 +1408,30 @@
 				var data_query = 
 				"DEFINE get:soft" + " " + '"soft"' + "\n" + "SELECT DISTINCT * FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
 			}
+			
+			if (limit >= 1) { // if results per page is active
+				data_query = data_query + "\n" + "OFFSET " + offset + "\n" + "LIMIT " + limit ;
+			} 
+			
+			if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
+				data_query = "DEFINE input:same-as" + '"yes" \n' + data_query ;
+			} else if (document.getElementById("ruleNameID").checked == true) {
+				data_query = "DEFINE input:inference" + ' ' + "'" + document.getElementById("infRuleNameID").value + "'" + ' \n' + data_query ;
+			}
+			
+			// CSV download
+			if (document.getElementById("csvID").checked == true || document.getElementById("xmlID").checked == true) {
+		        await downloadResults() ;
+			}
 
-            var endpoint = tabCheck("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
+            var endpoint = checkValue("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
 	        let url = endpoint + encodeURIComponent(data_query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
 
-	        console.log("Retrieving Table Data From: " + url);
+			if (document.getElementById("cmdID").checked == true) {
+		        console.log("Retrieving Table Data From: " + url);
+				console.log("Query: " + data_query);
+			}
+	        
 		
 	        const options = {
 	                            method: 'GET',
@@ -939,20 +1444,43 @@
 	                        };
 			
 			try {
-		        var resp = await fetch(url, options)
+		        var resp = await fetch(url,options)
 	
 				.then((res) => res.json())
 		        .then( data =>{
 					
 				    refreshTable();
 					createHeader();
-					var table = tabCheckTable("dbmsTableID", "fsTableID") ;
+					var table = checkId("dbmsTableID", "fsTableID") ;
 					
 		            if (data.results.bindings.length > 0){
 						for (var i = 0; i < data.results.bindings.length; i++) {	
-							subject = data.results.bindings[i].subject.value ;
-							predicate = data.results.bindings[i].predicate.value ;
-							object = data.results.bindings[i].object.value ;	
+							var subject = data.results.bindings[i].subject.value ;
+							var predicate = data.results.bindings[i].predicate.value ;
+							var object = data.results.bindings[i].object.value ;				
+							if (document.getElementById("fctID").checked == true) { //if fct checkbox is checked
+								if (subject.includes(graph) || regexp.test(subject)) { //if subject is not a literal value
+									subject = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].subject.value ;
+									subject = subject.replace("#", "%23"); // replaces # with %23 for fct results
+								}
+								
+								if (predicate.includes(graph) || regexp.test(predicate)) { //if subject is not a literal value
+									predicate = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].predicate.value ;
+									predicate = predicate.replace("#", "%23");
+								}
+								
+								if (object.includes(graph) || regexp.test(object)) {
+									object = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].object.value ;
+									object = object.replace("#", "%23");
+								} else { //if object is literal value
+									object = data.results.bindings[i].object.value ;
+								}
+								
+							} else {
+								subject = data.results.bindings[i].subject.value ;
+								predicate = data.results.bindings[i].predicate.value ;
+								object = data.results.bindings[i].object.value ;
+							}
 				
 							var row = table.insertRow(-1);
 						    var cell1 = row.insertCell(0);
@@ -966,19 +1494,22 @@
 						hideSpinner() ;
 		            } else{
 						hideSpinner() ;
-						console.log("No data found by lookup");
+						console.log("No data returned by query");
 		            }
 				})	
 			} catch(e) {
 				hideSpinner() ;
-				console.error('Table Refresh Failed:', e) ;
-			}		  
+				console.error('Table Refresh Failed', e) ;
+				alert('Table Refresh Failed ' + e);
+			}	
+			await setTableSize() ;	
+			await buttonDisplay() ;    
 	    }
 	
 		// This function gets the range of the predicate to determine if object is a literal or a reference
 		async function predicateRange() {
 			var predicate = validatePredicate() ; 
-			var graph = tabCheck("docNameID", "docNameID2") ;
+			var graph = checkValue("docNameID", "docNameID2") ;
 		
 		    var range_query =
 			"PREFIX : <" + graph + "#>\n" 
@@ -989,11 +1520,15 @@
 			+ "filter (?range in (rdfs:Literal, xsd:string, xsd:decimal, xsd:integer, xsd:boolean, xsd:date, xsd:time))\n"
 			+"}" 		
 			
-            var endpoint = tabCheck("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
+            var endpoint = checkValue("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
 			// This sets the url for retrieving the json
 	        let url = endpoint + encodeURIComponent(range_query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ; 
 
-	        console.log("Recieving Predicate Range From: " + url);
+			if (document.getElementById("cmdID").checked == true) {
+		        console.log("Recieving Predicate Range From: " + url);
+				console.log("Query" + range_query);
+			}
+	        
 		
 	        const options = {
 	                            method: 'GET',
@@ -1006,34 +1541,39 @@
 	        };
 		
 			try {
-				const resp = await fetch(url, options); // resp awaits completion of fetch 
+				const resp = await fetch(url,options); // resp awaits completion of fetch 
 			
 				if (resp.status >= 200 && resp.status <= 300) {
 					console.log(resp.status + " - " + resp.statusText);
 				} else {
-					console.log("Error " + resp.status +" - " + resp.statusText) ;
+					throw new Error("Error " + resp.status +" - " + resp.statusText) ;
 				}
 				const json = await resp.json(); // constant awaits resp before being assigned (so it isn't assigned as a promise)
 				return (json.boolean) ; // returns true or false returned by query after awaiting results
 			} catch(e) {
-				console.error('Predicate Range Lookup Failed:', e) ;
+				console.error('Predicate Range Lookup Failed', e) ;
+				alert('Predicate Range Lookup Failed ' + e)
 			}		
-		
 		}
 	
 		async function turtleGen() {
+			await setLimit() ;
 			showSpinner() ;
 		    var subject = validateSubject() ;
 			var predicate = validatePredicate() ;
 			var object = await validateObject() ; // insert function awaits object value before proceeding
 			var docName = document.getElementById("docNameID2").value ;
+			console.log("subject: " + subject)
 
 			var turtle_cmd = 
 			"" + "INSERT DATA {@prefix : <" + docName + "#> ." + ' ' + subject + ' ' + predicate + ' ' + object + ' ' + ".}" + ""
 			
 			let url = docName ;
-
-	        console.log("Fetch Command:" + turtle_cmd);
+			
+			if (document.getElementById("fctID").checked == true) {
+				console.log("Insert Command:" + turtle_cmd);	
+			}
+	        
 		
 	        const options = {
 	                            method: 'PATCH',
@@ -1047,7 +1587,7 @@
 	        };
 		
 			try {
-		        var resp = await fetch(url, options);
+		        var resp = await solid.auth.fetch(url,options);
 				if (resp.status >= 200 && resp.status <= 300) {
 					hideSpinner() ;
 					console.log(resp.status + " - " + resp.statusText);
@@ -1055,15 +1595,19 @@
 				}
 				else {
 					hideSpinner() ;
-					console.log("Error " + resp.status +" - " + resp.statusText) ;
+					throw new Error("Error " + resp.status +" - " + resp.statusText) ;
 				}
 			} catch (e) {
 				hideSpinner() ;
-				console.error('Request Failed:', e) ;
-			}			
+				console.error('Insert Failed ' + e) ;
+				alert('Insert Failed ' + e)
+			}
+			await setTableSize() ;		
+			await buttonDisplay() ;  
 		}
 		
 		async function turtleDel() {
+			await setLimit() ;
 			showSpinner() ;
 		    var subject = validateSubject() ;
 			var predicate = validatePredicate() ;
@@ -1074,8 +1618,10 @@
 			"" + "PREFIX : <" + docName + "#> DELETE DATA" + ' ' + "{" + subject + ' ' + predicate + ' ' + object + ' ' + ".}" + ""
 		
 			let url = docName ;
-
-	        console.log("Fetch Command:" + del_cmd);
+			if (document.getElementById("fctID").checked == true) {
+				console.log("Delete Command:" + del_cmd);	
+			}
+	        
 		
 	        const options = {
 	                            method: 'PATCH',
@@ -1089,7 +1635,7 @@
 	        };
 		
 			try {
-		        var resp = await fetch(url, options);
+		        var resp = await solid.auth.fetch(url,options);
 				if (resp.status >= 200 && resp.status <= 300) {
 					hideSpinner() ;
 					console.log(resp.status + " - " + resp.statusText);
@@ -1097,12 +1643,15 @@
 				}
 				else {
 					hideSpinner() ;
-					console.log("Error " + resp.status +" - " + resp.statusText) ;
+					throw new Error("Error " + resp.status +" - " + resp.statusText) ;
 				}
 			} catch (e) {
 				hideSpinner() ;
-				console.error('Request Failed:', e) ;
-			}			
+				console.error('Request Failed ' + e) ;
+				alert('Delete Failed ' + e)
+			}		
+			await setTableSize() ;	
+			await buttonDisplay() ;  
 		}
 	</script>
 	
@@ -1137,8 +1686,9 @@
 
              return ret;
            } catch(e) {
-       	    console.error('Error:', e)
-       	    return null;
+			   console.error('Error', e)
+			   alert('Error ', e)
+			   return null;
            }
         }
 
@@ -1151,7 +1701,7 @@
                              crossDomain: true,
                          };
            try {
-               var resp = await solid.auth.fetch(url, options);
+               var resp = await solid.auth.fetch(url,options);
                if (resp.ok) {
  		  var body = await resp.text();
  		  var contentType = resp.headers.get('content-type');
@@ -1162,7 +1712,8 @@
                }
            } 
  	  catch(e) {
-       	      console.error('Request failed:', e)
+		  console.error('Request failed', e)
+		  alert('Request failed ', e)
            }
         }
 
@@ -1187,6 +1738,7 @@
             await solid.auth.logout()
             location.reload()
         }
+		
 	</script>
   </body>
 </html>
