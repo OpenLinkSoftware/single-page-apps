@@ -528,6 +528,10 @@
                                     opt.innerHTML = applications[i].applicationProgramLabel.value;
                                     applicationName.appendChild(opt);
                                 }
+                                var otherOpt = document.createElement('option');
+                                    otherOpt.value = "otherOption";
+                                    otherOpt.innerHTML = "Other";
+                                    applicationName.appendChild(otherOpt);
                                 applicationName.style.display = '';
                                 applicationName.disabled = false;
                                 hideSpinner() ;
@@ -1089,6 +1093,10 @@
                        dbmsHostOsVersion = document.getElementById("dbmsHostOsVersionID");
                        
                        var searchURI = window.location.origin + '/search/' + Date.now();
+ 
+                       var applicationRecord =  "";
+                       if (applicationName != "otherOption")
+                         applicationRecord = "ecrm:hasApplication <" + applicationName.value + "> ; \n"
                        
                        var insert_cmd = 
                          "PREFIX schema: <http://schema.org/>\n" 
@@ -1097,7 +1105,7 @@
                          + "<" + searchURI + "> a ecrm:DownloadSearch ; \n"
                          + "ecrm:hasDatabaseEngine <" + databaseServer.value + "> ; \n"
                          + "ecrm:hasDbmsVersion \"" + dbmsVersion.value + "\" ; \n"
-                         + "ecrm:hasApplication <" + applicationName.value + "> ; \n"
+                         + applicationRecord
                          + "ecrm:hasApplicationVersion \"" + applicationVersion.value + "\" ; \n"
                          + "ecrm:hasServer <" + dbmsHostOs.value + "> ; \n"
                          + "ecrm:hasServerVersion \"" + dbmsHostOsVersion.value + "\" ; \n"
