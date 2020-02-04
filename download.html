@@ -66,7 +66,7 @@
 		  						<p class="errorMessage" id="applicationNameErrorID" ></p>
                                                                 <label for="applicationVersion">Full Version (if known)</label>
                                                                 <br />
-		  						<input size="20" id="applicationVersionID" name="applicationVersion"></input>
+		  						<input size="20" id="applicationVersionID" name="applicationVersion" onchange="applicationVersionChanged(this)"></input>
 		  	        </div>
 		  	        <div class="col-xs-6">
 	                                                        <label for="appHostOsFamID">Application Host OS Family</label>
@@ -84,7 +84,7 @@
 		  						<p class="errorMessage" id="appHostOsErrorID" ></p>
                                                                 <label for="appHostOsVersion">Full Version (if known)</label>
                                                                 <br />
-		  						<input size="20" id="appHostOsVersionID" name="appHostOsVersion"></input>
+		  						<input size="20" id="appHostOsVersionID" name="appHostOsVersion" onchange="appHostOsVersionChanged(this)"></input>
 		  	        </div>
 		  	    </div>
                                 <hr>
@@ -105,7 +105,7 @@
 		  						<p class="errorMessage" id="databaseServerErrorID" ></p>
                                                                 <label for="dbmsVersion">Full Version (if known)</label>
                                                                 <br />
-		  						<input size="20" id="dbmsVersionID" name="dbmsVersion"></input>
+		  						<input size="20" id="dbmsVersionID" name="dbmsVersion" onchange="dbmsVersionChanged(this)"></input>
 		  	        </div>
 		  	        <div class="col-xs-6">
 	                                                        <label for="dbmsHostOsFamID">Database Server Host OS Family</label>
@@ -123,7 +123,7 @@
 		  						<p class="errorMessage" id="dbmsHostOsErrorID" ></p>
                                                                 <label for="dbmsHostOsVersion">Full Version (if known)</label>
                                                                 <br />
-		  						<input size="20" id="dbmsHostOsVersionID" name="dbmsHostOsVersion"></input>
+		  						<input size="20" id="dbmsHostOsVersionID" name="dbmsHostOsVersion" onchange="dbmsHostOsVersionChanged(this)"></input>
 		  	        </div>
 		  	    </div>
                                 <hr>
@@ -793,6 +793,7 @@
                                 console.error('Query Failed getting operating system families ', e) ;
                                 alert('Query Failed getting operating system families ' + e)
                         }                  
+                       document.getElementById("dbmsHostOsID").focus()
                 }
 
 
@@ -859,6 +860,7 @@
                                 console.error('Query Failed getting operating system families ', e) ;
                                 alert('Query Failed getting operating system families ' + e)
                         }                  
+                       document.getElementById("appHostOsID").focus()
                 }
 
                 async function databaseServerFamSelected(databaseServerFam) {
@@ -919,7 +921,7 @@
                                 console.error('Query Failed getting database engines ', e) ;
                                 alert('Query Failed getting database engines ' + e)
                         }                  
-
+                       document.getElementById("databaseServerID").focus()
                 }
 
                 async function handlePermalink() {
@@ -1027,21 +1029,49 @@
                 async function appNameSelected(appName) {
                   resultAreaReset();
                   checkAllSelected();
+                  document.getElementById("applicationVersionID").focus()
+                }
+
+                async function applicationVersionChanged(appVersion) {
+                  resultAreaReset();
+                  checkAllSelected();
+                  document.getElementById("appHostOsFamID").focus()
                 }
 
                 async function appHostOsSelected(appHostOs) {
                   resultAreaReset();
                   checkAllSelected();
+                  document.getElementById("appHostOsVersionID").focus()
+                }
+
+                async function appHostOsVersionChanged(appHostOsVersion) {
+                  resultAreaReset();
+                  checkAllSelected();
+                  document.getElementById("databaseServerFamID").focus()
                 }
 
                 async function databaseServerSelected(databaseServer) {
                   resultAreaReset();
                   checkAllSelected();
+                  document.getElementById("dbmsVersionID").focus()
+                }
+
+                async function dbmsVersionChanged(dbmsVersion) {
+                  resultAreaReset();
+                  checkAllSelected();
+                  document.getElementById("dbmsHostOsFamID").focus()
                 }
 
                 async function dbmsHostOsSelected(dbmsHostOs) {
                   resultAreaReset();
                   checkAllSelected();
+                  document.getElementById("dbmsHostOsVersionID").focus()
+                }
+
+                async function dbmsHostOsVersionChanged(dbmsHostOsVersion) {
+                  resultAreaReset();
+                  checkAllSelected();
+                  document.getElementById("downloadBtnID").focus()
                 }
 
                 function checkAllSelected() {
