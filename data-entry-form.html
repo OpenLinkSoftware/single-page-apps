@@ -16,7 +16,7 @@
 		<script src="https://cdn.jsdelivr.net/npm/rdflib@0.20.1/dist/rdflib.min.js"></script>
 	</head>
 
-	<body>
+	<body onload="onLoad()">
 	<!-- Button feedback spinner -->
 	<div id="spinner"></div>
 	<!-- Start of tabs container -->
@@ -78,6 +78,7 @@
 		  <a id="logged-href" href="" title="" style="margin-top: 5px; margin-left: 15px; max-height: 35px" class="pull-right" class="hidden"><img id="uid-icon" src="./common/uid.png"></a>
 		  <li class="pull-right"> <button id="loginID" style="margin-top: 5px" type="button" onclick="authLogin()" class="hidden btn btn-primary">Login</button> </li>
 		  <li class="pull-right"><button id="logoutID" style="margin-top: 5px" type="button" onclick="authLogout()" class="hidden btn btn-danger">Logout</button></li>
+		  <li class="pull-right"><a id="permalinkID">Permalink</a></li>
 		  
 	  </ul>
 	  <!-- End of tabs menu -->
@@ -95,27 +96,27 @@
 		  					<div class="form-group">
 		  						<label for="subjectID">Subject</label>
 		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="If the subject is not a URI it will be used as the fragment identifier of a Relative URI."></span> 
-		  						<input type="text" class="form-control" placeholder="Subject" id="subjectID">
+		  						<input type="text" class="form-control" placeholder="Subject" id="subjectID" onchange="updatePermalink()">
 		  						<p class="errorMessage" id="subjectErrorID" ></p>
 		  					</div>
 		  					<div class="form-group">
 		  						<label for="predicateID">Predicate</label>
 		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The predicate can either be a URI (ex. http://xmlns.com/foaf/0.1/name) or a curie (ex. foaf:name) because these are preloaded in Virtuoso."></span> 
-		  						<input type="text" class="form-control" placeholder="Predicate" id="predicateID">
+		  						<input type="text" class="form-control" placeholder="Predicate" id="predicateID" onchange="updatePermalink()">
 		  						<p class="errorMessage" id="predicateErrorID" ></p>
 		  					</div>
 		  					<div class="form-group">
 		  						<label for="objectID">Object</label> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Wether or not the Object is a literal value or a reference is determined by the range of the predicate. Quoting the Object will override this feature and make it a literal value."></span> 
-		  						<input type="text" class="form-control" placeholder="Object" id="objectID">
+		  						<input type="text" class="form-control" placeholder="Object" id="objectID" onchange="updatePermalink()">
 		  					</div>
 		  					<div class="form-group">
 		  						<label for="docNameID">Document Name</label>
-		  						<input type="text" class="form-control" value="urn:records:test" id="docNameID">
+		  						<input type="text" class="form-control" value="urn:records:test" id="docNameID" onchange="updatePermalink()">
 		  						<p class="errorMessage" id="docNameErrorID" ></p>
 		  					</div>
 		  					<div class="form-group">
 		  						<label for="endpointID">SPARQL Endpoint</label> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Required for accepted relation object (values) lookup"></span> 
-		  						<input type="text" class="form-control" id="endpointID" size="35" value="https://linkeddata.uriburner.com/sparql"/>
+		  						<input type="text" class="form-control" id="endpointID" size="35" value="https://linkeddata.uriburner.com/sparql" onchange="updatePermalink()"/>
 		  					</div>
 				
 		  					<!-- Start Buttons -->
@@ -1001,7 +1002,62 @@
 	
 	<!-- These Functions Handle the Functionality of the Page -->
 	<script>
-		updateTable(); //Table is always shown when page is loaded
+		//updateTable(); //Table is always shown when page is loaded
+              var initalSubject = "";
+              var initalPredicate = "";
+              var initalObject = "";
+              var initalDocumentName = "";
+              var initalEndpoint = "";
+
+		// Check for permalink once the page has loaded then update the table
+             function onLoad() {
+                  var queryString = window.location.search;
+                  var params = new URLSearchParams(queryString);
+                  var setInputs = params.get("setInputs");
+
+                  resetPermalink();
+                  if (setInputs == "true") {
+                       initialSubject = decodeURIComponent(params.get("subject"));
+                       initialPredicate = decodeURIComponent(params.get("predicate"));
+                       initialObject = decodeURIComponent(params.get("object"));
+                       initialDocumentName = decodeURIComponent(params.get("documentName"));
+                       initialEndpoint = decodeURIComponent(params.get("endpoint"));
+                       handlePermalink();
+                  } else {
+                    updateTable()
+                  }
+                }
+
+		// Handle the permalink parameters
+              function handlePermalink() {
+                  var subject = checkId("subjectID", "subjectID2"); 
+                  var predicate = checkId("predicateID", "predicateID2"); 
+                  var object = checkId("objectID", "objectID2"); 
+                  var documentName = checkId("docNameID", "docNameID2"); 
+                  var endpoint = checkId("endpointID", "endpointID2"); 
+
+                  if (initialSubject != "") {
+                    subject.value = initialSubject;
+                    initialSubject = "";
+                  }
+                  if (initialPredicate != "") {
+                    predicate.value = initialPredicate;
+                    initialPredicate = "";
+                  }
+                  if (initialObject != "") {
+                    object.value = initialObject;
+                    initialObject = "";
+                  }
+                  if (initialDocumentName != "") {
+                    documentName.value = initialDocumentName;
+                    initialDocumentName = "";
+                  }
+                  if (initialEndpoint != "") {
+                    endpoint.value = initialEndpoint;
+                    initialEndpoint = "";
+                  }
+                  updateTable(); 
+              }
 	
 		//SPARQL INSERT SCRIPT
 	    async function recordGen() {
@@ -1653,6 +1709,29 @@
 			await setTableSize() ;	
 			await buttonDisplay() ;  
 		}
+
+                function resetPermalink () {
+                       permalink = document.getElementById("permalinkID");
+                       permalink.href = window.location.href;
+                }
+
+                function updatePermalink () {
+
+                       var permalink = document.getElementById("permalinkID");
+                       var subject = document.getElementById("subjectID");
+                       var predicate = document.getElementById("predicateID");
+                       var object = document.getElementById("objectID");
+                       var documentName = document.getElementById("docNameID");
+                       var endpoint = document.getElementById("endpointID");
+
+                       permalink.href = window.location.origin + window.location.pathname;
+                       permalink.href = permalink.href + "?setInputs=true&";
+                       permalink.href = permalink.href + "subject=" + encodeURIComponent(subject.value) + "&";
+                       permalink.href = permalink.href + "predicate=" +  encodeURIComponent(predicate.value) + "&";
+                       permalink.href = permalink.href + "object=" +  encodeURIComponent(object.value) + "&";
+                       permalink.href = permalink.href + "documentName=" +  encodeURIComponent(documentName.value) + "&";
+                       permalink.href = permalink.href + "endpoint=" +  encodeURIComponent(endpoint.value);
+                }
 	</script>
 	
 	<!-- These functions are used for Authentication -->
