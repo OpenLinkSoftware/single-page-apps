@@ -66,7 +66,7 @@
 		  						<p class="errorMessage" id="applicationNameErrorID" ></p>
                                                                 <label for="applicationVersion">Full Version (if known)</label>
                                                                 <br />
-		  						<input size="20" id="applicationVersionID" name="applicationVersion"></input>
+		  						<input size="20" id="applicationVersionID" name="applicationVersion" onchange="applicationVersionChanged(this)"></input>
 		  	        </div>
 		  	        <div class="col-xs-6">
 	                                                        <label for="appHostOsFamID">Application Host OS Family</label>
@@ -84,7 +84,7 @@
 		  						<p class="errorMessage" id="appHostOsErrorID" ></p>
                                                                 <label for="appHostOsVersion">Full Version (if known)</label>
                                                                 <br />
-		  						<input size="20" id="appHostOsVersionID" name="appHostOsVersion"></input>
+		  						<input size="20" id="appHostOsVersionID" name="appHostOsVersion" onchange="appHostOsVersionChanged(this)"></input>
 		  	        </div>
 		  	    </div>
                                 <hr>
@@ -105,7 +105,7 @@
 		  						<p class="errorMessage" id="databaseServerErrorID" ></p>
                                                                 <label for="dbmsVersion">Full Version (if known)</label>
                                                                 <br />
-		  						<input size="20" id="dbmsVersionID" name="dbmsVersion"></input>
+		  						<input size="20" id="dbmsVersionID" name="dbmsVersion" onchange="dbmsVersionChanged(this)"></input>
 		  	        </div>
 		  	        <div class="col-xs-6">
 	                                                        <label for="dbmsHostOsFamID">Database Server Host OS Family</label>
@@ -123,7 +123,7 @@
 		  						<p class="errorMessage" id="dbmsHostOsErrorID" ></p>
                                                                 <label for="dbmsHostOsVersion">Full Version (if known)</label>
                                                                 <br />
-		  						<input size="20" id="dbmsHostOsVersionID" name="dbmsHostOsVersion"></input>
+		  						<input size="20" id="dbmsHostOsVersionID" name="dbmsHostOsVersion" onchange="dbmsHostOsVersionChanged(this)"></input>
 		  	        </div>
 		  	    </div>
                                 <hr>
@@ -140,7 +140,8 @@
 				
 		  	    </div>
                             <div>
-                            <span id="resultAreaID"> </span>
+                            <span id="resultAreaMultitierID"> </span>
+                            <span id="resultAreaLiteID"> </span>
 		  	    </div>
 		
 	  </div>
@@ -392,11 +393,17 @@
                 }
 
                 function resultAreaReset() {
-                  var resultArea = document.getElementById("resultAreaID");
-                  var child = resultArea.lastElementChild;  
+                  var resultAreaMultitier = document.getElementById("resultAreaMultitierID");
+                  var resultAreaLite = document.getElementById("resultAreaLiteID");
+                  var child = resultAreaMultitier.lastElementChild;  
                   while (child) { 
-                    resultArea.removeChild(child); 
-                    child = resultArea.lastElementChild; 
+                    resultAreaMultitier.removeChild(child); 
+                    child = resultAreaMultitier.lastElementChild; 
+                  } 
+                  child = resultAreaLite.lastElementChild;  
+                  while (child) { 
+                    resultAreaLite.removeChild(child); 
+                    child = resultAreaLite.lastElementChild; 
                   } 
                 }
 
@@ -528,6 +535,10 @@
                                     opt.innerHTML = applications[i].applicationProgramLabel.value;
                                     applicationName.appendChild(opt);
                                 }
+                                var otherOpt = document.createElement('option');
+                                    otherOpt.value = "otherOption";
+                                    otherOpt.innerHTML = "Other";
+                                    applicationName.appendChild(otherOpt);
                                 applicationName.style.display = '';
                                 applicationName.disabled = false;
                                 hideSpinner() ;
@@ -789,6 +800,7 @@
                                 console.error('Query Failed getting operating system families ', e) ;
                                 alert('Query Failed getting operating system families ' + e)
                         }                  
+                       document.getElementById("dbmsHostOsID").focus()
                 }
 
 
@@ -855,6 +867,7 @@
                                 console.error('Query Failed getting operating system families ', e) ;
                                 alert('Query Failed getting operating system families ' + e)
                         }                  
+                       document.getElementById("appHostOsID").focus()
                 }
 
                 async function databaseServerFamSelected(databaseServerFam) {
@@ -915,7 +928,7 @@
                                 console.error('Query Failed getting database engines ', e) ;
                                 alert('Query Failed getting database engines ' + e)
                         }                  
-
+                       document.getElementById("databaseServerID").focus()
                 }
 
                 async function handlePermalink() {
@@ -1023,21 +1036,49 @@
                 async function appNameSelected(appName) {
                   resultAreaReset();
                   checkAllSelected();
+                  document.getElementById("applicationVersionID").focus()
+                }
+
+                async function applicationVersionChanged(appVersion) {
+                  resultAreaReset();
+                  checkAllSelected();
+                  document.getElementById("appHostOsFamID").focus()
                 }
 
                 async function appHostOsSelected(appHostOs) {
                   resultAreaReset();
                   checkAllSelected();
+                  document.getElementById("appHostOsVersionID").focus()
+                }
+
+                async function appHostOsVersionChanged(appHostOsVersion) {
+                  resultAreaReset();
+                  checkAllSelected();
+                  document.getElementById("databaseServerFamID").focus()
                 }
 
                 async function databaseServerSelected(databaseServer) {
                   resultAreaReset();
                   checkAllSelected();
+                  document.getElementById("dbmsVersionID").focus()
+                }
+
+                async function dbmsVersionChanged(dbmsVersion) {
+                  resultAreaReset();
+                  checkAllSelected();
+                  document.getElementById("dbmsHostOsFamID").focus()
                 }
 
                 async function dbmsHostOsSelected(dbmsHostOs) {
                   resultAreaReset();
                   checkAllSelected();
+                  document.getElementById("dbmsHostOsVersionID").focus()
+                }
+
+                async function dbmsHostOsVersionChanged(dbmsHostOsVersion) {
+                  resultAreaReset();
+                  checkAllSelected();
+                  document.getElementById("downloadBtnID").focus()
                 }
 
                 function checkAllSelected() {
@@ -1071,12 +1112,14 @@
                        resultAreaReset();
                        recordSearch();
 
+                       createMTHeading();
                        getMTAgentInstallers();
+                       getMTClientInstallers();
+                       getMTBrokerInstallers();
                        getLiteInstallers();
                        updatePermalink();
                 }
 
-              
                 async function recordSearch() {
 
                        applicationName = document.getElementById("applicationNameID");
@@ -1089,6 +1132,10 @@
                        dbmsHostOsVersion = document.getElementById("dbmsHostOsVersionID");
                        
                        var searchURI = window.location.origin + '/search/' + Date.now();
+ 
+                       var applicationRecord =  "";
+                       if (applicationName != "otherOption")
+                         applicationRecord = "ecrm:hasApplication <" + applicationName.value + "> ; \n"
                        
                        var insert_cmd = 
                          "PREFIX schema: <http://schema.org/>\n" 
@@ -1097,7 +1144,7 @@
                          + "<" + searchURI + "> a ecrm:DownloadSearch ; \n"
                          + "ecrm:hasDatabaseEngine <" + databaseServer.value + "> ; \n"
                          + "ecrm:hasDbmsVersion \"" + dbmsVersion.value + "\" ; \n"
-                         + "ecrm:hasApplication <" + applicationName.value + "> ; \n"
+                         + applicationRecord
                          + "ecrm:hasApplicationVersion \"" + applicationVersion.value + "\" ; \n"
                          + "ecrm:hasServer <" + dbmsHostOs.value + "> ; \n"
                          + "ecrm:hasServerVersion \"" + dbmsHostOsVersion.value + "\" ; \n"
@@ -1148,6 +1195,13 @@
  
                 }
 
+                function createMTHeading() {
+                                var resultAreaMultitier = document.getElementById("resultAreaMultitierID");
+                                var heading = document.createElement('h2');
+                                heading.innerHTML = "Multitier Installers"; 
+                                resultAreaMultitier.appendChild(heading);
+                }
+
                 async function getMTAgentInstallers() {
 
                        databaseServerFam = document.getElementById("databaseServerFamID");
@@ -1184,10 +1238,10 @@
                                 .then((res) => res.json())
                         .then( data =>{
                             if (data.results.bindings.length > 0){
-                                var resultArea = document.getElementById("resultAreaID");
+                                var resultArea = document.getElementById("resultAreaMultitierID");
                                 var results = data.results.bindings;
-                                var heading = document.createElement('h2');
-                                heading.innerHTML = "Multitier Agent Installers"; 
+                                var heading = document.createElement('h3');
+                                heading.innerHTML = "Agent Installers"; 
                                 var list = document.createElement('ul');
                                 for (i in results) {
                                     var item = document.createElement('li');
@@ -1203,13 +1257,13 @@
                                 hideSpinner() ;
                             }
                             else {
-                                //throw new Error("No MT downloads found");
+                                //throw new Error("No MT agent downloads found");
                                 console.log("No MT downloads found");
-                                var resultArea = document.getElementById("resultAreaID");
-                                var heading = document.createElement('h2');
-                                heading.innerHTML = "Multitier Agent Installers"; 
+                                var resultArea = document.getElementById("resultAreaMultitierID");
+                                var heading = document.createElement('h3');
+                                heading.innerHTML = "Agent Installers"; 
                                 var infoMessage = document.createElement('p');
-                                infoMessage.innerHTML = "No multitier downloads found";
+                                infoMessage.innerHTML = "No multitier agent downloads found";
                                 resultArea.appendChild(heading);
                                 resultArea.appendChild(infoMessage);
                                 hideSpinner() ;
@@ -1221,6 +1275,149 @@
                         }                  
                 }
 
+                async function getMTClientInstallers() {
+
+                       databaseServerFam = document.getElementById("databaseServerFamID");
+                       databaseServer = document.getElementById("databaseServerID");
+                       appHostOs = document.getElementById("appHostOsID");
+                       dbmsHostOs = document.getElementById("dbmsHostOsID");
+
+                       var query =     
+                           "DEFINE input:same-as \"yes\" \n"
+                           + "select distinct ?version ?title ?url \n"
+                           + "where { \n"
+                           + "?installer a <http://www.openlinksw.com/ontology/installers#InstallerArchive> . \n"
+                           + "?installer <http://schema.org/name> ?title . \n"
+                           + "?installer <http://schema.org/downloadUrl> ?url . \n"
+                           + "?installer <http://www.openlinksw.com/ontology/software#hasOperatingSystem> <" + appHostOs.value + "> . \n"
+                           + "?installer <http://www.openlinksw.com/ontology/installers#hasInstallerArchiveCategory> <http://data.openlinksw.com/oplweb/component_category/MTGenericClientInstaller#this> . \n"
+                           + "?installer <http://www.openlinksw.com/ontology/products#versionText> ?version . \n"
+                           + "} order by ?version ";
+                       //var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
+                       let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
+
+                       const options = {
+                                    method: 'GET',
+                                    headers: {
+                                               'Content-type': 'application/sparql-results+json; charset=UTF-8',
+                                                                                 },
+                                    credentials: 'include',
+                                    mode: 'cors',
+                                    crossDomain: true,
+                                };
+                        try {
+                        var resp = await fetch(url, options)
+                                .then((res) => res.json())
+                        .then( data =>{
+                            if (data.results.bindings.length > 0){
+                                var resultArea = document.getElementById("resultAreaMultitierID");
+                                var results = data.results.bindings;
+                                var heading = document.createElement('h3');
+                                heading.innerHTML = "Client Installers"; 
+                                var list = document.createElement('ul');
+                                for (i in results) {
+                                    var item = document.createElement('li');
+                                    var link = document.createElement('a');
+                                    link.innerHTML = results[i].title.value;
+                                    link.href = results[i].url.value;
+                                    item.innerHTML = "Release " + results[i].version.value + " ";
+                                    item.appendChild(link);
+                                    list.appendChild(item);
+                                }
+                                resultArea.appendChild(heading);
+                                resultArea.appendChild(list);
+                                hideSpinner() ;
+                            }
+                            else {
+                                //throw new Error("No MT client downloads found");
+                                console.log("No MT client downloads found");
+                                var resultArea = document.getElementById("resultAreaMultitierID");
+                                var heading = document.createElement('h3');
+                                heading.innerHTML = "Client Installers"; 
+                                var infoMessage = document.createElement('p');
+                                infoMessage.innerHTML = "No multitier client downloads found";
+                                resultArea.appendChild(heading);
+                                resultArea.appendChild(infoMessage);
+                                hideSpinner() ;
+                            }
+                        })
+                        } catch(e) {
+                                console.error('Error getting lite installers ', e) ;
+                                alert('Error getting installers ' + e)
+                        }                  
+                }
+
+                async function getMTBrokerInstallers() {
+
+                       databaseServerFam = document.getElementById("databaseServerFamID");
+                       databaseServer = document.getElementById("databaseServerID");
+                       appHostOs = document.getElementById("appHostOsID");
+                       dbmsHostOs = document.getElementById("dbmsHostOsID");
+
+                       var query =     
+                           "DEFINE input:same-as \"yes\" \n"
+                           + "select distinct ?version ?title ?url \n"
+                           + "where { \n"
+                           + "?installer a <http://www.openlinksw.com/ontology/installers#InstallerArchive> . \n"
+                           + "?installer <http://schema.org/name> ?title . \n"
+                           + "?installer <http://schema.org/downloadUrl> ?url . \n"
+                           + "?installer <http://www.openlinksw.com/ontology/software#hasOperatingSystem> <" + dbmsHostOs.value + "> . \n"
+                           + "?installer <http://www.openlinksw.com/ontology/installers#hasInstallerArchiveCategory> <http://data.openlinksw.com/oplweb/component_category/MTServerRBrokerInstaller#this> . \n"
+                           + "?installer <http://www.openlinksw.com/ontology/products#versionText> ?version . \n"
+                           + "} order by ?version ";
+                       //var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
+                       let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
+
+                       const options = {
+                                    method: 'GET',
+                                    headers: {
+                                               'Content-type': 'application/sparql-results+json; charset=UTF-8',
+                                                                                 },
+                                    credentials: 'include',
+                                    mode: 'cors',
+                                    crossDomain: true,
+                                };
+                        try {
+                        var resp = await fetch(url, options)
+                                .then((res) => res.json())
+                        .then( data =>{
+                            if (data.results.bindings.length > 0){
+                                var resultArea = document.getElementById("resultAreaMultitierID");
+                                var results = data.results.bindings;
+                                var heading = document.createElement('h3');
+                                heading.innerHTML = "Broker Installers"; 
+                                var list = document.createElement('ul');
+                                for (i in results) {
+                                    var item = document.createElement('li');
+                                    var link = document.createElement('a');
+                                    link.innerHTML = results[i].title.value;
+                                    link.href = results[i].url.value;
+                                    item.innerHTML = "Release " + results[i].version.value + " ";
+                                    item.appendChild(link);
+                                    list.appendChild(item);
+                                }
+                                resultArea.appendChild(heading);
+                                resultArea.appendChild(list);
+                                hideSpinner() ;
+                            }
+                            else {
+                                //throw new Error("No MT broker downloads found");
+                                console.log("No MT broker downloads found");
+                                var resultArea = document.getElementById("resultAreaMultitierID");
+                                var heading = document.createElement('h3');
+                                heading.innerHTML = "Broker Installers"; 
+                                var infoMessage = document.createElement('p');
+                                infoMessage.innerHTML = "No multitier broker downloads found";
+                                resultArea.appendChild(heading);
+                                resultArea.appendChild(infoMessage);
+                                hideSpinner() ;
+                            }
+                        })
+                        } catch(e) {
+                                console.error('Error getting lite installers ', e) ;
+                                alert('Error getting installers ' + e)
+                        }                  
+                }
 
                 async function getLiteInstallers() {
 
@@ -1258,7 +1455,7 @@
                                 .then((res) => res.json())
                         .then( data =>{
                             if (data.results.bindings.length > 0){
-                                var resultArea = document.getElementById("resultAreaID");
+                                var resultArea = document.getElementById("resultAreaLiteID");
                                 var results = data.results.bindings;
                                 var heading = document.createElement('h2');
                                 heading.innerHTML = "Lite Installers"; 
@@ -1279,7 +1476,7 @@
                             else {
                                 //throw new Error("No lite downloads found");
                                 console.log("No lite downloads found");
-                                var resultArea = document.getElementById("resultAreaID");
+                                var resultArea = document.getElementById("resultAreaLiteID");
                                 var heading = document.createElement('h2');
                                 heading.innerHTML = "Lite Installers"; 
                                 var infoMessage = document.createElement('p');
