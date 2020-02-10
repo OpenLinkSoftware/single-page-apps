@@ -287,6 +287,7 @@
 	<!-- These Functions Handle the Functionality of the Page -->
 	<script>
 
+                var installerArray = [];
                 //var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
                 //var endpoint = "https://localhost/sparql?default-graph-uri=&query=" ;
                 var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
@@ -302,9 +303,30 @@
 
                 function onLoad() {
 
-                  // build the data island
-                  $("#dataIslandID").text(function() {
-                    return JSON.stringify({
+                  document.getElementById("dataIslandID").text = JSON.stringify(getInitialJsonMetadata()); 
+
+                  // check for params - if so set the dropdowns and get the downloads
+                  var queryString = window.location.search;
+                  var params = new URLSearchParams(queryString);
+                  var getResults = params.get("getResults");
+
+                  if (getResults == "true") {
+                       initialApplicationName = decodeURIComponent(params.get("applicationName"));
+                       initialDatabaseServerFam = decodeURIComponent(params.get("databaseServerFam"));
+                       initialDatabaseServer = decodeURIComponent(params.get("databaseServer"));
+                       initialAppHostOsFam = decodeURIComponent(params.get("appHostOsFam"));
+                       initialAppHostOs = decodeURIComponent(params.get("appHostOs"));
+                       initialDbmsHostOsFam = decodeURIComponent(params.get("dbmsHostOsFam"));
+                       initialDbmsHostOs = decodeURIComponent(params.get("dbmsHostOs"));
+                       handlePermalink();
+                  } else {
+                    clearInput()
+                  }
+                }
+
+                // build the data island
+                function getInitialJsonMetadata () {
+                    return {
                       "@context": {
                         "schema": "http://schema.org/",
                         "xsd": "http://www.w3.org/2001/XMLSchema#"
@@ -329,29 +351,18 @@
                           ]
                         }
                       ]
-                      });
-                  });
+                    };
+                }
 
-                  // check for params - if so set the dropdowns and get the downloads
-                  var queryString = window.location.search;
-                  var params = new URLSearchParams(queryString);
-                  var getResults = params.get("getResults");
+                function getSchemaAboutRelations (installerArray) {
+                    let myJson = JSON.parse(document.getElementById("dataIslandID").text);
 
-                  if (getResults == "true") {
-                       initialApplicationName = decodeURIComponent(params.get("applicationName"));
-                       initialDatabaseServerFam = decodeURIComponent(params.get("databaseServerFam"));
-                       initialDatabaseServer = decodeURIComponent(params.get("databaseServer"));
-                       initialAppHostOsFam = decodeURIComponent(params.get("appHostOsFam"));
-                       initialAppHostOs = decodeURIComponent(params.get("appHostOs"));
-                       initialDbmsHostOsFam = decodeURIComponent(params.get("dbmsHostOsFam"));
-                       initialDbmsHostOs = decodeURIComponent(params.get("dbmsHostOs"));
-                       handlePermalink();
-                  } else {
-                    clearInput()
-                  }
+                    myJson["@graph"][0]["schema:about"] = installerArray;
+                    return myJson;
                 }
 
                 function clearInput(){
+                  document.getElementById("dataIslandID").text = JSON.stringify(getInitialJsonMetadata()); 
                   document.getElementById("messageSpanID").textContent = "";
                   resultAreaReset();
                   applicationNameSelectorReset();
@@ -1106,18 +1117,22 @@
                   }
                 }
 
-                function findDownloads() {
+                async function findDownloads() {
                        showSpinner() ;
+                       updatePermalink();
+                       installerArray = [];
+                       document.getElementById("dataIslandID").text = JSON.stringify(getSchemaAboutRelations(installerArray)); 
 
                        resultAreaReset();
-                       recordSearch();
+                       var resp = await recordSearch();
 
-                       createMTHeading();
-                       getMTAgentInstallers();
-                       getMTClientInstallers();
-                       getMTBrokerInstallers();
-                       getLiteInstallers();
-                       updatePermalink();
+                       if (resp > 0) {
+                         createMTHeading();
+                         getMTAgentInstallers();
+                         getMTClientInstallers();
+                         getMTBrokerInstallers();
+                         getLiteInstallers();
+                       }
                 }
 
                 async function recordSearch() {
@@ -1177,19 +1192,23 @@
                        };
                 
                        try {
-                      var resp = await fetch(url,options);
+                       var resp = await fetch(url,options);
                                 if (resp.status >= 200 && resp.status <= 300) {
                                         console.log(resp.status + " - " + resp.statusText) ;
                                         hideSpinner() ;
+                                        return resp.status;
                                 } else {
-                                        throw new Error("Error " + resp.status +" - " + resp.statusText) ;
-                                        hideSpinner() ;
+                                        if (resp.status = 403) 
+                                          throw new Error("You must log in to continue") ;
+                                        else 
+                                          throw new Error("'Insert Failed: Error " + resp.status +" - " + resp.statusText) ;
                                 }
 
                        } catch(e) {
                                 hideSpinner() ;
                                 console.error('Insert Failed', e) ;
-                                alert('Insert Failed ' + e)
+                                alert(e)
+                                return 0;
                        }  
 
  
@@ -1203,6 +1222,7 @@
                 }
 
                 async function getMTAgentInstallers() {
+                       var localInstallerArray = [];
 
                        databaseServerFam = document.getElementById("databaseServerFamID");
                        databaseServer = document.getElementById("databaseServerID");
@@ -1211,7 +1231,7 @@
 
                        var query =     
                            "DEFINE input:same-as \"yes\" \n"
-                           + "select distinct ?version ?title ?url \n"
+                           + "select distinct ?installer ?version ?title ?url \n"
                            + "where { \n"
                            + "?installer a <http://www.openlinksw.com/ontology/installers#InstallerArchive> . \n"
                            + "?installer <http://schema.org/name> ?title . \n"
@@ -1251,9 +1271,12 @@
                                     item.innerHTML = "Release " + results[i].version.value + " ";
                                     item.appendChild(link);
                                     list.appendChild(item);
+                                    localInstallerArray = localInstallerArray.concat(results[i].installer.value);
                                 }
                                 resultArea.appendChild(heading);
                                 resultArea.appendChild(list);
+                                installerArray = installerArray.concat(localInstallerArray);
+                                document.getElementById("dataIslandID").text = JSON.stringify(getSchemaAboutRelations(installerArray)); 
                                 hideSpinner() ;
                             }
                             else {
@@ -1270,12 +1293,13 @@
                             }
                         })
                         } catch(e) {
-                                console.error('Error getting lite installers ', e) ;
+                                console.error('Error getting multitier agent installers ', e) ;
                                 alert('Error getting installers ' + e)
                         }                  
                 }
 
                 async function getMTClientInstallers() {
+                       var localInstallerArray = [];
 
                        databaseServerFam = document.getElementById("databaseServerFamID");
                        databaseServer = document.getElementById("databaseServerID");
@@ -1284,7 +1308,7 @@
 
                        var query =     
                            "DEFINE input:same-as \"yes\" \n"
-                           + "select distinct ?version ?title ?url \n"
+                           + "select distinct ?installer ?version ?title ?url \n"
                            + "where { \n"
                            + "?installer a <http://www.openlinksw.com/ontology/installers#InstallerArchive> . \n"
                            + "?installer <http://schema.org/name> ?title . \n"
@@ -1323,9 +1347,12 @@
                                     item.innerHTML = "Release " + results[i].version.value + " ";
                                     item.appendChild(link);
                                     list.appendChild(item);
+                                    localInstallerArray = localInstallerArray.concat(results[i].installer.value);
                                 }
                                 resultArea.appendChild(heading);
                                 resultArea.appendChild(list);
+                                installerArray = installerArray.concat(localInstallerArray);
+                                document.getElementById("dataIslandID").text = JSON.stringify(getSchemaAboutRelations(installerArray)); 
                                 hideSpinner() ;
                             }
                             else {
@@ -1342,12 +1369,13 @@
                             }
                         })
                         } catch(e) {
-                                console.error('Error getting lite installers ', e) ;
+                                console.error('Error getting multitier client installers ', e) ;
                                 alert('Error getting installers ' + e)
                         }                  
                 }
 
                 async function getMTBrokerInstallers() {
+                       var localInstallerArray = [];
 
                        databaseServerFam = document.getElementById("databaseServerFamID");
                        databaseServer = document.getElementById("databaseServerID");
@@ -1356,7 +1384,7 @@
 
                        var query =     
                            "DEFINE input:same-as \"yes\" \n"
-                           + "select distinct ?version ?title ?url \n"
+                           + "select distinct ?installer ?version ?title ?url \n"
                            + "where { \n"
                            + "?installer a <http://www.openlinksw.com/ontology/installers#InstallerArchive> . \n"
                            + "?installer <http://schema.org/name> ?title . \n"
@@ -1395,9 +1423,12 @@
                                     item.innerHTML = "Release " + results[i].version.value + " ";
                                     item.appendChild(link);
                                     list.appendChild(item);
+                                    localInstallerArray = localInstallerArray.concat(results[i].installer.value);
                                 }
                                 resultArea.appendChild(heading);
                                 resultArea.appendChild(list);
+                                installerArray = installerArray.concat(localInstallerArray);
+                                document.getElementById("dataIslandID").text = JSON.stringify(getSchemaAboutRelations(installerArray)); 
                                 hideSpinner() ;
                             }
                             else {
@@ -1414,12 +1445,13 @@
                             }
                         })
                         } catch(e) {
-                                console.error('Error getting lite installers ', e) ;
+                                console.error('Error getting multitier broker installers ', e) ;
                                 alert('Error getting installers ' + e)
                         }                  
                 }
 
                 async function getLiteInstallers() {
+                       var localInstallerArray = [];
 
                        databaseServerFam = document.getElementById("databaseServerFamID");
                        databaseServer = document.getElementById("databaseServerID");
@@ -1428,7 +1460,7 @@
 
                        var query =     
                            "DEFINE input:same-as \"yes\" \n"
-                           + "select distinct ?version ?title ?url \n"
+                           + "select distinct ?installer ?version ?title ?url \n"
                            + "where { \n"
                            + "?installer a <http://www.openlinksw.com/ontology/installers#InstallerArchive> . \n"
                            + "?installer <http://schema.org/name> ?title . \n"
@@ -1468,9 +1500,12 @@
                                     item.innerHTML = "Release " + results[i].version.value + " ";
                                     item.appendChild(link);
                                     list.appendChild(item);
+                                    localInstallerArray = localInstallerArray.concat(results[i].installer.value);
                                 }
                                 resultArea.appendChild(heading);
                                 resultArea.appendChild(list);
+                                installerArray = installerArray.concat(localInstallerArray);
+                                document.getElementById("dataIslandID").text = JSON.stringify(getSchemaAboutRelations(installerArray)); 
                                 hideSpinner() ;
                             }
                             else {
@@ -1494,7 +1529,7 @@
 
                 function resetPermalink () {
                        permalink = document.getElementById("permalinkID");
-                       permalink.href = window.location.href;
+                       permalink.href = window.location.origin + window.location.pathname;
                 }
 
                 function updatePermalink () {
@@ -1594,7 +1629,7 @@
                    await solid.auth.logout()
                }
                // Now that we have a cookie, reload to display the authenticated page
-               location.reload()
+               window.location = document.getElementById("permalinkID").href;
             }
         }
        
