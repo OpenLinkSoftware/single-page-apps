@@ -96,7 +96,7 @@
 		  					<div class="form-group">
 		  						<label for="subjectID">Subject</label>
 		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="If the subject is not a URI it will be used as the fragment identifier of a Relative URI."></span> 
-		  						<input type="text" class="form-control" placeholder="Subject" id="subjectID" onchange="updatePermalink()">
+		  						<textarea class="form-control" placeholder="Subject" rows="1" style="resize:vertical" id="subjectID" onchange="updatePermalink()"></textarea>
 		  						<p class="errorMessage" id="subjectErrorID" ></p>
 		  					</div>
 		  					<div class="form-group">
@@ -106,8 +106,8 @@
 		  						<p class="errorMessage" id="predicateErrorID" ></p>
 		  					</div>
 		  					<div class="form-group">
-		  						<label for="objectID">Object</label> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Wether or not the Object is a literal value or a reference is determined by the range of the predicate. Quoting the Object will override this feature and make it a literal value."></span> 
-		  						<input type="text" class="form-control" placeholder="Object" id="objectID" onchange="updatePermalink()">
+		  						<label for="objectID">Object</label> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Whether or not the Object is a literal value or a reference is determined by the range of the predicate. Quoting the Object will override this feature and make it a literal value."></span> 
+		  						<textarea class="form-control" placeholder="Object" rows="1" style="resize:vertical" id="objectID" onchange="updatePermalink()"></textarea>
 		  					</div>
 		  					<div class="form-group">
 		  						<label for="docNameID">Document Name</label>
@@ -167,7 +167,7 @@
 		  					<div class="form-group">
 		  						<label for="subjectID2">Subject</label>
 		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="If the subject is not a URI it will be used as the fragment identifier of a Relative URI."></span> 
-		  						<input type="text" class="form-control" placeholder="Subject" id="subjectID2">
+		  						<textarea class="form-control" placeholder="Subject" rows="1" style="resize:vertical" id="subjectID2" onchange="updatePermalink()"></textarea>
 		  						<p class="errorMessage" id="subjectErrorID2" ></p>
 		  					</div>
 		  					<div class="form-group">
@@ -178,16 +178,16 @@
 		  					</div>
 		  					<div class="form-group">
 		  						<label for="objectID2">Object</label> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Wether or not the Object is a literal value or a reference is determined by the range of the predicate. Quoting the Object will override this feature and make it a literal value."></span> 
-		  						<input type="text" class="form-control" placeholder="Object" id="objectID2">
+		  						<textarea class="form-control" placeholder="Object" rows="1" style="resize:vertical" id="objectID2" onchange="updatePermalink()"></textarea>
 		  					</div>
 		  					<div class="form-group">
 		  						<label for="docNameID2">Document Name</label>
-		  						<input type="text" class="form-control" value="https://kingsley.idehen.net/public_home/jordan/Public/record-test.ttl" id="docNameID2">
+		  						<input type="text" class="form-control" value="https://kingsley.idehen.net/public_home/jordan/Public/record-test.ttl" id="docNameID2" onchange="updatePermalink()">
 		  						<p class="errorMessage" id="docNameErrorID2" ></p>
 		  					</div>
 		  					<div class="form-group">
 		  						<label for="endpointID2">SPARQL Endpoint (required for predicate lookup)</label> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Required for accepted relation object (values) lookup"></span> 
-		  						<input type="text" class="form-control" id="endpointID2" size="35" value="https://linkeddata.uriburner.com/sparql"/>
+		  						<input type="text" class="form-control" id="endpointID2" size="35" value="https://linkeddata.uriburner.com/sparql" onchange="updatePermalink()"/>
 		  					</div>
 
 		  					<!-- Start Buttons -->
@@ -1003,6 +1003,7 @@
 	<!-- These Functions Handle the Functionality of the Page -->
 	<script>
 		//updateTable(); //Table is always shown when page is loaded
+              var initalTab = "";
               var initalSubject = "";
               var initalPredicate = "";
               var initalObject = "";
@@ -1017,11 +1018,16 @@
 
                   resetPermalink();
                   if (setInputs == "true") {
+                       initialTab = decodeURIComponent(params.get("tab"));
                        initialSubject = decodeURIComponent(params.get("subject"));
                        initialPredicate = decodeURIComponent(params.get("predicate"));
                        initialObject = decodeURIComponent(params.get("object"));
                        initialDocumentName = decodeURIComponent(params.get("documentName"));
                        initialEndpoint = decodeURIComponent(params.get("endpoint"));
+                       if (initialTab == "dbms")
+                          $('a[href="#dbmsID"]').tab('show');
+                       else if (initialTab == "fs")
+                          $('a[href="#fsID"]').tab('show');
                        handlePermalink();
                   } else {
                     updateTable()
@@ -1718,14 +1724,22 @@
                 function updatePermalink () {
 
                        var permalink = document.getElementById("permalinkID");
-                       var subject = document.getElementById("subjectID");
-                       var predicate = document.getElementById("predicateID");
-                       var object = document.getElementById("objectID");
-                       var documentName = document.getElementById("docNameID");
-                       var endpoint = document.getElementById("endpointID");
+                       var subject = checkId("subjectID", "subjectID2"); 
+                       var predicate = checkId("predicateID", "predicateID2"); 
+                       var object = checkId("objectID", "objectID2"); 
+                       var documentName = checkId("docNameID", "docNameID2"); 
+                       var endpoint = checkId("endpointID", "endpointID2"); 
+                       var tab = "";
+
+			if (document.getElementById('dbmsTabID').getAttribute('class') == "active"){
+				tab = "dbms";
+			} else if (document.getElementById('fsTabID').getAttribute('class') == "active"){
+				tab = "fs";
+			}
 
                        permalink.href = window.location.origin + window.location.pathname;
                        permalink.href = permalink.href + "?setInputs=true&";
+                       permalink.href = permalink.href + "tab=" + encodeURIComponent(tab) + "&";
                        permalink.href = permalink.href + "subject=" + encodeURIComponent(subject.value) + "&";
                        permalink.href = permalink.href + "predicate=" +  encodeURIComponent(predicate.value) + "&";
                        permalink.href = permalink.href + "object=" +  encodeURIComponent(object.value) + "&";
