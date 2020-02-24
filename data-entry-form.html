@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -16,7 +15,7 @@
 		<script src="https://cdn.jsdelivr.net/npm/rdflib@0.20.1/dist/rdflib.min.js"></script>
 	</head>
 
-	<body onload="onLoad()">
+	<body>
 	<!-- Button feedback spinner -->
 	<div id="spinner"></div>
 	<!-- Start of tabs container -->
@@ -318,14 +317,40 @@
 
 	<!-- These Functions Modify the Onscreen Display -->
 	<script>
-		docNameValue() ; //Checks/Updates document name when page is loaded
+		//docNameValue() ; //Checks/Updates document name when page is loaded
 		var solid_storage = null; 
+                var initalTab = "";
+                var initalSubject = "";
+                var initalPredicate = "";
+                var initalObject = "";
+                var initalDocumentName = "";
+                var initalEndpoint = "";
 	  
 		//Tooltip activation function
 		$(document).ready(function(){
 		    $('[data-toggle="tooltip"]').tooltip({
 		        placement : 'right'
 		    }); 
+
+                  // check for permalink
+                  var queryString = window.location.search;
+                  var params = new URLSearchParams(queryString);
+                  var setInputs = params.get("setInputs");
+                 
+                  resetPermalink();
+                  if (setInputs == "true") {
+                       initialTab = decodeURIComponent(params.get("tab"));
+                       initialSubject = decodeURIComponent(params.get("subject"));
+                       initialPredicate = decodeURIComponent(params.get("predicate"));
+                       initialObject = decodeURIComponent(params.get("object"));
+                       initialDocumentName = decodeURIComponent(params.get("documentName"));
+                       initialEndpoint = decodeURIComponent(params.get("endpoint"));
+                       handlePermalink();
+                       if (initialTab == "dbms")
+                          $('a[href="#dbmsID"]').tab('show');
+                       else if (initialTab == "fs")
+                          $('a[href="#fsID"]').tab('show');
+                  }
 
 		  const loginButton = document.getElementById('loginID');
 		  const logoutButton = document.getElementById('logoutID');
@@ -343,7 +368,7 @@
 
 	                  solid_storage = await fetchProfile(session.webId);
 	                  sessionStorage.setItem('solid_storage', solid_storage);
-                      await docNameValue()
+                          await docNameValue()
 	                }
 
 	              } else {
@@ -353,9 +378,48 @@
 	                solid_storage = null;
 	                sessionStorage.removeItem('solid_storage');
 	              }
-	            })
+                      updateTable();
+	            });
 		});
-		
+
+                function checkPermalinkTab (id1, id2) {
+			if (initialTab == 'dbms') {
+				return document.getElementById(id1) ;
+			} else if (initialTab == 'fs'){
+				return document.getElementById(id2) ;
+			}
+		}
+
+		// Handle the permalink parameters
+                function handlePermalink() {
+                    var subject = checkPermalinkTab("subjectID", "subjectID2"); 
+                    var predicate = checkPermalinkTab("predicateID", "predicateID2"); 
+                    var object = checkPermalinkTab("objectID", "objectID2"); 
+                    var documentName = checkPermalinkTab("docNameID", "docNameID2"); 
+                    var endpoint = checkPermalinkTab("endpointID", "endpointID2"); 
+          
+                    if (initialSubject != "") {
+                      subject.value = initialSubject;
+                      initialSubject = "";
+                    }
+                    if (initialPredicate != "") {
+                      predicate.value = initialPredicate;
+                      initialPredicate = "";
+                    }
+                    if (initialObject != "") {
+                      object.value = initialObject;
+                      initialObject = "";
+                    }
+                    if (initialDocumentName != "") {
+                      documentName.value = initialDocumentName;
+                      //initialDocumentName = "";
+                    }
+                    if (initialEndpoint != "") {
+                      endpoint.value = initialEndpoint;
+                      initialEndpoint = "";
+                    }
+                }
+	
 		/* Gets the solid storage from window > application > session storage 
 		so it can be used as the document name for functions 
 		function is called when page is loaded/reloaded */
@@ -373,6 +437,11 @@
 				document.getElementById("docNameID").value = solid_storage_value ;
 				document.getElementById("docNameID2").value = solid_storage_value ;	
 			}
+
+                        // value from permalink  
+                        var documentName = checkPermalinkTab("docNameID", "docNameID2"); 
+                        documentName.value = initialDocumentName;
+
 		}
 		
 		// Clears subject, predicate, object input fields
@@ -1003,68 +1072,8 @@
 	<!-- These Functions Handle the Functionality of the Page -->
 	<script>
 		//updateTable(); //Table is always shown when page is loaded
-              var initalTab = "";
-              var initalSubject = "";
-              var initalPredicate = "";
-              var initalObject = "";
-              var initalDocumentName = "";
-              var initalEndpoint = "";
 
-		// Check for permalink once the page has loaded then update the table
-             function onLoad() {
-                  var queryString = window.location.search;
-                  var params = new URLSearchParams(queryString);
-                  var setInputs = params.get("setInputs");
 
-                  resetPermalink();
-                  if (setInputs == "true") {
-                       initialTab = decodeURIComponent(params.get("tab"));
-                       initialSubject = decodeURIComponent(params.get("subject"));
-                       initialPredicate = decodeURIComponent(params.get("predicate"));
-                       initialObject = decodeURIComponent(params.get("object"));
-                       initialDocumentName = decodeURIComponent(params.get("documentName"));
-                       initialEndpoint = decodeURIComponent(params.get("endpoint"));
-                       if (initialTab == "dbms")
-                          $('a[href="#dbmsID"]').tab('show');
-                       else if (initialTab == "fs")
-                          $('a[href="#fsID"]').tab('show');
-                       handlePermalink();
-                  } else {
-                    updateTable()
-                  }
-                }
-
-		// Handle the permalink parameters
-              function handlePermalink() {
-                  var subject = checkId("subjectID", "subjectID2"); 
-                  var predicate = checkId("predicateID", "predicateID2"); 
-                  var object = checkId("objectID", "objectID2"); 
-                  var documentName = checkId("docNameID", "docNameID2"); 
-                  var endpoint = checkId("endpointID", "endpointID2"); 
-
-                  if (initialSubject != "") {
-                    subject.value = initialSubject;
-                    initialSubject = "";
-                  }
-                  if (initialPredicate != "") {
-                    predicate.value = initialPredicate;
-                    initialPredicate = "";
-                  }
-                  if (initialObject != "") {
-                    object.value = initialObject;
-                    initialObject = "";
-                  }
-                  if (initialDocumentName != "") {
-                    documentName.value = initialDocumentName;
-                    initialDocumentName = "";
-                  }
-                  if (initialEndpoint != "") {
-                    endpoint.value = initialEndpoint;
-                    initialEndpoint = "";
-                  }
-                  updateTable(); 
-              }
-	
 		//SPARQL INSERT SCRIPT
 	    async function recordGen() {
 			await setLimit() ;
