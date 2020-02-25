@@ -361,7 +361,7 @@
 		function is called when page is loaded/reloaded */
 		async function docNameValue() {
 			solid_storage = await sessionStorage.getItem("solid_storage")
-			var solid_storage_value = solid_storage + "mydata.ttl" ;
+			var solid_storage_value = solid_storage ;
 			if (document.getElementById("cmdID").checked == true) {
 				console.log('solid storage: ' + solid_storage); 
 			}
