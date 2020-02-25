@@ -982,16 +982,22 @@
 			
 			try {
 		        var resp = await fetch(url,options)
-	
-				.then((res) => res.json())
-		        .then( data =>{
-					
-		            if (data.results.bindings.length > 0){
-						tableSize = Number(data.results.bindings[0].count.value) ;
-		            } else{
-						console.log("Table size is 0");
-		            }
-				})	
+	            if (resp.ok && resp.status == 200) {
+	              var data = await resp.json();
+
+		          if (data.results.bindings.length > 0){
+					tableSize = Number(data.results.bindings[0].count.value) ;
+		          } else{
+					console.log("Table size is 0");
+		          }
+
+	            } else {
+	              var msg = await resp.text();
+	              hideSpinner();
+	              console.error("Error: "+msg)
+	              alert("Error: "+msg);
+	            }
+
 			} catch(e) {
 				hideSpinner() ;
 				console.error('Table Size Failed', e) ;
@@ -1281,43 +1287,49 @@
 	                        };
 			try {
 		        var resp = await fetch(url,options)
-			
-				.then((res) => res.json())
-		        .then( data =>{
+	            if (resp.ok && resp.status == 200) {
+	              var data = await resp.json();
+
+				  refreshTable();
 				
-				    refreshTable();
-					
-					/*
+				  /*
                     Dynamic Table for processing JSON Structured Data (via "application/sparql-results+json" document content type)
                     that enables INSERT to be handled via a 3-tuple subject, predicate, object graph (relation) while query results 
                     are handled via an N-Tuple structured table (relation).
-                    */
-		            if (data.results.bindings.length > 0){
-						var table = checkId("dbmsTableID", "fsTableID") ; // creates table for header
-						var header = table.createTHead(); // creates empty tHead
-						var headRow = header.insertRow(0); // inserts row into tHead
-						var bindings = data.results.bindings;
-						for (var col = 0; col < data.head.vars.length; col++) { // for each column
-							var headCell = headRow.insertCell(col); // inserts new cell at position i in thead
-							headCell.innerHTML = "<b>" + data.head.vars[col] + "</b>"; // adds bold text to thead cell
-							}
-						for (i in bindings) {
-							var curr = 0 ; // curr is used to keep track of correct cell position
-							var binding = bindings[i];
-							var bodyRow = table.insertRow(-1); // create new row
-							for (n in binding) {
-								var bodyCell = bodyRow.insertCell(curr); // create new cell in row
-								bodyCell.innerHTML = tableFormat(binding[n].value); // set value of cell
-								curr += 1 ;
-							}
+                  */
+		          if (data.results.bindings.length > 0){
+					var table = checkId("dbmsTableID", "fsTableID") ; // creates table for header
+					var header = table.createTHead(); // creates empty tHead
+					var headRow = header.insertRow(0); // inserts row into tHead
+					var bindings = data.results.bindings;
+					for (var col = 0; col < data.head.vars.length; col++) { // for each column
+						var headCell = headRow.insertCell(col); // inserts new cell at position i in thead
+						headCell.innerHTML = "<b>" + data.head.vars[col] + "</b>"; // adds bold text to thead cell
 						}
-						hideSpinner() ;
-		            }	
-		            else{
-						hideSpinner() ;
-						console.log("No data returned by query");
-		            }
-				})
+					for (i in bindings) {
+						var curr = 0 ; // curr is used to keep track of correct cell position
+						var binding = bindings[i];
+						var bodyRow = table.insertRow(-1); // create new row
+						for (n in binding) {
+							var bodyCell = bodyRow.insertCell(curr); // create new cell in row
+							bodyCell.innerHTML = tableFormat(binding[n].value); // set value of cell
+							curr += 1 ;
+						}
+					}
+					hideSpinner() ;
+		          }	
+		          else{
+					hideSpinner() ;
+					console.log("No data returned by query");
+		          }
+
+	            } else {
+	              var msg = await resp.text();
+	              hideSpinner();
+				  console.error('Query Failed', msg) ;
+				  alert('Query Failed ' + msg)
+	            }
+
 			} catch(e) {
 				hideSpinner() ;
 				console.error('Query Failed', e) ;
@@ -1391,61 +1403,68 @@
 	                        };
 			try {
 		        var resp = await fetch(url,options)
-			
-				.then((res) => res.json())
-		        .then( data =>{
-				
-				    refreshTable();
-					createHeader();
 
-		            if (data.results.bindings.length > 0){
-						var table = checkId("dbmsTableID", "fsTableID") ;
-						var object = nonvalidatedObject() ;
-						for (var i = 0; i < data.results.bindings.length; i++) {
-							var subject = data.results.bindings[i].subject.value ;
-							var predicate = data.results.bindings[i].predicate.value ;
-							var object = data.results.bindings[i].object.value ;
-							if (document.getElementById("fctID").checked == true) { //if fct checkbox is checked
-								if (subject.includes(graph) || regexp.test(subject)) { //if subject is not a literal value
-									subject = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].subject.value ;
-									subject = subject.replace("#", "%23"); // replaces # with %23 for fct results
-								}
-								
-								if (predicate.includes(graph) || regexp.test(predicate)) { //if subject is not a literal value
-									predicate = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].predicate.value ;
-									predicate = predicate.replace("#", "%23");
-								}
-								
-								if (object.includes(graph) || regexp.test(object)) {
-									object = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].object.value ;
-									object = object.replace("#", "%23");
-								} else { //if object is literal value
-									object = data.results.bindings[i].object.value ;
-								}
-								
-							} else {
-								subject = data.results.bindings[i].subject.value ;
-								predicate = data.results.bindings[i].predicate.value ;
+	            if (resp.ok && resp.status == 200) {
+	              var data = await resp.json();
+
+				  refreshTable();
+				  createHeader();
+
+		          if (data.results.bindings.length > 0){
+					var table = checkId("dbmsTableID", "fsTableID") ;
+					var object = nonvalidatedObject() ;
+					for (var i = 0; i < data.results.bindings.length; i++) {
+						var subject = data.results.bindings[i].subject.value ;
+						var predicate = data.results.bindings[i].predicate.value ;
+						var object = data.results.bindings[i].object.value ;
+						if (document.getElementById("fctID").checked == true) { //if fct checkbox is checked
+							if (subject.includes(graph) || regexp.test(subject)) { //if subject is not a literal value
+								subject = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].subject.value ;
+								subject = subject.replace("#", "%23"); // replaces # with %23 for fct results
+							}
+							
+							if (predicate.includes(graph) || regexp.test(predicate)) { //if subject is not a literal value
+								predicate = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].predicate.value ;
+								predicate = predicate.replace("#", "%23");
+							}
+							
+							if (object.includes(graph) || regexp.test(object)) {
+								object = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].object.value ;
+								object = object.replace("#", "%23");
+							} else { //if object is literal value
 								object = data.results.bindings[i].object.value ;
 							}
-								
-
-							var row = table.insertRow(-1);
-						    var cell1 = row.insertCell(0);
-						    var cell2 = row.insertCell(1);
-						    var cell3 = row.insertCell(2);
-
-						    cell1.innerHTML = tableFormat(subject);
-						    cell2.innerHTML = tableFormat(predicate);
-						    cell3.innerHTML = tableFormat(object);	
+							
+						} else {
+							subject = data.results.bindings[i].subject.value ;
+							predicate = data.results.bindings[i].predicate.value ;
+							object = data.results.bindings[i].object.value ;
 						}
-						hideSpinner() ;
-		            }
-		            else{
-						hideSpinner() ;
-						console.log("No data returned by query");
-		            }
-				})
+							
+
+						var row = table.insertRow(-1);
+					    var cell1 = row.insertCell(0);
+					    var cell2 = row.insertCell(1);
+					    var cell3 = row.insertCell(2);
+
+					    cell1.innerHTML = tableFormat(subject);
+					    cell2.innerHTML = tableFormat(predicate);
+					    cell3.innerHTML = tableFormat(object);	
+					}
+					hideSpinner() ;
+		          }
+		          else{
+					hideSpinner() ;
+					console.log("No data returned by query");
+		          }
+
+	            } else {
+	              var msg = await resp.text();
+	              hideSpinner();
+				  console.error('Query Failed', msg) ;
+				  alert('Query Failed ' + msg)
+	            }
+
 			} catch(e) {
 				hideSpinner() ;
 				console.error('Query Failed', e) ;
@@ -1507,58 +1526,65 @@
 			
 			try {
 		        var resp = await fetch(url,options)
-	
-				.then((res) => res.json())
-		        .then( data =>{
-					
-				    refreshTable();
-					createHeader();
-					var table = checkId("dbmsTableID", "fsTableID") ;
-					
-		            if (data.results.bindings.length > 0){
-						for (var i = 0; i < data.results.bindings.length; i++) {	
-							var subject = data.results.bindings[i].subject.value ;
-							var predicate = data.results.bindings[i].predicate.value ;
-							var object = data.results.bindings[i].object.value ;				
-							if (document.getElementById("fctID").checked == true) { //if fct checkbox is checked
-								if (subject.includes(graph) || regexp.test(subject)) { //if subject is not a literal value
-									subject = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].subject.value ;
-									subject = subject.replace("#", "%23"); // replaces # with %23 for fct results
-								}
-								
-								if (predicate.includes(graph) || regexp.test(predicate)) { //if subject is not a literal value
-									predicate = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].predicate.value ;
-									predicate = predicate.replace("#", "%23");
-								}
-								
-								if (object.includes(graph) || regexp.test(object)) {
-									object = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].object.value ;
-									object = object.replace("#", "%23");
-								} else { //if object is literal value
-									object = data.results.bindings[i].object.value ;
-								}
-								
-							} else {
-								subject = data.results.bindings[i].subject.value ;
-								predicate = data.results.bindings[i].predicate.value ;
+
+	            if (resp.ok && resp.status == 200) {
+	              var data = await resp.json();
+
+				  refreshTable();
+				  createHeader();
+				  var table = checkId("dbmsTableID", "fsTableID") ;
+				
+		          if (data.results.bindings.length > 0){
+					for (var i = 0; i < data.results.bindings.length; i++) {	
+						var subject = data.results.bindings[i].subject.value ;
+						var predicate = data.results.bindings[i].predicate.value ;
+						var object = data.results.bindings[i].object.value ;				
+						if (document.getElementById("fctID").checked == true) { //if fct checkbox is checked
+							if (subject.includes(graph) || regexp.test(subject)) { //if subject is not a literal value
+								subject = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].subject.value ;
+								subject = subject.replace("#", "%23"); // replaces # with %23 for fct results
+							}
+							
+							if (predicate.includes(graph) || regexp.test(predicate)) { //if subject is not a literal value
+								predicate = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].predicate.value ;
+								predicate = predicate.replace("#", "%23");
+							}
+							
+							if (object.includes(graph) || regexp.test(object)) {
+								object = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].object.value ;
+								object = object.replace("#", "%23");
+							} else { //if object is literal value
 								object = data.results.bindings[i].object.value ;
 							}
-				
-							var row = table.insertRow(-1);
-						    var cell1 = row.insertCell(0);
-						    var cell2 = row.insertCell(1);
-						    var cell3 = row.insertCell(2);
-
-						    cell1.innerHTML = tableFormat(subject);
-						    cell2.innerHTML = tableFormat(predicate);
-						    cell3.innerHTML = tableFormat(object);	
+							
+						} else {
+							subject = data.results.bindings[i].subject.value ;
+							predicate = data.results.bindings[i].predicate.value ;
+							object = data.results.bindings[i].object.value ;
 						}
-						hideSpinner() ;
-		            } else{
-						hideSpinner() ;
-						console.log("No data returned by query");
-		            }
-				})	
+				
+						var row = table.insertRow(-1);
+					    var cell1 = row.insertCell(0);
+					    var cell2 = row.insertCell(1);
+					    var cell3 = row.insertCell(2);
+
+					    cell1.innerHTML = tableFormat(subject);
+					    cell2.innerHTML = tableFormat(predicate);
+					    cell3.innerHTML = tableFormat(object);	
+					}
+					hideSpinner() ;
+		          } else{
+					hideSpinner() ;
+					console.log("No data returned by query");
+		          }
+
+	            } else {
+	              var msg = await resp.text();
+	              hideSpinner();
+				  console.error('Table Refresh Failed', msg) ;
+				  alert('Table Refresh Failed ' + msg);
+	            }
+
 			} catch(e) {
 				hideSpinner() ;
 				console.error('Table Refresh Failed', e) ;
