@@ -319,12 +319,12 @@
 	<script>
 		//docNameValue() ; //Checks/Updates document name when page is loaded
 		var solid_storage = null; 
-                var initalTab = "";
-                var initalSubject = "";
-                var initalPredicate = "";
-                var initalObject = "";
-                var initalDocumentName = "";
-                var initalEndpoint = "";
+                var initialTab = "";
+                var initialSubject = "";
+                var initialPredicate = "";
+                var initialObject = "";
+                var initialDocumentName = "";
+                var initialEndpoint = "";
 	  
 		//Tooltip activation function
 		$(document).ready(function(){
@@ -438,9 +438,11 @@
 				document.getElementById("docNameID2").value = solid_storage_value ;	
 			}
 
-                        // value from permalink  
-                        var documentName = checkPermalinkTab("docNameID", "docNameID2"); 
-                        documentName.value = initialDocumentName;
+ 		        // value from permalink  
+ 			if (initialDocumentName != "" && initialTab != "") {
+ 			        var documentName = checkPermalinkTab("docNameID", "docNameID2"); 
+ 				documentName.value = initialDocumentName;
+		        }
 
 		}
 		
@@ -788,6 +790,7 @@
 		// update table on tab switch
 		$('.nav-tabs').find('a').on('shown.bs.tab', function () {
 			updateTable() ;
+			updatePermalink() ;
 		});
 		
 		// This function allows hyperlinks to be used in the table
@@ -1022,7 +1025,9 @@
 			} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
 				// Use of Sponger Pragma to force document reload during query evaluation
 				var query = 
-				"DEFINE get:soft" + " " + '"soft"' + "\n" + "SELECT DISTINCT COUNT(*) AS ?count FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
+				"DEFINE get:refresh" + " " + '"clean"' + "\n"
+				+ "DEFINE get:soft" + " " + '"replace"' + "\n"
+				+ "SELECT DISTINCT COUNT(*) AS ?count FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
 			}
 			
 			if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
@@ -1359,7 +1364,8 @@
 				+ "WHERE {" + " " + subject + " " + predicate + " " + object + " " + "}"
 			} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
 				var query = 
-				"DEFINE get:soft" + " " + '"soft"' + "\n"
+				"DEFINE get:refresh" + " " + '"clean"' + "\n"
+				+ "DEFINE get:soft" + " " + '"replace"' + "\n"
 				+ "PREFIX : <" + graph + "#>\n" 
 				+ "SELECT DISTINCT" + " " + subject + " AS ?subject" + " " + predicate + " AS ?predicate" + " " + object + " AS ?object \n"
 				+ "FROM <" + graph + "> \n" 
@@ -1477,7 +1483,9 @@
 			} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
 				// Use of Sponger Pragma to force document reload during query evaluation
 				var data_query = 
-				"DEFINE get:soft" + " " + '"soft"' + "\n" + "SELECT DISTINCT * FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
+				"DEFINE get:refresh" + " " + '"clean"' + "\n"
+				+ "DEFINE get:soft" + " " + '"replace"' + "\n"
+ 				+ "SELECT DISTINCT * FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
 			}
 			
 			if (limit >= 1) { // if results per page is active
