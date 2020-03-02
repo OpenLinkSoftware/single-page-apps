@@ -51,7 +51,7 @@
 	  <!-- End of tabs menu -->
   
 	  <div class="container">
-		  				<h1 style="text-align:center">Heading?</h1>
+		  				<h1 style="text-align:center">Installer Download Wizard &#45; ODBC, JDBC, ADO.NET, OLE DB Drivers / Connectors</h1>
                                                 <span id="messageSpanID"></span>
 		  				<form id="downloadFormID" class="form" method="post">
 		  					<div class="form-group">
@@ -287,6 +287,7 @@
 	<!-- These Functions Handle the Functionality of the Page -->
 	<script>
 
+                var installerArray = [];
                 //var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
                 //var endpoint = "https://localhost/sparql?default-graph-uri=&query=" ;
                 var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
@@ -302,35 +303,7 @@
 
                 function onLoad() {
 
-                  // build the data island
-                  $("#dataIslandID").text(function() {
-                    return JSON.stringify({
-                      "@context": {
-                        "schema": "http://schema.org/",
-                        "xsd": "http://www.w3.org/2001/XMLSchema#"
-                      },
-                      "@graph": [
-                        {
-                          "@type": "schema:WebPage",
-                          "@id": window.location.origin + window.location.pathname,
-                          "schema:description": "Single page application that allows searching for downloads suitable to a specified environment.",
-                          "schema:name": "OpenLink Downloads Search",
-                          "schema:publisher": "http://www.openlinksw.com/#this" ,
-                          "schema:relatedLink": [
-                            "https://www.openlinksw.com" ,
-                            "https://virtuoso.openlinksw.com" ,
-                            "https://uda.openlinksw.com" ,
-                            "http://osds.openlinksw.com" ,
-                            "http://ods.openlinksw.com" ,
-                            "http://ode.openlinksw.com" ,
-                            "http://osdb.openlinksw.com" ,
-                            "http://osde.openlinksw.com" ,
-                            "http://youid.openlinksw.com" 
-                          ]
-                        }
-                      ]
-                      });
-                  });
+                  document.getElementById("dataIslandID").text = JSON.stringify(getInitialJsonMetadata()); 
 
                   // check for params - if so set the dropdowns and get the downloads
                   var queryString = window.location.search;
@@ -351,7 +324,45 @@
                   }
                 }
 
+                // build the data island
+                function getInitialJsonMetadata () {
+                    return {
+                      "@context": {
+                        "schema": "http://schema.org/",
+                        "xsd": "http://www.w3.org/2001/XMLSchema#"
+                      },
+                      "@graph": [
+                        {
+                          "@type": "schema:WebPage",
+                          "@id": window.location.origin + window.location.pathname,
+                          "schema:description": "Single page application that allows searching for installers suitable for a specified environment.",
+                          "schema:name": "OpenLink Downloads Search",
+                          "schema:publisher": "http://www.openlinksw.com/#this" ,
+                          "schema:relatedLink": [
+                            "https://www.openlinksw.com" ,
+                            "https://virtuoso.openlinksw.com" ,
+                            "https://uda.openlinksw.com" ,
+                            "http://osds.openlinksw.com" ,
+                            "http://ods.openlinksw.com" ,
+                            "http://ode.openlinksw.com" ,
+                            "http://osdb.openlinksw.com" ,
+                            "http://osde.openlinksw.com" ,
+                            "http://youid.openlinksw.com" 
+                          ]
+                        }
+                      ]
+                    };
+                }
+
+                function getSchemaAboutRelations (installerArray) {
+                    let myJson = JSON.parse(document.getElementById("dataIslandID").text);
+
+                    myJson["@graph"][0]["schema:about"] = installerArray;
+                    return myJson;
+                }
+
                 function clearInput(){
+                  document.getElementById("dataIslandID").text = JSON.stringify(getInitialJsonMetadata()); 
                   document.getElementById("messageSpanID").textContent = "";
                   resultAreaReset();
                   applicationNameSelectorReset();
@@ -1106,18 +1117,22 @@
                   }
                 }
 
-                function findDownloads() {
+                async function findDownloads() {
                        showSpinner() ;
+                       updatePermalink();
+                       installerArray = [];
+                       document.getElementById("dataIslandID").text = JSON.stringify(getSchemaAboutRelations(installerArray)); 
 
                        resultAreaReset();
-                       recordSearch();
+                       var resp = await recordSearch();
 
-                       createMTHeading();
-                       getMTAgentInstallers();
-                       getMTClientInstallers();
-                       getMTBrokerInstallers();
-                       getLiteInstallers();
-                       updatePermalink();
+                       if (resp > 0) {
+                         createMTHeading();
+                         getMTAgentInstallers();
+                         getMTClientInstallers();
+                         getMTBrokerInstallers();
+                         getLiteInstallers();
+                       }
                 }
 
                 async function recordSearch() {
@@ -1177,19 +1192,23 @@
                        };
                 
                        try {
-                      var resp = await fetch(url,options);
+                       var resp = await fetch(url,options);
                                 if (resp.status >= 200 && resp.status <= 300) {
                                         console.log(resp.status + " - " + resp.statusText) ;
                                         hideSpinner() ;
+                                        return resp.status;
                                 } else {
-                                        throw new Error("Error " + resp.status +" - " + resp.statusText) ;
-                                        hideSpinner() ;
+                                        if (resp.status = 403) 
+                                          throw new Error("You must log in to continue") ;
+                                        else 
+                                          throw new Error("'Insert Failed: Error " + resp.status +" - " + resp.statusText) ;
                                 }
 
                        } catch(e) {
                                 hideSpinner() ;
                                 console.error('Insert Failed', e) ;
-                                alert('Insert Failed ' + e)
+                                alert(e)
+                                return 0;
                        }  
 
  
@@ -1198,11 +1217,12 @@
                 function createMTHeading() {
                                 var resultAreaMultitier = document.getElementById("resultAreaMultitierID");
                                 var heading = document.createElement('h2');
-                                heading.innerHTML = "Multitier Installers"; 
+                                heading.innerHTML = "Enterprise Edition Installers"; 
                                 resultAreaMultitier.appendChild(heading);
                 }
 
                 async function getMTAgentInstallers() {
+                       var localInstallerArray = [];
 
                        databaseServerFam = document.getElementById("databaseServerFamID");
                        databaseServer = document.getElementById("databaseServerID");
@@ -1211,7 +1231,7 @@
 
                        var query =     
                            "DEFINE input:same-as \"yes\" \n"
-                           + "select distinct ?version ?title ?url \n"
+                           + "select distinct ?installer ?version ?title ?url \n"
                            + "where { \n"
                            + "?installer a <http://www.openlinksw.com/ontology/installers#InstallerArchive> . \n"
                            + "?installer <http://schema.org/name> ?title . \n"
@@ -1241,41 +1261,53 @@
                                 var resultArea = document.getElementById("resultAreaMultitierID");
                                 var results = data.results.bindings;
                                 var heading = document.createElement('h3');
-                                heading.innerHTML = "Agent Installers"; 
-                                var list = document.createElement('ul');
+                                heading.innerHTML = "Database Agent Component Installers"; 
+                                var table = document.createElement('table');
+                                table.classList.add ("table"); 
+                                table.classList.add ("table-bordered"); 
+                                var tableBody = document.createElement('tbody');
+                                table.appendChild(tableBody);
                                 for (i in results) {
-                                    var item = document.createElement('li');
+                                    var tableRow = document.createElement('tr');
+                                    var tableData1 = document.createElement('td');
+                                    tableData1.innerHTML = "Release " + results[i].version.value;
+                                    tableRow.appendChild(tableData1);
+                                    var tableData2 = document.createElement('td');
                                     var link = document.createElement('a');
                                     link.innerHTML = results[i].title.value;
                                     link.href = results[i].url.value;
-                                    item.innerHTML = "Release " + results[i].version.value + " ";
-                                    item.appendChild(link);
-                                    list.appendChild(item);
+                                    tableData2.appendChild(link);
+                                    tableRow.appendChild(tableData2);
+                                    tableBody.appendChild(tableRow);
+                                    localInstallerArray = localInstallerArray.concat(results[i].installer.value);
                                 }
                                 resultArea.appendChild(heading);
-                                resultArea.appendChild(list);
+                                resultArea.appendChild(table);
+                                installerArray = installerArray.concat(localInstallerArray);
+                                document.getElementById("dataIslandID").text = JSON.stringify(getSchemaAboutRelations(installerArray)); 
                                 hideSpinner() ;
                             }
                             else {
-                                //throw new Error("No MT agent downloads found");
-                                console.log("No MT downloads found");
+                                //throw new Error("No database agent installers found");
+                                console.log("No database agent installers found");
                                 var resultArea = document.getElementById("resultAreaMultitierID");
                                 var heading = document.createElement('h3');
-                                heading.innerHTML = "Agent Installers"; 
+                                heading.innerHTML = "Database Agent Component Installers"; 
                                 var infoMessage = document.createElement('p');
-                                infoMessage.innerHTML = "No multitier agent downloads found";
+                                infoMessage.innerHTML = "No database agent installer found";
                                 resultArea.appendChild(heading);
                                 resultArea.appendChild(infoMessage);
                                 hideSpinner() ;
                             }
                         })
                         } catch(e) {
-                                console.error('Error getting lite installers ', e) ;
+                                console.error('Error getting multitier agent installers ', e) ;
                                 alert('Error getting installers ' + e)
                         }                  
                 }
 
                 async function getMTClientInstallers() {
+                       var localInstallerArray = [];
 
                        databaseServerFam = document.getElementById("databaseServerFamID");
                        databaseServer = document.getElementById("databaseServerID");
@@ -1284,7 +1316,7 @@
 
                        var query =     
                            "DEFINE input:same-as \"yes\" \n"
-                           + "select distinct ?version ?title ?url \n"
+                           + "select distinct ?installer ?version ?title ?url \n"
                            + "where { \n"
                            + "?installer a <http://www.openlinksw.com/ontology/installers#InstallerArchive> . \n"
                            + "?installer <http://schema.org/name> ?title . \n"
@@ -1313,41 +1345,53 @@
                                 var resultArea = document.getElementById("resultAreaMultitierID");
                                 var results = data.results.bindings;
                                 var heading = document.createElement('h3');
-                                heading.innerHTML = "Client Installers"; 
-                                var list = document.createElement('ul');
+                                heading.innerHTML = "Generic Client Component Installers"; 
+                                var table = document.createElement('table');
+                                table.classList.add ("table"); 
+                                table.classList.add ("table-bordered"); 
+                                var tableBody = document.createElement('tbody');
+                                table.appendChild(tableBody);
                                 for (i in results) {
-                                    var item = document.createElement('li');
+                                    var tableRow = document.createElement('tr');
+                                    var tableData1 = document.createElement('td');
+                                    tableData1.innerHTML = "Release " + results[i].version.value;
+                                    tableRow.appendChild(tableData1);
+                                    var tableData2 = document.createElement('td');
                                     var link = document.createElement('a');
                                     link.innerHTML = results[i].title.value;
                                     link.href = results[i].url.value;
-                                    item.innerHTML = "Release " + results[i].version.value + " ";
-                                    item.appendChild(link);
-                                    list.appendChild(item);
+                                    tableData2.appendChild(link);
+                                    tableRow.appendChild(tableData2);
+                                    tableBody.appendChild(tableRow);
+                                    localInstallerArray = localInstallerArray.concat(results[i].installer.value);
                                 }
                                 resultArea.appendChild(heading);
-                                resultArea.appendChild(list);
+                                resultArea.appendChild(table);
+                                installerArray = installerArray.concat(localInstallerArray);
+                                document.getElementById("dataIslandID").text = JSON.stringify(getSchemaAboutRelations(installerArray)); 
                                 hideSpinner() ;
                             }
                             else {
-                                //throw new Error("No MT client downloads found");
-                                console.log("No MT client downloads found");
+                                //throw new Error("No generic client installers found");
+                                console.log("No generic client installers found");
                                 var resultArea = document.getElementById("resultAreaMultitierID");
                                 var heading = document.createElement('h3');
-                                heading.innerHTML = "Client Installers"; 
+                                heading.innerHTML = "Generic Client Component Installers"; 
                                 var infoMessage = document.createElement('p');
-                                infoMessage.innerHTML = "No multitier client downloads found";
+                                infoMessage.innerHTML = "No generic client installers found";
                                 resultArea.appendChild(heading);
                                 resultArea.appendChild(infoMessage);
                                 hideSpinner() ;
                             }
                         })
                         } catch(e) {
-                                console.error('Error getting lite installers ', e) ;
+                                console.error('Error getting database agent installers ', e) ;
                                 alert('Error getting installers ' + e)
                         }                  
                 }
 
                 async function getMTBrokerInstallers() {
+                       var localInstallerArray = [];
 
                        databaseServerFam = document.getElementById("databaseServerFamID");
                        databaseServer = document.getElementById("databaseServerID");
@@ -1356,7 +1400,7 @@
 
                        var query =     
                            "DEFINE input:same-as \"yes\" \n"
-                           + "select distinct ?version ?title ?url \n"
+                           + "select distinct ?installer ?version ?title ?url \n"
                            + "where { \n"
                            + "?installer a <http://www.openlinksw.com/ontology/installers#InstallerArchive> . \n"
                            + "?installer <http://schema.org/name> ?title . \n"
@@ -1385,41 +1429,53 @@
                                 var resultArea = document.getElementById("resultAreaMultitierID");
                                 var results = data.results.bindings;
                                 var heading = document.createElement('h3');
-                                heading.innerHTML = "Broker Installers"; 
-                                var list = document.createElement('ul');
+                                heading.innerHTML = "Request Broker Component Installers"; 
+                                var table = document.createElement('table');
+                                table.classList.add ("table"); 
+                                table.classList.add ("table-bordered"); 
+                                var tableBody = document.createElement('tbody');
+                                table.appendChild(tableBody);
                                 for (i in results) {
-                                    var item = document.createElement('li');
+                                    var tableRow = document.createElement('tr');
+                                    var tableData1 = document.createElement('td');
+                                    tableData1.innerHTML = "Release " + results[i].version.value;
+                                    tableRow.appendChild(tableData1);
+                                    var tableData2 = document.createElement('td');
                                     var link = document.createElement('a');
                                     link.innerHTML = results[i].title.value;
                                     link.href = results[i].url.value;
-                                    item.innerHTML = "Release " + results[i].version.value + " ";
-                                    item.appendChild(link);
-                                    list.appendChild(item);
+                                    tableData2.appendChild(link);
+                                    tableRow.appendChild(tableData2);
+                                    tableBody.appendChild(tableRow);
+                                    localInstallerArray = localInstallerArray.concat(results[i].installer.value);
                                 }
                                 resultArea.appendChild(heading);
-                                resultArea.appendChild(list);
+                                resultArea.appendChild(table);
+                                installerArray = installerArray.concat(localInstallerArray);
+                                document.getElementById("dataIslandID").text = JSON.stringify(getSchemaAboutRelations(installerArray)); 
                                 hideSpinner() ;
                             }
                             else {
-                                //throw new Error("No MT broker downloads found");
-                                console.log("No MT broker downloads found");
+                                //throw new Error("No request broker installers found");
+                                console.log("No request broker installers found");
                                 var resultArea = document.getElementById("resultAreaMultitierID");
                                 var heading = document.createElement('h3');
-                                heading.innerHTML = "Broker Installers"; 
+                                heading.innerHTML = "Request Broker Component Installers"; 
                                 var infoMessage = document.createElement('p');
-                                infoMessage.innerHTML = "No multitier broker downloads found";
+                                infoMessage.innerHTML = "No request broker installers found";
                                 resultArea.appendChild(heading);
                                 resultArea.appendChild(infoMessage);
                                 hideSpinner() ;
                             }
                         })
                         } catch(e) {
-                                console.error('Error getting lite installers ', e) ;
+                                console.error('Error getting request broker installers ', e) ;
                                 alert('Error getting installers ' + e)
                         }                  
                 }
 
                 async function getLiteInstallers() {
+                       var localInstallerArray = [];
 
                        databaseServerFam = document.getElementById("databaseServerFamID");
                        databaseServer = document.getElementById("databaseServerID");
@@ -1428,7 +1484,7 @@
 
                        var query =     
                            "DEFINE input:same-as \"yes\" \n"
-                           + "select distinct ?version ?title ?url \n"
+                           + "select distinct ?installer ?version ?title ?url \n"
                            + "where { \n"
                            + "?installer a <http://www.openlinksw.com/ontology/installers#InstallerArchive> . \n"
                            + "?installer <http://schema.org/name> ?title . \n"
@@ -1458,43 +1514,54 @@
                                 var resultArea = document.getElementById("resultAreaLiteID");
                                 var results = data.results.bindings;
                                 var heading = document.createElement('h2');
-                                heading.innerHTML = "Lite Installers"; 
-                                var list = document.createElement('ul');
+                                heading.innerHTML = "Lite Edition Installers"; 
+                                var table = document.createElement('table');
+                                table.classList.add ("table"); 
+                                table.classList.add ("table-bordered"); 
+                                var tableBody = document.createElement('tbody');
+                                table.appendChild(tableBody);
                                 for (i in results) {
-                                    var item = document.createElement('li');
+                                    var tableRow = document.createElement('tr');
+                                    var tableData1 = document.createElement('td');
+                                    tableData1.innerHTML = "Release " + results[i].version.value;
+                                    tableRow.appendChild(tableData1);
+                                    var tableData2 = document.createElement('td');
                                     var link = document.createElement('a');
                                     link.innerHTML = results[i].title.value;
                                     link.href = results[i].url.value;
-                                    item.innerHTML = "Release " + results[i].version.value + " ";
-                                    item.appendChild(link);
-                                    list.appendChild(item);
+                                    tableData2.appendChild(link);
+                                    tableRow.appendChild(tableData2);
+                                    tableBody.appendChild(tableRow);
+                                    localInstallerArray = localInstallerArray.concat(results[i].installer.value);
                                 }
                                 resultArea.appendChild(heading);
-                                resultArea.appendChild(list);
+                                resultArea.appendChild(table);
+                                installerArray = installerArray.concat(localInstallerArray);
+                                document.getElementById("dataIslandID").text = JSON.stringify(getSchemaAboutRelations(installerArray)); 
                                 hideSpinner() ;
                             }
                             else {
-                                //throw new Error("No lite downloads found");
-                                console.log("No lite downloads found");
+                                //throw new Error("No lite edition installers found");
+                                console.log("No lite edition installers found");
                                 var resultArea = document.getElementById("resultAreaLiteID");
                                 var heading = document.createElement('h2');
-                                heading.innerHTML = "Lite Installers"; 
+                                heading.innerHTML = "Lite Edition Installers"; 
                                 var infoMessage = document.createElement('p');
-                                infoMessage.innerHTML = "No lite downloads found";
+                                infoMessage.innerHTML = "No lite edition installers found";
                                 resultArea.appendChild(heading);
                                 resultArea.appendChild(infoMessage);
                                 hideSpinner() ;
                             }
                         })
                         } catch(e) {
-                                console.error('Error getting lite installers ', e) ;
+                                console.error('Error getting lite edition installers ', e) ;
                                 alert('Error getting installers ' + e)
                         }                  
                 }
 
                 function resetPermalink () {
                        permalink = document.getElementById("permalinkID");
-                       permalink.href = window.location.href;
+                       permalink.href = window.location.origin + window.location.pathname;
                 }
 
                 function updatePermalink () {
@@ -1594,7 +1661,7 @@
                    await solid.auth.logout()
                }
                // Now that we have a cookie, reload to display the authenticated page
-               location.reload()
+               window.location = document.getElementById("permalinkID").href;
             }
         }
        
