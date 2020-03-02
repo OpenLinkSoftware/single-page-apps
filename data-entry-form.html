@@ -96,7 +96,7 @@
 		  					<div class="form-group">
 		  						<label for="subjectID">Subject</label>
 		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="If the subject is not a URI it will be used as the fragment identifier of a Relative URI."></span> 
-		  						<input type="text" class="form-control" placeholder="Subject" id="subjectID" onchange="updatePermalink()">
+		  						<textarea class="form-control" placeholder="Subject" rows="1" style="resize:vertical" id="subjectID" onchange="updatePermalink()"></textarea>
 		  						<p class="errorMessage" id="subjectErrorID" ></p>
 		  					</div>
 		  					<div class="form-group">
@@ -106,8 +106,8 @@
 		  						<p class="errorMessage" id="predicateErrorID" ></p>
 		  					</div>
 		  					<div class="form-group">
-		  						<label for="objectID">Object</label> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Wether or not the Object is a literal value or a reference is determined by the range of the predicate. Quoting the Object will override this feature and make it a literal value."></span> 
-		  						<input type="text" class="form-control" placeholder="Object" id="objectID" onchange="updatePermalink()">
+		  						<label for="objectID">Object</label> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Whether or not the Object is a literal value or a reference is determined by the range of the predicate. Quoting the Object will override this feature and make it a literal value."></span> 
+		  						<textarea class="form-control" placeholder="Object" rows="1" style="resize:vertical" id="objectID" onchange="updatePermalink()"></textarea>
 		  					</div>
 		  					<div class="form-group">
 		  						<label for="docNameID">Document Name</label>
@@ -167,7 +167,7 @@
 		  					<div class="form-group">
 		  						<label for="subjectID2">Subject</label>
 		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="If the subject is not a URI it will be used as the fragment identifier of a Relative URI."></span> 
-		  						<input type="text" class="form-control" placeholder="Subject" id="subjectID2">
+		  						<textarea class="form-control" placeholder="Subject" rows="1" style="resize:vertical" id="subjectID2" onchange="updatePermalink()"></textarea>
 		  						<p class="errorMessage" id="subjectErrorID2" ></p>
 		  					</div>
 		  					<div class="form-group">
@@ -178,16 +178,16 @@
 		  					</div>
 		  					<div class="form-group">
 		  						<label for="objectID2">Object</label> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Wether or not the Object is a literal value or a reference is determined by the range of the predicate. Quoting the Object will override this feature and make it a literal value."></span> 
-		  						<input type="text" class="form-control" placeholder="Object" id="objectID2">
+		  						<textarea class="form-control" placeholder="Object" rows="1" style="resize:vertical" id="objectID2" onchange="updatePermalink()"></textarea>
 		  					</div>
 		  					<div class="form-group">
 		  						<label for="docNameID2">Document Name</label>
-		  						<input type="text" class="form-control" value="https://kingsley.idehen.net/public_home/jordan/Public/record-test.ttl" id="docNameID2">
+		  						<input type="text" class="form-control" value="https://kingsley.idehen.net/public_home/jordan/Public/record-test.ttl" id="docNameID2" onchange="updatePermalink()">
 		  						<p class="errorMessage" id="docNameErrorID2" ></p>
 		  					</div>
 		  					<div class="form-group">
 		  						<label for="endpointID2">SPARQL Endpoint (required for predicate lookup)</label> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Required for accepted relation object (values) lookup"></span> 
-		  						<input type="text" class="form-control" id="endpointID2" size="35" value="https://linkeddata.uriburner.com/sparql"/>
+		  						<input type="text" class="form-control" id="endpointID2" size="35" value="https://linkeddata.uriburner.com/sparql" onchange="updatePermalink()"/>
 		  					</div>
 
 		  					<!-- Start Buttons -->
@@ -361,7 +361,7 @@
 		function is called when page is loaded/reloaded */
 		async function docNameValue() {
 			solid_storage = await sessionStorage.getItem("solid_storage")
-			var solid_storage_value = solid_storage + "mydata.ttl" ;
+			var solid_storage_value = solid_storage ;
 			if (document.getElementById("cmdID").checked == true) {
 				console.log('solid storage: ' + solid_storage); 
 			}
@@ -982,16 +982,22 @@
 			
 			try {
 		        var resp = await fetch(url,options)
-	
-				.then((res) => res.json())
-		        .then( data =>{
-					
-		            if (data.results.bindings.length > 0){
-						tableSize = Number(data.results.bindings[0].count.value) ;
-		            } else{
-						console.log("Table size is 0");
-		            }
-				})	
+	            if (resp.ok && resp.status == 200) {
+	              var data = await resp.json();
+
+		          if (data.results.bindings.length > 0){
+					tableSize = Number(data.results.bindings[0].count.value) ;
+		          } else{
+					console.log("Table size is 0");
+		          }
+
+	            } else {
+	              var msg = await resp.text();
+	              hideSpinner();
+	              console.error("Error: "+msg)
+	              alert("Error: "+msg);
+	            }
+
 			} catch(e) {
 				hideSpinner() ;
 				console.error('Table Size Failed', e) ;
@@ -1003,6 +1009,7 @@
 	<!-- These Functions Handle the Functionality of the Page -->
 	<script>
 		//updateTable(); //Table is always shown when page is loaded
+              var initalTab = "";
               var initalSubject = "";
               var initalPredicate = "";
               var initalObject = "";
@@ -1017,11 +1024,16 @@
 
                   resetPermalink();
                   if (setInputs == "true") {
+                       initialTab = decodeURIComponent(params.get("tab"));
                        initialSubject = decodeURIComponent(params.get("subject"));
                        initialPredicate = decodeURIComponent(params.get("predicate"));
                        initialObject = decodeURIComponent(params.get("object"));
                        initialDocumentName = decodeURIComponent(params.get("documentName"));
                        initialEndpoint = decodeURIComponent(params.get("endpoint"));
+                       if (initialTab == "dbms")
+                          $('a[href="#dbmsID"]').tab('show');
+                       else if (initialTab == "fs")
+                          $('a[href="#fsID"]').tab('show');
                        handlePermalink();
                   } else {
                     updateTable()
@@ -1275,43 +1287,49 @@
 	                        };
 			try {
 		        var resp = await fetch(url,options)
-			
-				.then((res) => res.json())
-		        .then( data =>{
+	            if (resp.ok && resp.status == 200) {
+	              var data = await resp.json();
+
+				  refreshTable();
 				
-				    refreshTable();
-					
-					/*
+				  /*
                     Dynamic Table for processing JSON Structured Data (via "application/sparql-results+json" document content type)
                     that enables INSERT to be handled via a 3-tuple subject, predicate, object graph (relation) while query results 
                     are handled via an N-Tuple structured table (relation).
-                    */
-		            if (data.results.bindings.length > 0){
-						var table = checkId("dbmsTableID", "fsTableID") ; // creates table for header
-						var header = table.createTHead(); // creates empty tHead
-						var headRow = header.insertRow(0); // inserts row into tHead
-						var bindings = data.results.bindings;
-						for (var col = 0; col < data.head.vars.length; col++) { // for each column
-							var headCell = headRow.insertCell(col); // inserts new cell at position i in thead
-							headCell.innerHTML = "<b>" + data.head.vars[col] + "</b>"; // adds bold text to thead cell
-							}
-						for (i in bindings) {
-							var curr = 0 ; // curr is used to keep track of correct cell position
-							var binding = bindings[i];
-							var bodyRow = table.insertRow(-1); // create new row
-							for (n in binding) {
-								var bodyCell = bodyRow.insertCell(curr); // create new cell in row
-								bodyCell.innerHTML = tableFormat(binding[n].value); // set value of cell
-								curr += 1 ;
-							}
+                  */
+		          if (data.results.bindings.length > 0){
+					var table = checkId("dbmsTableID", "fsTableID") ; // creates table for header
+					var header = table.createTHead(); // creates empty tHead
+					var headRow = header.insertRow(0); // inserts row into tHead
+					var bindings = data.results.bindings;
+					for (var col = 0; col < data.head.vars.length; col++) { // for each column
+						var headCell = headRow.insertCell(col); // inserts new cell at position i in thead
+						headCell.innerHTML = "<b>" + data.head.vars[col] + "</b>"; // adds bold text to thead cell
 						}
-						hideSpinner() ;
-		            }	
-		            else{
-						hideSpinner() ;
-						console.log("No data returned by query");
-		            }
-				})
+					for (i in bindings) {
+						var curr = 0 ; // curr is used to keep track of correct cell position
+						var binding = bindings[i];
+						var bodyRow = table.insertRow(-1); // create new row
+						for (n in binding) {
+							var bodyCell = bodyRow.insertCell(curr); // create new cell in row
+							bodyCell.innerHTML = tableFormat(binding[n].value); // set value of cell
+							curr += 1 ;
+						}
+					}
+					hideSpinner() ;
+		          }	
+		          else{
+					hideSpinner() ;
+					console.log("No data returned by query");
+		          }
+
+	            } else {
+	              var msg = await resp.text();
+	              hideSpinner();
+				  console.error('Query Failed', msg) ;
+				  alert('Query Failed ' + msg)
+	            }
+
 			} catch(e) {
 				hideSpinner() ;
 				console.error('Query Failed', e) ;
@@ -1385,61 +1403,68 @@
 	                        };
 			try {
 		        var resp = await fetch(url,options)
-			
-				.then((res) => res.json())
-		        .then( data =>{
-				
-				    refreshTable();
-					createHeader();
 
-		            if (data.results.bindings.length > 0){
-						var table = checkId("dbmsTableID", "fsTableID") ;
-						var object = nonvalidatedObject() ;
-						for (var i = 0; i < data.results.bindings.length; i++) {
-							var subject = data.results.bindings[i].subject.value ;
-							var predicate = data.results.bindings[i].predicate.value ;
-							var object = data.results.bindings[i].object.value ;
-							if (document.getElementById("fctID").checked == true) { //if fct checkbox is checked
-								if (subject.includes(graph) || regexp.test(subject)) { //if subject is not a literal value
-									subject = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].subject.value ;
-									subject = subject.replace("#", "%23"); // replaces # with %23 for fct results
-								}
-								
-								if (predicate.includes(graph) || regexp.test(predicate)) { //if subject is not a literal value
-									predicate = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].predicate.value ;
-									predicate = predicate.replace("#", "%23");
-								}
-								
-								if (object.includes(graph) || regexp.test(object)) {
-									object = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].object.value ;
-									object = object.replace("#", "%23");
-								} else { //if object is literal value
-									object = data.results.bindings[i].object.value ;
-								}
-								
-							} else {
-								subject = data.results.bindings[i].subject.value ;
-								predicate = data.results.bindings[i].predicate.value ;
+	            if (resp.ok && resp.status == 200) {
+	              var data = await resp.json();
+
+				  refreshTable();
+				  createHeader();
+
+		          if (data.results.bindings.length > 0){
+					var table = checkId("dbmsTableID", "fsTableID") ;
+					var object = nonvalidatedObject() ;
+					for (var i = 0; i < data.results.bindings.length; i++) {
+						var subject = data.results.bindings[i].subject.value ;
+						var predicate = data.results.bindings[i].predicate.value ;
+						var object = data.results.bindings[i].object.value ;
+						if (document.getElementById("fctID").checked == true) { //if fct checkbox is checked
+							if (subject.includes(graph) || regexp.test(subject)) { //if subject is not a literal value
+								subject = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].subject.value ;
+								subject = subject.replace("#", "%23"); // replaces # with %23 for fct results
+							}
+							
+							if (predicate.includes(graph) || regexp.test(predicate)) { //if subject is not a literal value
+								predicate = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].predicate.value ;
+								predicate = predicate.replace("#", "%23");
+							}
+							
+							if (object.includes(graph) || regexp.test(object)) {
+								object = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].object.value ;
+								object = object.replace("#", "%23");
+							} else { //if object is literal value
 								object = data.results.bindings[i].object.value ;
 							}
-								
-
-							var row = table.insertRow(-1);
-						    var cell1 = row.insertCell(0);
-						    var cell2 = row.insertCell(1);
-						    var cell3 = row.insertCell(2);
-
-						    cell1.innerHTML = tableFormat(subject);
-						    cell2.innerHTML = tableFormat(predicate);
-						    cell3.innerHTML = tableFormat(object);	
+							
+						} else {
+							subject = data.results.bindings[i].subject.value ;
+							predicate = data.results.bindings[i].predicate.value ;
+							object = data.results.bindings[i].object.value ;
 						}
-						hideSpinner() ;
-		            }
-		            else{
-						hideSpinner() ;
-						console.log("No data returned by query");
-		            }
-				})
+							
+
+						var row = table.insertRow(-1);
+					    var cell1 = row.insertCell(0);
+					    var cell2 = row.insertCell(1);
+					    var cell3 = row.insertCell(2);
+
+					    cell1.innerHTML = tableFormat(subject);
+					    cell2.innerHTML = tableFormat(predicate);
+					    cell3.innerHTML = tableFormat(object);	
+					}
+					hideSpinner() ;
+		          }
+		          else{
+					hideSpinner() ;
+					console.log("No data returned by query");
+		          }
+
+	            } else {
+	              var msg = await resp.text();
+	              hideSpinner();
+				  console.error('Query Failed', msg) ;
+				  alert('Query Failed ' + msg)
+	            }
+
 			} catch(e) {
 				hideSpinner() ;
 				console.error('Query Failed', e) ;
@@ -1501,58 +1526,65 @@
 			
 			try {
 		        var resp = await fetch(url,options)
-	
-				.then((res) => res.json())
-		        .then( data =>{
-					
-				    refreshTable();
-					createHeader();
-					var table = checkId("dbmsTableID", "fsTableID") ;
-					
-		            if (data.results.bindings.length > 0){
-						for (var i = 0; i < data.results.bindings.length; i++) {	
-							var subject = data.results.bindings[i].subject.value ;
-							var predicate = data.results.bindings[i].predicate.value ;
-							var object = data.results.bindings[i].object.value ;				
-							if (document.getElementById("fctID").checked == true) { //if fct checkbox is checked
-								if (subject.includes(graph) || regexp.test(subject)) { //if subject is not a literal value
-									subject = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].subject.value ;
-									subject = subject.replace("#", "%23"); // replaces # with %23 for fct results
-								}
-								
-								if (predicate.includes(graph) || regexp.test(predicate)) { //if subject is not a literal value
-									predicate = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].predicate.value ;
-									predicate = predicate.replace("#", "%23");
-								}
-								
-								if (object.includes(graph) || regexp.test(object)) {
-									object = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].object.value ;
-									object = object.replace("#", "%23");
-								} else { //if object is literal value
-									object = data.results.bindings[i].object.value ;
-								}
-								
-							} else {
-								subject = data.results.bindings[i].subject.value ;
-								predicate = data.results.bindings[i].predicate.value ;
+
+	            if (resp.ok && resp.status == 200) {
+	              var data = await resp.json();
+
+				  refreshTable();
+				  createHeader();
+				  var table = checkId("dbmsTableID", "fsTableID") ;
+				
+		          if (data.results.bindings.length > 0){
+					for (var i = 0; i < data.results.bindings.length; i++) {	
+						var subject = data.results.bindings[i].subject.value ;
+						var predicate = data.results.bindings[i].predicate.value ;
+						var object = data.results.bindings[i].object.value ;				
+						if (document.getElementById("fctID").checked == true) { //if fct checkbox is checked
+							if (subject.includes(graph) || regexp.test(subject)) { //if subject is not a literal value
+								subject = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].subject.value ;
+								subject = subject.replace("#", "%23"); // replaces # with %23 for fct results
+							}
+							
+							if (predicate.includes(graph) || regexp.test(predicate)) { //if subject is not a literal value
+								predicate = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].predicate.value ;
+								predicate = predicate.replace("#", "%23");
+							}
+							
+							if (object.includes(graph) || regexp.test(object)) {
+								object = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].object.value ;
+								object = object.replace("#", "%23");
+							} else { //if object is literal value
 								object = data.results.bindings[i].object.value ;
 							}
-				
-							var row = table.insertRow(-1);
-						    var cell1 = row.insertCell(0);
-						    var cell2 = row.insertCell(1);
-						    var cell3 = row.insertCell(2);
-
-						    cell1.innerHTML = tableFormat(subject);
-						    cell2.innerHTML = tableFormat(predicate);
-						    cell3.innerHTML = tableFormat(object);	
+							
+						} else {
+							subject = data.results.bindings[i].subject.value ;
+							predicate = data.results.bindings[i].predicate.value ;
+							object = data.results.bindings[i].object.value ;
 						}
-						hideSpinner() ;
-		            } else{
-						hideSpinner() ;
-						console.log("No data returned by query");
-		            }
-				})	
+				
+						var row = table.insertRow(-1);
+					    var cell1 = row.insertCell(0);
+					    var cell2 = row.insertCell(1);
+					    var cell3 = row.insertCell(2);
+
+					    cell1.innerHTML = tableFormat(subject);
+					    cell2.innerHTML = tableFormat(predicate);
+					    cell3.innerHTML = tableFormat(object);	
+					}
+					hideSpinner() ;
+		          } else{
+					hideSpinner() ;
+					console.log("No data returned by query");
+		          }
+
+	            } else {
+	              var msg = await resp.text();
+	              hideSpinner();
+				  console.error('Table Refresh Failed', msg) ;
+				  alert('Table Refresh Failed ' + msg);
+	            }
+
 			} catch(e) {
 				hideSpinner() ;
 				console.error('Table Refresh Failed', e) ;
@@ -1718,14 +1750,22 @@
                 function updatePermalink () {
 
                        var permalink = document.getElementById("permalinkID");
-                       var subject = document.getElementById("subjectID");
-                       var predicate = document.getElementById("predicateID");
-                       var object = document.getElementById("objectID");
-                       var documentName = document.getElementById("docNameID");
-                       var endpoint = document.getElementById("endpointID");
+                       var subject = checkId("subjectID", "subjectID2"); 
+                       var predicate = checkId("predicateID", "predicateID2"); 
+                       var object = checkId("objectID", "objectID2"); 
+                       var documentName = checkId("docNameID", "docNameID2"); 
+                       var endpoint = checkId("endpointID", "endpointID2"); 
+                       var tab = "";
+
+			if (document.getElementById('dbmsTabID').getAttribute('class') == "active"){
+				tab = "dbms";
+			} else if (document.getElementById('fsTabID').getAttribute('class') == "active"){
+				tab = "fs";
+			}
 
                        permalink.href = window.location.origin + window.location.pathname;
                        permalink.href = permalink.href + "?setInputs=true&";
+                       permalink.href = permalink.href + "tab=" + encodeURIComponent(tab) + "&";
                        permalink.href = permalink.href + "subject=" + encodeURIComponent(subject.value) + "&";
                        permalink.href = permalink.href + "predicate=" +  encodeURIComponent(predicate.value) + "&";
                        permalink.href = permalink.href + "object=" +  encodeURIComponent(object.value) + "&";
