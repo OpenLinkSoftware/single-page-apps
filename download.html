@@ -43,7 +43,7 @@
 		  </li>
 		  <!-- End Dropdown -->
 		  <a id="logged-href" href="" title="" style="margin-top: 5px; margin-left: 15px;" class="pull-right" class="hidden"><img id="uid-icon" src="./common/uid.png"></a>
-		  <li class="pull-right"> <button id="loginID" style="margin-top: 5px" type="button" onclick="authLogin()" class="hidden btn btn-primary">Login</button> </li>
+		  <li class="pull-right"> <button id="loginID" style="margin-top: 5px" type="button" onclick="authLogin(true)" class="hidden btn btn-primary">Login</button> </li>
 		  <li class="pull-right"><button id="logoutID" style="margin-top: 5px" type="button" onclick="authLogout()" class="hidden btn btn-danger">Logout</button></li>
 		  <li class="pull-right"><a id="permalinkID">Permalink</a></li>
 		  
@@ -140,9 +140,36 @@
 				
 		  	    </div>
                             <div>
-                            <span id="resultAreaMultitierID"> </span>
+                            <span id="resultAreaMultitierID"> 
+		  	        <p class="errorMessage" id="resultAreaMultitierErrorID" ></p>
+                            </span>
                             <span id="resultAreaLiteID"> </span>
+		  	        <p class="errorMessage" id="resultAreaLiteErrorID" ></p>
+                            </span>
 		  	    </div>
+
+			    <div class="modal" tabindex="-1" role="dialog" id="modalID">
+                              <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+			          <div class="modal-header">
+                                    <h5 class="modal-title">Change Upload Location</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			              <span aria-hidden="true">&times;</span>
+                                    </button>
+			          </div>
+                                  <div class="modal-body">
+			            <p>
+                                      <label for="uploadLocationID">Upload Location: </label>
+                                      <input type="text" id="uploadLocationID" name="uploadLocation" value=saveLocation size="80">
+			            </p>
+                                  </div>
+                                  <div class="modal-footer">
+			            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="saveUploadLocation()" >Save changes</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+			          </div>
+                                </div>
+			      </div>
+                            </div>
 		
 	  </div>
 	</div>
@@ -277,6 +304,18 @@
 		function errorMessage(id, error) {
 			document.getElementById(id).innerHTML = error ; 
 		}
+
+		// Function is used to clear error message
+		function errorMessageClear(id) {
+			document.getElementById(id).innerHTML = "" ; 
+		}
+
+		// Function is used to clear all error messages
+		function errorMessagesClearAll() {
+                  var errorMessages = document.getElementsByClassName("errorMessage");
+                  for (var i=0; i < errorMessages.length; i++)
+                        errorMessages[i].innerHTML = "" ;
+		}
 	</script>
 
 	<!-- These Functions Handle the Form Validation -->
@@ -292,6 +331,7 @@
                 //var endpoint = "https://localhost/sparql?default-graph-uri=&query=" ;
                 var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
                 var graph = "urn:openlink:download:search:record" ;
+                var saveLocation = "";
 
                 var initialApplicationName = "";
                 var initialDatabaseServerFam = "";
@@ -300,6 +340,7 @@
                 var initialAppHostOs = "";
                 var initialDbmsHostOsFam = "";
                 var initialDbmsHostOs = "";
+                var initialSaveLocation = "";
 
                 function onLoad() {
 
@@ -318,6 +359,7 @@
                        initialAppHostOs = decodeURIComponent(params.get("appHostOs"));
                        initialDbmsHostOsFam = decodeURIComponent(params.get("dbmsHostOsFam"));
                        initialDbmsHostOs = decodeURIComponent(params.get("dbmsHostOs"));
+                       initialSaveLocation = decodeURIComponent(params.get("saveLocation"));
                        handlePermalink();
                   } else {
                     clearInput()
@@ -354,7 +396,7 @@
                     };
                 }
 
-                function getSchemaAboutRelations (installerArray) {
+                function getSchemaAboutRelations () {
                     let myJson = JSON.parse(document.getElementById("dataIslandID").text);
 
                     myJson["@graph"][0]["schema:about"] = installerArray;
@@ -563,7 +605,7 @@
                        } catch(e) {
                                 hideSpinner() ;
                                 console.error('Query Failed getting applications ', e) ;
-                                alert('Query Failed getting applications ' + e)
+                                errorMessage('applicationNameErrorID', 'Query Failed getting applications ' + e)
                         }                  
 
                 }
@@ -584,7 +626,9 @@
                            + "where { \n"
                            + " ?databaseServer a oplsof:DbmsFamily . \n"
                            + " ?databaseServer <http://schema.org/name> ?name . \n" 
-                           + " ?databaseServer oplsof:hasDatabaseEngine ?databaseServerFamily . \n"
+                           + " ?installer a <http://www.openlinksw.com/ontology/installers#InstallerArchive> . \n" 
+                           + " ?installer <http://www.openlinksw.com/ontology/installers#hasInstallerArchiveCategory> <http://data.openlinksw.com/oplweb/component_category/MTServerDBInstaller#this> . \n"
+                           + " ?installer <http://www.openlinksw.com/ontology/software#hasDatabaseFamily> ?databaseServer . \n"
                            + "} order by ?databaseServerLabel" ;
                        //var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
                        let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
@@ -624,7 +668,7 @@
                        } catch(e) {
                                 hideSpinner() ;
                                 console.error('Query Failed getting database servers ', e) ;
-                                alert('Query Failed getting database servers ' + e)
+                                errorMessage('databaseServerFamErrorID', 'Query Failed getting database servers ' + e);
                         }                  
 
                 }
@@ -645,6 +689,9 @@
                            + " ?opsysFamily a oplsof:OpsysFamily . \n"
                            + " ?opsysFamily rdfs:label ?name . \n" 
                            + " ?opsysFamily oplsof:hasOperatingSystem ?os . \n" 
+                           + " ?installer a <http://www.openlinksw.com/ontology/installers#InstallerArchive> . \n" 
+                           + " ?installer <http://www.openlinksw.com/ontology/installers#hasInstallerArchiveCategory> <http://data.openlinksw.com/oplweb/component_category/MTServerDBInstaller#this> .\n"
+                           + " ?installer <http://www.openlinksw.com/ontology/software#hasOperatingSystemFamily> ?opsysFamily . \n"
                            + "} order by ?opsysFamilyLabel" ;
                        //var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
                        let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
@@ -684,7 +731,7 @@
                        } catch(e) {
                                 hideSpinner() ;
                                 console.error('Query Failed getting operating system families ', e) ;
-                                alert('Query Failed getting operating system families ' + e)
+                                errorMessage('appHostOsFamErrorID', 'Query Failed getting operating system families ' + e);
                         }                  
 
                 }
@@ -705,6 +752,8 @@
                            + " ?opsysFamily a oplsof:OpsysFamily . \n"
                            + " ?opsysFamily rdfs:label ?name . \n" 
                            + " ?opsysFamily oplsof:hasOperatingSystem ?os . \n" 
+                           + " ?installer a <http://www.openlinksw.com/ontology/installers#InstallerArchive> . \n" 
+                           + " ?installer <http://www.openlinksw.com/ontology/software#hasOperatingSystemFamily> ?opsysFamily . \n"
                            + "} order by ?opsysFamilyLabel" ;
                        //var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
                        let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
@@ -744,7 +793,7 @@
                        } catch(e) {
                                 hideSpinner() ;
                                 console.error('Query Failed getting operating system families ', e) ;
-                                alert('Query Failed getting operating system families ' + e)
+                                errorMessage('dbmsHostOsFamErrorID', 'Query Failed getting operating system families ' + e);
                         }                  
 
                 }
@@ -767,6 +816,8 @@
                            + " ?opSystem oplsof:OperatingSystemCommercialName ?name . \n"
                            + " ?opsysFamily oplsof:hasOperatingSystem ?opSystem .  \n"
                            + " filter (?opsysFamily = <" + opsysFamily.value + ">) . \n"
+                           + " ?installer a <http://www.openlinksw.com/ontology/installers#InstallerArchive> . \n" 
+                           + " ?installer <http://www.openlinksw.com/ontology/software#hasOperatingSystem> ?opSystem . \n"
                            + "} order by ?opSystem ";
                        //var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
                        let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
@@ -809,7 +860,7 @@
                         } catch(e) {
                                 hideSpinner() ;
                                 console.error('Query Failed getting operating system families ', e) ;
-                                alert('Query Failed getting operating system families ' + e)
+                                errorMessage('dbmsHostOsErrorID', 'Query Failed getting operating system families ' + e);
                         }                  
                        document.getElementById("dbmsHostOsID").focus()
                 }
@@ -833,6 +884,9 @@
                            + " ?opSystem oplsof:OperatingSystemCommercialName ?name . \n"
                            + " ?opsysFamily oplsof:hasOperatingSystem ?opSystem .  \n"
                            + " filter (?opsysFamily = <" + opsysFamily.value + ">) . \n"
+                           + " ?installer a <http://www.openlinksw.com/ontology/installers#InstallerArchive> . \n" 
+                           + " ?installer <http://www.openlinksw.com/ontology/installers#hasInstallerArchiveCategory> <http://data.openlinksw.com/oplweb/component_category/MTGenericClientInstaller#this> . \n"
+                           + " ?installer <http://www.openlinksw.com/ontology/software#hasOperatingSystem> ?opSystem . \n"
                            + "} order by ?opSystem ";
                        //var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
                        //var endpoint = "https://localhost/sparql?default-graph-uri=&query=" ;
@@ -876,7 +930,7 @@
                         } catch(e) {
                                 hideSpinner() ;
                                 console.error('Query Failed getting operating system families ', e) ;
-                                alert('Query Failed getting operating system families ' + e)
+                                errorMessage('appHostOsErrorID', 'Query Failed getting operating system families ' + e);
                         }                  
                        document.getElementById("appHostOsID").focus()
                 }
@@ -898,6 +952,8 @@
                            + " ?databaseServer <http://schema.org/name> ?name . \n" 
                            + " ?databaseServer oplsof:hasDatabaseFamily ?databaseServerFamily . \n"
                            + " filter (?databaseServerFamily = <" + databaseServerFam.value + ">) . \n"
+                           + " ?installer a <http://www.openlinksw.com/ontology/installers#InstallerArchive> . \n" 
+                           + " ?installer <http://www.openlinksw.com/ontology/software#hasDatabaseEngine> ?databaseServer . \n"
                            + "} order by ?databaseServerLabel" ;
                        //var endpoint = "https://www.openlinksw.com/sparql?default-graph-uri=&query=" ;
                        let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
@@ -937,7 +993,7 @@
                        } catch(e) {
                                 hideSpinner() ;
                                 console.error('Query Failed getting database engines ', e) ;
-                                alert('Query Failed getting database engines ' + e)
+                                errorMessage('databaseServerErrorID', 'Query Failed getting database engines ' + e);
                         }                  
                        document.getElementById("databaseServerID").focus()
                 }
@@ -1007,6 +1063,13 @@
                     initialDbmsHostOs = "";
                   }
 
+                  if (initialSaveLocation != "" && initialSaveLocation != "null") {
+                    saveLocation = initialSaveLocation;
+                    buttons = document.getElementsByName('changeUploadLocationButtonName');
+                    for (var i = 0; i < buttons.length; i++) 
+                        buttons[i].title = 'Current upload location: ' + saveLocation;
+                    initialSaveLocatoin = "";
+                  }
                   checkAllSelected();
                   findDownloads();
                 }
@@ -1120,19 +1183,21 @@
                 async function findDownloads() {
                        showSpinner() ;
                        updatePermalink();
+		       errorMessagesClearAll();
                        installerArray = [];
-                       document.getElementById("dataIslandID").text = JSON.stringify(getSchemaAboutRelations(installerArray)); 
+                       document.getElementById("dataIslandID").text = JSON.stringify(getSchemaAboutRelations()); 
 
                        resultAreaReset();
-                       var resp = await recordSearch();
+                       // Cannot work out how to make the login work 
+                       //var resp = await recordSearch();
 
-                       if (resp > 0) {
+                       //if (resp > 0) {
                          createMTHeading();
                          getMTAgentInstallers();
                          getMTClientInstallers();
                          getMTBrokerInstallers();
                          getLiteInstallers();
-                       }
+                       //}
                 }
 
                 async function recordSearch() {
@@ -1192,14 +1257,19 @@
                        };
                 
                        try {
-                       var resp = await fetch(url,options);
+                       var resp = await solid.auth.fetch(url,options);
                                 if (resp.status >= 200 && resp.status <= 300) {
                                         console.log(resp.status + " - " + resp.statusText) ;
                                         hideSpinner() ;
                                         return resp.status;
                                 } else {
-                                        if (resp.status = 403) 
-                                          throw new Error("You must log in to continue") ;
+                                        if (resp.status = 403) { 
+                                          // throw new Error("You must log in to continue") ;
+                                          hideSpinner() ;
+                                          await authLogin(true);
+                                          var secondAttempt = await recordSearch();
+                                          return secondAttempt;
+                                        }
                                         else 
                                           throw new Error("'Insert Failed: Error " + resp.status +" - " + resp.statusText) ;
                                 }
@@ -1207,7 +1277,6 @@
                        } catch(e) {
                                 hideSpinner() ;
                                 console.error('Insert Failed', e) ;
-                                alert(e)
                                 return 0;
                        }  
 
@@ -1228,6 +1297,8 @@
                        databaseServer = document.getElementById("databaseServerID");
                        appHostOs = document.getElementById("appHostOsID");
                        dbmsHostOs = document.getElementById("dbmsHostOsID");
+
+                       if (saveLocation == '') saveLocation = solid_storage;
 
                        var query =     
                            "DEFINE input:same-as \"yes\" \n"
@@ -1261,7 +1332,23 @@
                                 var resultArea = document.getElementById("resultAreaMultitierID");
                                 var results = data.results.bindings;
                                 var heading = document.createElement('h3');
+                                var messageArea = document.createElement('p');
+                                var changeUploadLocationButton = document.createElement('button');
+                                changeUploadLocationButton.name = 'changeUploadLocationButtonName';
+                                changeUploadLocationButton.setAttribute('data-toggle', 'modal');
+                                changeUploadLocationButton.setAttribute('data-target', '#modalID');
+                                changeUploadLocationButton.classList.add("btn");
+                                changeUploadLocationButton.classList.add("btn-primary");
+                                if (saveLocation != null)
+                                  changeUploadLocationButton.title = 'Current upload location: ' + saveLocation;
+                                else
+                                  changeUploadLocationButton.title = 'No upload location set';
+                                changeUploadLocationButton.innerHTML = 'Change upload location';
+                                changeUploadLocationButton.style = 'margin: 10px; float: right';
+                                document.getElementById('uploadLocationID').value = saveLocation;
                                 heading.innerHTML = "Database Agent Component Installers"; 
+                                messageArea.classList.add("errorMessage"); 
+                                messageArea.id = 'agentResultsErrorID';
                                 var table = document.createElement('table');
                                 table.classList.add ("table"); 
                                 table.classList.add ("table-bordered"); 
@@ -1275,16 +1362,39 @@
                                     var tableData2 = document.createElement('td');
                                     var link = document.createElement('a');
                                     link.innerHTML = results[i].title.value;
-                                    link.href = results[i].url.value;
+                                    link.href = results[i].installer.value;
                                     tableData2.appendChild(link);
                                     tableRow.appendChild(tableData2);
+                                    var tableData3 = document.createElement('td');
+                                    var downloadLink = document.createElement('a');
+                                    downloadLink.href = results[i].url.value;
+                                    var downloadButton = document.createElement('button');
+                                    downloadButton.classList.add("btn");
+                                    downloadButton.classList.add("btn-primary");
+                                    downloadButton.innerHTML = "Download";
+                                    downloadButton.title = results[i].url.value;
+                                    downloadLink.appendChild(downloadButton);
+                                    tableData3.appendChild(downloadLink);
+                                    tableRow.appendChild(tableData3);
+                                    var tableData4 = document.createElement('td');
+                                    var uploadButton = document.createElement('button');
+                                    uploadButton.innerHTML = "Upload";
+                                    uploadButton.classList.add("btn");
+                                    uploadButton.classList.add("btn-primary");
+                                    uploadButton.onclick = function() {uploadFile(this, 'agentResultsErrorID')}
+                                    uploadButton.value = results[i].url.value;
+                                    uploadButton.title = results[i].url.value;
+                                    tableData4.appendChild(uploadButton);
+                                    tableRow.appendChild(tableData4);
                                     tableBody.appendChild(tableRow);
                                     localInstallerArray = localInstallerArray.concat(results[i].installer.value);
                                 }
                                 resultArea.appendChild(heading);
-                                resultArea.appendChild(table);
+                                resultArea.appendChild(messageArea);
+                                resultArea.appendChild(changeUploadLocationButton);
+                                resultArea.appendChild(table)
                                 installerArray = installerArray.concat(localInstallerArray);
-                                document.getElementById("dataIslandID").text = JSON.stringify(getSchemaAboutRelations(installerArray)); 
+                                document.getElementById("dataIslandID").text = JSON.stringify(getSchemaAboutRelations()); 
                                 hideSpinner() ;
                             }
                             else {
@@ -1302,7 +1412,7 @@
                         })
                         } catch(e) {
                                 console.error('Error getting multitier agent installers ', e) ;
-                                alert('Error getting installers ' + e)
+                                errorMessage('resultAreaMultitierErrorID', 'Error getting installers ' + e);
                         }                  
                 }
 
@@ -1313,6 +1423,8 @@
                        databaseServer = document.getElementById("databaseServerID");
                        appHostOs = document.getElementById("appHostOsID");
                        dbmsHostOs = document.getElementById("dbmsHostOsID");
+
+                       if (saveLocation == '') saveLocation = solid_storage;
 
                        var query =     
                            "DEFINE input:same-as \"yes\" \n"
@@ -1345,7 +1457,23 @@
                                 var resultArea = document.getElementById("resultAreaMultitierID");
                                 var results = data.results.bindings;
                                 var heading = document.createElement('h3');
+                                var messageArea = document.createElement('p');
+                                var changeUploadLocationButton = document.createElement('button');
+                                changeUploadLocationButton.name = 'changeUploadLocationButtonName';
+                                changeUploadLocationButton.setAttribute('data-toggle', 'modal');
+                                changeUploadLocationButton.setAttribute('data-target', '#modalID');
+                                changeUploadLocationButton.classList.add("btn");
+                                changeUploadLocationButton.classList.add("btn-primary");
+                                if (saveLocation != null)
+                                  changeUploadLocationButton.title = 'Current upload location: ' + saveLocation;
+                                else
+                                  changeUploadLocationButton.title = 'No upload location set';
+                                changeUploadLocationButton.innerHTML = 'Change upload location';
+                                changeUploadLocationButton.style = 'margin: 10px; float: right';
+                                document.getElementById('uploadLocationID').value = saveLocation;
                                 heading.innerHTML = "Generic Client Component Installers"; 
+                                messageArea.classList.add("errorMessage"); 
+                                messageArea.id = 'clientResultsErrorID';
                                 var table = document.createElement('table');
                                 table.classList.add ("table"); 
                                 table.classList.add ("table-bordered"); 
@@ -1359,16 +1487,39 @@
                                     var tableData2 = document.createElement('td');
                                     var link = document.createElement('a');
                                     link.innerHTML = results[i].title.value;
-                                    link.href = results[i].url.value;
+                                    link.href = results[i].installer.value;
                                     tableData2.appendChild(link);
                                     tableRow.appendChild(tableData2);
+                                    var tableData3 = document.createElement('td');
+                                    var downloadLink = document.createElement('a');
+                                    downloadLink.href = results[i].url.value;
+                                    var downloadButton = document.createElement('button');
+                                    downloadButton.classList.add("btn");
+                                    downloadButton.classList.add("btn-primary");
+                                    downloadButton.innerHTML = "Download";
+                                    downloadButton.title = results[i].url.value;
+                                    downloadLink.appendChild(downloadButton);
+                                    tableData3.appendChild(downloadLink);
+                                    tableRow.appendChild(tableData3);
+                                    var tableData4 = document.createElement('td');
+                                    var uploadButton = document.createElement('button');
+                                    uploadButton.innerHTML = "Upload";
+                                    uploadButton.classList.add("btn");
+                                    uploadButton.classList.add("btn-primary");
+                                    uploadButton.onclick = function() {uploadFile(this, 'clientResultsErrorID')}
+                                    uploadButton.value = results[i].url.value;
+                                    uploadButton.title = results[i].url.value;
+                                    tableData4.appendChild(uploadButton);
+                                    tableRow.appendChild(tableData4);
                                     tableBody.appendChild(tableRow);
                                     localInstallerArray = localInstallerArray.concat(results[i].installer.value);
                                 }
                                 resultArea.appendChild(heading);
+                                resultArea.appendChild(messageArea);
+                                resultArea.appendChild(changeUploadLocationButton);
                                 resultArea.appendChild(table);
                                 installerArray = installerArray.concat(localInstallerArray);
-                                document.getElementById("dataIslandID").text = JSON.stringify(getSchemaAboutRelations(installerArray)); 
+                                document.getElementById("dataIslandID").text = JSON.stringify(getSchemaAboutRelations()); 
                                 hideSpinner() ;
                             }
                             else {
@@ -1386,7 +1537,7 @@
                         })
                         } catch(e) {
                                 console.error('Error getting database agent installers ', e) ;
-                                alert('Error getting installers ' + e)
+                                errorMessage('resultAreaMultitierErrorID', 'Error getting installers ' + e);
                         }                  
                 }
 
@@ -1397,6 +1548,8 @@
                        databaseServer = document.getElementById("databaseServerID");
                        appHostOs = document.getElementById("appHostOsID");
                        dbmsHostOs = document.getElementById("dbmsHostOsID");
+
+                       if (saveLocation == '') saveLocation = solid_storage;
 
                        var query =     
                            "DEFINE input:same-as \"yes\" \n"
@@ -1429,7 +1582,23 @@
                                 var resultArea = document.getElementById("resultAreaMultitierID");
                                 var results = data.results.bindings;
                                 var heading = document.createElement('h3');
+                                var messageArea = document.createElement('p');
+                                var changeUploadLocationButton = document.createElement('button');
+                                changeUploadLocationButton.name = 'changeUploadLocationButtonName';
+                                changeUploadLocationButton.setAttribute('data-toggle', 'modal');
+                                changeUploadLocationButton.setAttribute('data-target', '#modalID');
+                                changeUploadLocationButton.classList.add("btn");
+                                changeUploadLocationButton.classList.add("btn-primary");
+                                if (saveLocation != null)
+                                  changeUploadLocationButton.title = 'Current upload location: ' + saveLocation;
+                                else
+                                  changeUploadLocationButton.title = 'No upload location set';
+                                changeUploadLocationButton.innerHTML = 'Change upload location';
+                                changeUploadLocationButton.style = 'margin: 10px; float: right';
+                                document.getElementById('uploadLocationID').value = saveLocation;
                                 heading.innerHTML = "Request Broker Component Installers"; 
+                                messageArea.classList.add("errorMessage"); 
+                                messageArea.id = 'rqbResultsErrorID';
                                 var table = document.createElement('table');
                                 table.classList.add ("table"); 
                                 table.classList.add ("table-bordered"); 
@@ -1443,16 +1612,39 @@
                                     var tableData2 = document.createElement('td');
                                     var link = document.createElement('a');
                                     link.innerHTML = results[i].title.value;
-                                    link.href = results[i].url.value;
+                                    link.href = results[i].installer.value;
                                     tableData2.appendChild(link);
                                     tableRow.appendChild(tableData2);
+                                    var tableData3 = document.createElement('td');
+                                    var downloadLink = document.createElement('a');
+                                    downloadLink.href = results[i].url.value;
+                                    var downloadButton = document.createElement('button');
+                                    downloadButton.classList.add("btn");
+                                    downloadButton.classList.add("btn-primary");
+                                    downloadButton.innerHTML = "Download";
+                                    downloadButton.title = results[i].url.value;
+                                    downloadLink.appendChild(downloadButton);
+                                    tableData3.appendChild(downloadLink);
+                                    tableRow.appendChild(tableData3);
+                                    var tableData4 = document.createElement('td');
+                                    var uploadButton = document.createElement('button');
+                                    uploadButton.innerHTML = "Upload";
+                                    uploadButton.classList.add("btn");
+                                    uploadButton.classList.add("btn-primary");
+                                    uploadButton.onclick = function() {uploadFile(this, 'rqbResultsErrorID')}
+                                    uploadButton.value = results[i].url.value;
+                                    uploadButton.title = results[i].url.value;
+                                    tableData4.appendChild(uploadButton);
+                                    tableRow.appendChild(tableData4);
                                     tableBody.appendChild(tableRow);
                                     localInstallerArray = localInstallerArray.concat(results[i].installer.value);
                                 }
                                 resultArea.appendChild(heading);
+                                resultArea.appendChild(messageArea);
+                                resultArea.appendChild(changeUploadLocationButton);
                                 resultArea.appendChild(table);
                                 installerArray = installerArray.concat(localInstallerArray);
-                                document.getElementById("dataIslandID").text = JSON.stringify(getSchemaAboutRelations(installerArray)); 
+                                document.getElementById("dataIslandID").text = JSON.stringify(getSchemaAboutRelations()); 
                                 hideSpinner() ;
                             }
                             else {
@@ -1470,7 +1662,7 @@
                         })
                         } catch(e) {
                                 console.error('Error getting request broker installers ', e) ;
-                                alert('Error getting installers ' + e)
+                                errorMessage('resultAreaMultitierErrorID', 'Error getting installers ' + e);
                         }                  
                 }
 
@@ -1481,6 +1673,8 @@
                        databaseServer = document.getElementById("databaseServerID");
                        appHostOs = document.getElementById("appHostOsID");
                        dbmsHostOs = document.getElementById("dbmsHostOsID");
+
+                       if (saveLocation == '') saveLocation = solid_storage;
 
                        var query =     
                            "DEFINE input:same-as \"yes\" \n"
@@ -1514,7 +1708,23 @@
                                 var resultArea = document.getElementById("resultAreaLiteID");
                                 var results = data.results.bindings;
                                 var heading = document.createElement('h2');
+                                var messageArea = document.createElement('p');
+                                var changeUploadLocationButton = document.createElement('button');
+                                changeUploadLocationButton.name = 'changeUploadLocationButtonName';
+                                changeUploadLocationButton.setAttribute('data-toggle', 'modal');
+                                changeUploadLocationButton.setAttribute('data-target', '#modalID');
+                                changeUploadLocationButton.classList.add("btn");
+                                changeUploadLocationButton.classList.add("btn-primary");
+                                if (saveLocation != null)
+                                  changeUploadLocationButton.title = 'Current upload location: ' + saveLocation;
+                                else
+                                  changeUploadLocationButton.title = 'No upload location set';
+                                changeUploadLocationButton.innerHTML = 'Change upload location';
+                                changeUploadLocationButton.style = 'margin: 10px; float: right';
+                                document.getElementById('uploadLocationID').value = saveLocation;
                                 heading.innerHTML = "Lite Edition Installers"; 
+                                messageArea.classList.add("errorMessage"); 
+                                messageArea.id = 'liteResultsErrorID';
                                 var table = document.createElement('table');
                                 table.classList.add ("table"); 
                                 table.classList.add ("table-bordered"); 
@@ -1528,16 +1738,39 @@
                                     var tableData2 = document.createElement('td');
                                     var link = document.createElement('a');
                                     link.innerHTML = results[i].title.value;
-                                    link.href = results[i].url.value;
+                                    link.href = results[i].installer.value;
                                     tableData2.appendChild(link);
                                     tableRow.appendChild(tableData2);
+                                    var tableData3 = document.createElement('td');
+                                    var downloadLink = document.createElement('a');
+                                    downloadLink.href = results[i].url.value;
+                                    var downloadButton = document.createElement('button');
+                                    downloadButton.classList.add("btn");
+                                    downloadButton.classList.add("btn-primary");
+                                    downloadButton.innerHTML = "Download";
+                                    downloadButton.title = results[i].url.value;
+                                    downloadLink.appendChild(downloadButton);
+                                    tableData3.appendChild(downloadLink);
+                                    tableRow.appendChild(tableData3);
+                                    var tableData4 = document.createElement('td');
+                                    var uploadButton = document.createElement('button');
+                                    uploadButton.innerHTML = "Upload";
+                                    uploadButton.classList.add("btn");
+                                    uploadButton.classList.add("btn-primary");
+                                    uploadButton.onclick = function() {uploadFile(this, 'liteResultsErrorID')}
+                                    uploadButton.value = results[i].url.value;
+                                    uploadButton.title = results[i].url.value;
+                                    tableData4.appendChild(uploadButton);
+                                    tableRow.appendChild(tableData4);
                                     tableBody.appendChild(tableRow);
                                     localInstallerArray = localInstallerArray.concat(results[i].installer.value);
                                 }
                                 resultArea.appendChild(heading);
+                                resultArea.appendChild(messageArea);
+                                resultArea.appendChild(changeUploadLocationButton);
                                 resultArea.appendChild(table);
                                 installerArray = installerArray.concat(localInstallerArray);
-                                document.getElementById("dataIslandID").text = JSON.stringify(getSchemaAboutRelations(installerArray)); 
+                                document.getElementById("dataIslandID").text = JSON.stringify(getSchemaAboutRelations()); 
                                 hideSpinner() ;
                             }
                             else {
@@ -1555,8 +1788,114 @@
                         })
                         } catch(e) {
                                 console.error('Error getting lite edition installers ', e) ;
-                                alert('Error getting installers ' + e)
+                                errorMessage('resultAreaLiteErrorID', 'Error getting installers ' + e);
                         }                  
+                }
+
+                function saveUploadLocation() {
+		          errorMessagesClearAll();
+                          saveLocation = document.getElementById('uploadLocationID').value;
+                          // if there is a final / remove it...
+                          if (saveLocation.endsWith ('/')) saveLocation = saveLocation.substring(0, saveLocation.length - 1);
+                          buttons = document.getElementsByName('changeUploadLocationButtonName');
+                          for (var i = 0; i < buttons.length; i++) 
+                             buttons[i].title = 'Current upload location: ' + saveLocation;
+                          updatePermalink();
+                }
+
+                function getNameFromInstallerUrl(url) {
+                        if (url.indexOf("/") > 0)
+                          return url.substring(url.lastIndexOf("/") + 1, url.length);
+                        else 
+                          return url;
+                }
+
+                async function fileExists (fileName, button, messageElementID) {
+console.log('In file exists');
+                        const options = {
+	                                        method: 'HEAD',
+	                                        credentials: 'include',
+	                                        mode: 'cors',
+	                                        crossDomain: true,
+	                    };
+	
+                            try {
+                            var resp = await solid.auth.fetch(saveLocation + '/' + fileName, options);
+                            	if (resp.status == 401 || resp.status == 403) {
+                            	        errorMessage(messageElementID, 'Access denied to the configured upload location ');
+                            		hideSpinner() ;
+                                        await authLogin();
+                                        uploadFile(button, messageElementID);
+                            	}
+                            	else if (resp.status == 404) {
+                            		hideSpinner() ;
+                                        return false;
+                            	} else {
+                            		hideSpinner() ;
+                                        return true; 
+                            	}
+                            } catch (e) {
+                            	hideSpinner() ;
+                            	console.error('Failed ' + e) ;
+                            	errorMessage(messageElementID, 'Failed ' + e);
+                            }
+                }
+
+
+                async function uploadFile (button, messageElementID) {
+
+		        errorMessagesClearAll();
+                        if (saveLocation == null || saveLocation == "") {
+                            errorMessage(messageElementID, 'Upload Failed: No upload location set');
+                            return;
+                        }
+                        showSpinner() ;
+                        var fileName = getNameFromInstallerUrl(button.value);
+                        try {
+                            if (await fileExists(fileName, button, messageElementID)) {
+                              hideSpinner() ;
+                              if (confirm("File " + fileName  + " exists, do you want to overwrite it?") == false) 
+                                return;
+                            }
+	                    const options = {
+	                                        method: 'PUT',
+	                                        headers: {
+	                                                   'Content-type': 'application/octet-stream',
+	                    								 },
+	                                        credentials: 'include',
+	                                        mode: 'cors',
+	                                        crossDomain: true,
+                                                body: button.value
+	                    };
+	
+                            var resp = await solid.auth.fetch(saveLocation + '/'+ fileName, options);
+                            	if (resp.status >= 200 && resp.status <= 300) {
+                            		hideSpinner() ;
+                            		//console.log(resp.status + " - " + resp.statusText);
+                            	}
+                            	else if (resp.status == 401 || resp.status == 403) {
+                            		hideSpinner() ;
+                                        await authLogin();
+                                        // try again...
+                                        var resp2 = await solid.auth.fetch(saveLocation + '/'+ fileName, options);
+                            	        if (resp.status >= 200 && resp.status <= 300) {
+                            		  hideSpinner() ;
+                            	        } else {
+                            		  hideSpinner() ;
+                            		  throw new Error("Error " + resp.status +" - " + resp.statusText) ;
+                            	        }
+                            	}
+                            	else {
+                            		hideSpinner() ;
+                            		throw new Error("Error " + resp.status +" - " + resp.statusText) ;
+                            	}
+                            } catch (e) {
+                            	hideSpinner() ;
+                            	console.error('Upload Failed ' + e) ;
+                            	errorMessage(messageElementID, 'Upload Failed ' + e);
+                            } finally {
+                                window.location = document.getElementById("permalinkID").href;
+                            }
                 }
 
                 function resetPermalink () {
@@ -1583,7 +1922,8 @@
                        permalink.href = permalink.href + "databaseServerFam=" +  encodeURIComponent(databaseServerFam.value) + "&";
                        permalink.href = permalink.href + "databaseServer=" +  encodeURIComponent(databaseServer.value) + "&";
                        permalink.href = permalink.href + "dbmsHostOsFam=" +  encodeURIComponent(dbmsHostOsFam.value) + "&";
-                       permalink.href = permalink.href + "dbmsHostOs=" +  encodeURIComponent(dbmsHostOs.value);
+                       permalink.href = permalink.href + "dbmsHostOs=" +  encodeURIComponent(dbmsHostOs.value) + "&";
+                       permalink.href = permalink.href + "saveLocation=" +  encodeURIComponent(saveLocation);
                 }
 	</script>
 	<!-- These functions are used for Authentication -->
@@ -1610,15 +1950,15 @@
 
              var store = kb.any(s_webId, PIM('storage'));
              var inbox = kb.any(s_webId, LDP('inbox'));
-             if (inbox)
-               ret = inbox.value;
-             else if (store)
+             if (store)
                ret = store.value;
+             else if (inbox)
+               ret = inbox.value;
 
              return ret;
            } catch(e) {
-			   console.error('Error', e)
-			   alert('Error ', e)
+			   console.error('Error fetching profile information', e)
+			   alert('Error fetching profile information', e)
 			   return null;
            }
         }
@@ -1643,12 +1983,12 @@
                }
            } 
  	  catch(e) {
-		  console.error('Request failed', e)
-		  alert('Request failed ', e)
+		  console.error('loadProfile request failed', e)
+		  alert('loadProfile request failed ', e)
            }
         }
 
-        async function authLogin() {
+        async function authLogin(refresh) {
             const popupUri = './common/popup.html'
 
             const session = await solid.auth.popupLogin({ popupUri })
@@ -1661,7 +2001,8 @@
                    await solid.auth.logout()
                }
                // Now that we have a cookie, reload to display the authenticated page
-               window.location = document.getElementById("permalinkID").href;
+               if (refresh)
+                 window.location = document.getElementById("permalinkID").href;
             }
         }
        
