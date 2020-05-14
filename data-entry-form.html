@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -788,9 +789,12 @@
 	<script>
 		
 		// update table on tab switch
-		$('.nav-tabs').find('a').on('shown.bs.tab', function () {
-			updateTable() ;
-			updatePermalink() ;
+		$('.nav-tabs a').on('shown.bs.tab', function(event){
+			var currTab = $(event.target).text();
+			var prevTab = $(event.relatedTarget).text();
+			if (currTab != "About" && prevTab != "About") {
+				updateTable() ;
+			}
 		});
 		
 		// This function allows hyperlinks to be used in the table
