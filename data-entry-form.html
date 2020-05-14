@@ -787,10 +787,14 @@
 	<!-- These functions handle the data table -->
 	<script>
 		
-		// update table on tab switch
-		$('.nav-tabs').find('a').on('shown.bs.tab', function () {
-			updateTable() ;
-			updatePermalink() ;
+		// update table and permalink on tab switch
+		$('.nav-tabs a').on('shown.bs.tab', function(event){
+			var currTab = $(event.target).text();
+			var prevTab = $(event.relatedTarget).text();
+			if (currTab != "About" && prevTab != "About") {
+				updateTable() ;
+				updatePermalink();
+			}
 		});
 		
 		// This function allows hyperlinks to be used in the table
