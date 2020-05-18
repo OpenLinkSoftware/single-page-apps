@@ -811,6 +811,13 @@
 				if (str.includes("https://linkeddata.uriburner.com/describe/?url=")) {// of str is in fct format
 					strLabel = strLabel.replace("https://linkeddata.uriburner.com/describe/?url=", "");
 					strLabel = strLabel.replace("%23", "#");
+				} else if (str.includes("nodeID://")) {
+					strLabel = strLabel.replace("nodeID://", "_:");
+				} else if (str.includes("#")) {
+					strLabel = str.split('#')[1];
+				} else if (str.includes("/")) {
+					var strList = str.split("/");
+					strLabel = strList.pop();
 				}
 			} 
 			
