@@ -526,6 +526,7 @@
 	
 		// Function checks if input is a blank node
 		function isBlankNode(str) {
+			str = str.trim();
 			if (str.charAt(0) == "_" && str.charAt(1) == ":") {
 				return str ;
 			} else if (str.charAt(0) == "[" && str.charAt(str.length-1) == "]") {
