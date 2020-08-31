@@ -9,7 +9,7 @@
 		<!-- Latest compiled JavaScript -->
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 		<!-- Authentication and RDF procssing library -->
-		<script src="./common/js/solid-auth-client.bundle.js"></script> 
+		<script src="./common/js/solid-auth-client.bundle.js"></script>
 	    <!-- <script src="https://cdn.jsdelivr.net/npm/solid-auth-client@2.3.0/dist-lib/solid-auth-client.bundle.js"></script> -->
 		<!-- <script src="./common/js/rdflib.min.js"></script> -->
 		<script src="https://cdn.jsdelivr.net/npm/rdflib@0.20.1/dist/rdflib.min.js"></script>
@@ -27,10 +27,10 @@
 		<li id="aboutTabID"><a data-toggle="tab" href="#aboutID">About</a></li>
 		<!-- Start Dropdown -->
 		<li class="pull-right" class="dropdown">
-		    <a class="dropdown-toggle" style="max-height: 40px" data-toggle="dropdown" href="#"> 
+		    <a class="dropdown-toggle" style="max-height: 40px" data-toggle="dropdown" href="#">
 			<span class="glyphicon glyphicon-cog"></span>
 		    <span class="caret"></span></a>
-			
+
 		    <ul class="dropdown-menu">
 			  <!-- Faceted Browser Links Checkbox  -->
 			  <div class="checkbox">
@@ -78,10 +78,10 @@
 		  <li class="pull-right"> <button id="loginID" style="margin-top: 5px" type="button" onclick="authLogin()" class="hidden btn btn-primary">Login</button> </li>
 		  <li class="pull-right"><button id="logoutID" style="margin-top: 5px" type="button" onclick="authLogout()" class="hidden btn btn-danger">Logout</button></li>
 		  <li class="pull-right"><a id="permalinkID">Permalink</a></li>
-		  
+
 	  </ul>
 	  <!-- End of tabs menu -->
-  
+
 	  <!-- Add content to the tabs-->
 	  <div class="tab-content">
 		<!-- Start DBMS Tab -->
@@ -94,18 +94,18 @@
 		  				<form id="dbmsFormID" class="form" method="post">
 		  					<div class="form-group">
 		  						<label for="subjectID">Subject</label>
-		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="If the subject is not a URI it will be used as the fragment identifier of a Relative URI."></span> 
+		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="If the subject is not a URI it will be used as the fragment identifier of a Relative URI."></span>
 		  						<textarea class="form-control" placeholder="Subject" rows="1" style="resize:vertical" id="subjectID" onchange="updatePermalink()"></textarea>
 		  						<p class="errorMessage" id="subjectErrorID" ></p>
 		  					</div>
 		  					<div class="form-group">
 		  						<label for="predicateID">Predicate</label>
-		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The predicate can either be a URI (ex. http://xmlns.com/foaf/0.1/name) or a curie (ex. foaf:name) because these are preloaded in Virtuoso."></span> 
+		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The predicate can either be a URI (ex. http://xmlns.com/foaf/0.1/name) or a curie (ex. foaf:name) because these are preloaded in Virtuoso."></span>
 		  						<input type="text" class="form-control" placeholder="Predicate" id="predicateID" onchange="updatePermalink()">
 		  						<p class="errorMessage" id="predicateErrorID" ></p>
 		  					</div>
 		  					<div class="form-group">
-		  						<label for="objectID">Object</label> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Whether or not the Object is a literal value or a reference is determined by the range of the predicate. Quoting the Object will override this feature and make it a literal value."></span> 
+		  						<label for="objectID">Object</label> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Whether or not the Object is a literal value or a reference is determined by the range of the predicate. Quoting the Object will override this feature and make it a literal value."></span>
 		  						<textarea class="form-control" placeholder="Object" rows="1" style="resize:vertical" id="objectID" onchange="updatePermalink()"></textarea>
 		  					</div>
 		  					<div class="form-group">
@@ -114,24 +114,24 @@
 		  						<p class="errorMessage" id="docNameErrorID" ></p>
 		  					</div>
 		  					<div class="form-group">
-		  						<label for="endpointID">SPARQL Endpoint</label> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Required for accepted relation object (values) lookup"></span> 
+		  						<label for="endpointID">SPARQL Endpoint</label> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Required for accepted relation object (values) lookup"></span>
 		  						<input type="text" class="form-control" id="endpointID" size="35" value="https://linkeddata.uriburner.com/sparql" onchange="updatePermalink()"/>
 		  					</div>
-				
+
 		  					<!-- Start Buttons -->
 		  					<div class=button-wrapper>
 		  					<span>
 							<button id="clearBtnID" type="button" onclick="clearInput()" class="btn btn-primary">Clear</button>
-		  					<button id="insertBtnID" type="button" onclick="recordGen()" class="btn btn-success">Add</button> 
-		  					<button id="deleteBtnID" type="button" onclick="recordDel()" class="btn btn-danger">Delete</button> 
-		  					<button id="queryBtnID" type="button" onclick="queryGen()" class="btn btn-warning">Query</button> 
+		  					<button id="insertBtnID" type="button" onclick="recordGen()" class="btn btn-success">Add</button>
+		  					<button id="deleteBtnID" type="button" onclick="recordDel()" class="btn btn-danger">Delete</button>
+		  					<button id="queryBtnID" type="button" onclick="queryGen()" class="btn btn-warning">Query</button>
 		  					<button id="dataBtnID" type="button" onclick="updateTable()" class="btn btn-info">All Data</button>
 							</span>
 		  					</div>
 		  					<!-- End Buttons -->
 		  				</form>
 		  				<!-- End of Form Div -->
-				
+
 		  			<!--Start Table Div (Right Side) -->
 		  	        </div>
 		  	        <div class="col-xs-6">
@@ -145,7 +145,7 @@
 							<button id="firstBtnID" type="button" onclick="first()" style="background-color: #99A3A4; color: #FDFEFE; margin-right: 5px" class="btn pull-left">First</button>
 							<button id="prevBtnID" type="button" onclick="previous()" style="background-color: #99A3A4; color: #FDFEFE" class="btn pull-left">Prev</button>
 							<button id="lastBtnID" type="button" onclick="last()" style="background-color: #99A3A4; color: #FDFEFE; margin-left: 5px" class="btn pull-right">Last</button>
-							
+
 							<button id="nextBtnID" type="button" onclick="next()" style="background-color: #99A3A4; color: #FDFEFE" class="btn pull-right ">Next</button>
 						</div>
 		  	        </div>
@@ -154,7 +154,7 @@
 		  	</div>
 	    </div>
 		<!-- End DBMS Tab -->
-		
+
 		<!-- Start File System Tab -->
 	    <div id="fsID" class="tab-pane fade">
 		  	<div class="container">
@@ -165,18 +165,18 @@
 		  				<form id="fsFormID" class="form" method="post">
 		  					<div class="form-group">
 		  						<label for="subjectID2">Subject</label>
-		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="If the subject is not a URI it will be used as the fragment identifier of a Relative URI."></span> 
+		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="If the subject is not a URI it will be used as the fragment identifier of a Relative URI."></span>
 		  						<textarea class="form-control" placeholder="Subject" rows="1" style="resize:vertical" id="subjectID2" onchange="updatePermalink()"></textarea>
 		  						<p class="errorMessage" id="subjectErrorID2" ></p>
 		  					</div>
 		  					<div class="form-group">
 		  						<label for="predicateID2">Predicate</label>
-		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The predicate can either be a URI (ex. http://xmlns.com/foaf/0.1/name) or a curie (ex. foaf:name) because these are preloaded in Virtuoso."></span> 
+		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The predicate can either be a URI (ex. http://xmlns.com/foaf/0.1/name) or a curie (ex. foaf:name) because these are preloaded in Virtuoso."></span>
 		  						<input type="text" class="form-control" placeholder="Predicate" id="predicateID2">
 		  						<p class="errorMessage" id="predicateErrorID2" ></p>
 		  					</div>
 		  					<div class="form-group">
-		  						<label for="objectID2">Object</label> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Wether or not the Object is a literal value or a reference is determined by the range of the predicate. Quoting the Object will override this feature and make it a literal value."></span> 
+		  						<label for="objectID2">Object</label> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Wether or not the Object is a literal value or a reference is determined by the range of the predicate. Quoting the Object will override this feature and make it a literal value."></span>
 		  						<textarea class="form-control" placeholder="Object" rows="1" style="resize:vertical" id="objectID2" onchange="updatePermalink()"></textarea>
 		  					</div>
 		  					<div class="form-group">
@@ -185,7 +185,7 @@
 		  						<p class="errorMessage" id="docNameErrorID2" ></p>
 		  					</div>
 		  					<div class="form-group">
-		  						<label for="endpointID2">SPARQL Endpoint (required for predicate lookup)</label> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Required for accepted relation object (values) lookup"></span> 
+		  						<label for="endpointID2">SPARQL Endpoint (required for predicate lookup)</label> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Required for accepted relation object (values) lookup"></span>
 		  						<input type="text" class="form-control" id="endpointID2" size="35" value="https://linkeddata.uriburner.com/sparql" onchange="updatePermalink()"/>
 		  					</div>
 
@@ -195,14 +195,14 @@
 							<button id="clearBtnID" type="button" onclick="clearInput()" class="btn btn-primary">Clear</button>
 							<button id="insertBtnID2" type="button" onclick="turtleGen()" class="btn btn-success">Add</button>
 							<button id="deleteBtnID2" type="button" onclick="turtleDel()" class="btn btn-danger">Delete</button>
-		  					<button id="queryBtnID2" type="button" onclick="queryGen()" class="btn btn-warning">Query</button> 
+		  					<button id="queryBtnID2" type="button" onclick="queryGen()" class="btn btn-warning">Query</button>
 		  					<button id="dataBtnID2" type="button" onclick="updateTable()" class="btn btn-info">All Data</button>
 		  				    </span>
 		  					</div>
 		  					<!-- End Buttons -->
 		  				</form>
 		  				<!-- End of Form Div -->
-					
+
 		  			<!--Start Table Div (Right Side) -->
 		  	        </div>
 		  	        <div class="col-xs-6">
@@ -216,7 +216,7 @@
 							<button id="firstBtnID2" type="button" onclick="first()" style="background-color: #99A3A4; color: #FDFEFE; margin-right: 5px" class="btn pull-left disabled">First</button>
 							<button id="prevBtnID2" type="button" onclick="previous()" style="background-color: #99A3A4; color: #FDFEFE" class="btn pull-left disabled">Prev</button>
 							<button id="lastBtnID2" type="button" onclick="last()" style="background-color: #99A3A4; color: #FDFEFE; margin-left: 5px" class="btn pull-right disabled">Last</button>
-							
+
 							<button id="nextBtnID2" type="button" onclick="next()" style="background-color: #99A3A4; color: #FDFEFE" class="btn pull-right disabled">Next</button>
 						</div>
 		  	        </div>
@@ -229,35 +229,35 @@
 	    <div id="aboutID" class="tab-pane fade">
 		  	<div class="container">
 				<p style="padding-top: 10px"> Generic SPARQL Data Entry Form 1.0.4<br>
-					Description: Simple Data Entry Form that helps unravel the power of RDF and SPARQL with regards to Structured Data creation and interaction. <br> 
+					Description: Simple Data Entry Form that helps unravel the power of RDF and SPARQL with regards to Structured Data creation and interaction. <br>
 					Creator: <a href="https://jordan.solid.openlinksw.com:8444/profile/card#me">Jordan Idehen</a> (<a href="https://github.com/jidehen#this">Github</a>, <a href="https://www.linkedin.com/in/jordan-idehen-143934157/#this">LinkedIn</a>) <br>
 					Supervisor: <a href="https://github.com/OpenLinkSoftware#this">OpenLink Software</a> <br>
-					License: Public Domain  
+					License: Public Domain
 				</p>
 			</div>
 		<!-- End About Tab -->
 	  </div>
 	<!-- End of tabs container -->
 	</div>
-	
+
 	<!-- Error Display CSS -->
 	<style>
 		/* sets input field red if invalid */
 		.error {
 		  border:2px solid red;
 		}
-	
+
 		/* sets error message color red */
 		.errorMessage {
 			color:red;
 		}
-	
+
 		/* wraps text in table */
 		td {
 		  word-wrap: break-word;
 		}
 	</style>
-	
+
 	<!-- Spinner CSS -->
 	<style>
 		#spinner{
@@ -276,7 +276,7 @@
 		      transform: rotate(360deg);
 		  }
 		}
-		
+
 		#spinner::after {
 		    content:'';
 		    display:block;
@@ -292,7 +292,7 @@
 		    animation: spin .8s linear infinite;
 		}
 	</style>
-	
+
 	<!-- Dropdown menu CSS-->
 	<style>
 		.dropdown-menu {
@@ -303,13 +303,13 @@
 		    font-size: 20px;
 		}
 	</style>
-	
+
 	<!-- Spinner Javascript -->
 	<script>
 		function showSpinner() {
 		  document.getElementById("spinner").className = "show";
 		}
-		
+
 		function hideSpinner() {
 		  document.getElementById("spinner").className = document.getElementById("spinner").className.replace("show", "");
 		}
@@ -318,25 +318,25 @@
 	<!-- These Functions Modify the Onscreen Display -->
 	<script>
 		//docNameValue() ; //Checks/Updates document name when page is loaded
-		var solid_storage = null; 
+		var solid_storage = null;
                 var initialTab = "";
                 var initialSubject = "";
                 var initialPredicate = "";
                 var initialObject = "";
                 var initialDocumentName = "";
                 var initialEndpoint = "";
-	  
+
 		//Tooltip activation function
 		$(document).ready(function(){
 		    $('[data-toggle="tooltip"]').tooltip({
 		        placement : 'right'
-		    }); 
+		    });
 
                   // check for permalink
                   var queryString = window.location.search;
                   var params = new URLSearchParams(queryString);
                   var setInputs = params.get("setInputs");
-                 
+
                   resetPermalink();
                   if (setInputs == "true") {
                        initialTab = decodeURIComponent(params.get("tab"));
@@ -392,12 +392,12 @@
 
 		// Handle the permalink parameters
                 function handlePermalink() {
-                    var subject = checkPermalinkTab("subjectID", "subjectID2"); 
-                    var predicate = checkPermalinkTab("predicateID", "predicateID2"); 
-                    var object = checkPermalinkTab("objectID", "objectID2"); 
-                    var documentName = checkPermalinkTab("docNameID", "docNameID2"); 
-                    var endpoint = checkPermalinkTab("endpointID", "endpointID2"); 
-          
+                    var subject = checkPermalinkTab("subjectID", "subjectID2");
+                    var predicate = checkPermalinkTab("predicateID", "predicateID2");
+                    var object = checkPermalinkTab("objectID", "objectID2");
+                    var documentName = checkPermalinkTab("docNameID", "docNameID2");
+                    var endpoint = checkPermalinkTab("endpointID", "endpointID2");
+
                     if (initialSubject != "") {
                       subject.value = initialSubject;
                       initialSubject = "";
@@ -419,33 +419,33 @@
                       initialEndpoint = "";
                     }
                 }
-	
-		/* Gets the solid storage from window > application > session storage 
-		so it can be used as the document name for functions 
+
+		/* Gets the solid storage from window > application > session storage
+		so it can be used as the document name for functions
 		function is called when page is loaded/reloaded */
 		async function docNameValue() {
 			solid_storage = await sessionStorage.getItem("solid_storage")
 			var solid_storage_value = solid_storage ;
 			if (document.getElementById("cmdID").checked == true) {
-				console.log('solid storage: ' + solid_storage); 
-			}
-			
-			if (solid_storage == null) {
-				document.getElementById("docNameID").value = "urn:records:test" ;
-				document.getElementById("docNameID2").value = "https://kingsley.idehen.net/public_home/jordan/Public/record-test.ttl" ;		
-			} else {
-				document.getElementById("docNameID").value = solid_storage_value ;
-				document.getElementById("docNameID2").value = solid_storage_value ;	
+				console.log('solid storage: ' + solid_storage);
 			}
 
- 		        // value from permalink  
+			if (solid_storage == null) {
+				document.getElementById("docNameID").value = "urn:records:test" ;
+				document.getElementById("docNameID2").value = "https://kingsley.idehen.net/public_home/jordan/Public/record-test.ttl" ;
+			} else {
+				document.getElementById("docNameID").value = solid_storage_value ;
+				document.getElementById("docNameID2").value = solid_storage_value ;
+			}
+
+ 		        // value from permalink
  			if (initialDocumentName != "" && initialTab != "") {
- 			        var documentName = checkPermalinkTab("docNameID", "docNameID2"); 
+ 			        var documentName = checkPermalinkTab("docNameID", "docNameID2");
  				documentName.value = initialDocumentName;
 		        }
 
 		}
-		
+
 		// Clears subject, predicate, object input fields
 		function clearInput() {
 			if (document.getElementById('dbmsTabID').getAttribute('class') == "active"){
@@ -462,7 +462,7 @@
 				document.getElementById("endpointID2").value = curEndpoint ;
 			}
 		}
-	
+
 		// This function checks which tab the user is in to determine focus of functions
 		function checkValue(id1, id2) {
 			if (document.getElementById('dbmsTabID').getAttribute('class') == "active"){
@@ -471,7 +471,7 @@
 				return document.getElementById(id2).value ;
 			}
 		}
-	
+
 		// This function checks which tab the user is in to determine table to display data (different because of .value)
 		function checkId(id1, id2) {
 			if (document.getElementById('dbmsTabID').getAttribute('class') == "active"){
@@ -488,15 +488,15 @@
 		function setInputColor(id) {
 			document.getElementById(id).className = document.getElementById(id).className + " error";  // this adds the error class
 		}
-	
+
 		// Function is used to remove input field border color
 		function removeInputColor(id) {
 			document.getElementById(id).className = "form-control"; // removes error class
 		}
-	
+
 		// Function is used to display error message
 		function errorMessage(id, error) {
-			document.getElementById(id).innerHTML = error ; 
+			document.getElementById(id).innerHTML = error ;
 		}
 	</script>
 
@@ -509,21 +509,21 @@
 		document.getElementById("docNameID2").addEventListener("input", docNameValidation);
 		function docNameValidation() {
 			var str = document.getElementById("docNameID2").value ;
-		 
+
 			try {
 				if (regexp.test(str)) { //removes error for valid uri
-					errorMessage("docNameErrorID2", "") ; 
+					errorMessage("docNameErrorID2", "") ;
 					removeInputColor('docNameID2') ;
 				} else {
 					setInputColor("docNameID2") ;
-					errorMessage("docNameErrorID2", "Document name must be a full uri for patch method") ; 
+					errorMessage("docNameErrorID2", "Document name must be a full uri for patch method") ;
 					throw new Error("Document Name must be a full uri for patch method"); // Throws error because input is not a valid uri
 				}
 			} catch(e) {
 				console.error('Invalid uri', e) ;
 			}
 		}
-	
+
 		// Function checks if input is a blank node
 		function isBlankNode(str) {
 			str = str.trim();
@@ -535,7 +535,7 @@
 				return false ;
 			}
 		}
-		
+
 		// Function checks if input contains a language tag
 		function langTag(str) {
 			const langexp = /@[a-zA-Z][a-zA-Z]/ ; // regexp for languge tag ex. @en
@@ -545,15 +545,15 @@
 				return false ;
 			}
 		}
-	
+
 		// Function formats literal inputs
 		function formatLiteral(str) {
 			if (langTag(str)) { // str has lang tag
 				strArray = str.split('@') ; // split string at @ so the langtag is removed from string
 				str = strArray[0].trim() ;
-				langtag = '@' + strArray[1].trim() ; // need to add @ because it is removed by split 
+				langtag = '@' + strArray[1].trim() ; // need to add @ because it is removed by split
 				if (str.charAt(0) != '"' && str.charAt(0) != "'") {
-					return '"' + str + '"' + langtag 
+					return '"' + str + '"' + langtag
 				} else {
 					return str + langtag
 				}
@@ -563,19 +563,19 @@
 				} else if (str.charAt(0) == "'" && str.charAt(str.length-1) == "'") {
 					return str // If string begins and ends with single quote return it as is
 				} else if (str.charAt(0) == '"' && str.charAt(str.length-1) == '"') {
-					return str ;	
+					return str ;
 				} else if (str.indexOf(' ') >= 0){
 					if (str.charAt(0) != '"' && str.charAt(0) != "'") {
 						return '"' + str + '"' ;
 					} else {
 						return str ;
-					} 
+					}
 				} else {
 					return '"' + str + '"' ;
 				}
-			}	
+			}
 		}
-	
+
 		// This function formats the Subject input. Comments are inline
 		function formatSubject() {
 			if (document.getElementById('dbmsTabID').getAttribute('class') == "active"){
@@ -583,16 +583,16 @@
 			} else if (document.getElementById('fsTabID').getAttribute('class') == "active"){
 				var str = document.getElementById("subjectID2").value ;
 			}
-			
+
 			if (str.charAt(0) == '<' && str.charAt(str.length-1) == '>') {
 				return str ;
 			} else if (regexp.test(str) && !isBlankNode(str)) {
 				return '<' + str + '>' ; // Case: input is a uri. Solution: quote it
 			} else if (str.charAt(0) == "#") {
 				return '<' + str + '>' ; // Case: input is an unquoted relative uri. Solution: quote it
-			} else if (str.charAt(0) == '<' && str.charAt(1) == '#' && str.charAt(str.length-1) == '>') { 
+			} else if (str.charAt(0) == '<' && str.charAt(1) == '#' && str.charAt(str.length-1) == '>') {
 				return str ; // Case: input is already a relative uri. Solution: return it as is
-			} else if (str.includes(":")) {
+			} else if (str.includes(":") || str.includes("<#")) {
 				return str ; // Case: input is a curie. Solution: return it as is
 			} else if (str.charAt(0) == "?") {
 				return str ; // checks if input is a variable for deletion
@@ -605,49 +605,49 @@
 				}
 	        }
 		}
-	
+
 		// If the subject is quoted or contains a space this function throws and error
 		document.getElementById("subjectID").addEventListener("input", validateSubject);
 		document.getElementById("subjectID2").addEventListener("input", validateSubject);
 		function validateSubject() {
 			var str = checkValue("subjectID", "subjectID2") ;
 
-			try {	
-				if (document.getElementById('dbmsTabID').getAttribute('class') == "active") { 
+			try {
+				if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
 					if (isBlankNode(str)) { // removes error message for complete blank node
-						errorMessage("subjectErrorID", "") ; 
+						errorMessage("subjectErrorID", "") ;
 						removeInputColor('subjectID') ;
 						return formatSubject();
 					} else if (str.includes('"') || str.includes("'")) {
 						setInputColor("subjectID") ;
-						errorMessage("subjectErrorID", "Subject cannot contain a literal value unless it is a blank node") ; 
+						errorMessage("subjectErrorID", "Subject cannot contain a literal value unless it is a blank node") ;
 						throw new Error("Subject cannot be a literal value"); // Throws error because input is a literal value
 					} else if (str.indexOf(' ') >= 0){
 						setInputColor('subjectID') ;
-						errorMessage("subjectErrorID", "Subject cannot contain spaces unless it is a blank node") ; 
+						errorMessage("subjectErrorID", "Subject cannot contain spaces unless it is a blank node") ;
 						throw new Error("Subject cannot contain spaces");
-					} 
+					}
 					else {
-						errorMessage("subjectErrorID", "") ; 
+						errorMessage("subjectErrorID", "") ;
 						removeInputColor("subjectID") ;
 						return formatSubject(); // Returns formatted subject because it is valid
 					}
 				} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
 					if (isBlankNode(str)) { // removes error message for complete blank node
-						errorMessage("subjectErrorID2", "") ; 
+						errorMessage("subjectErrorID2", "") ;
 						removeInputColor('subjectID2') ;
 						return formatSubject();
 					} else if (str.includes('"') || str.includes("'")) {
 						setInputColor("subjectID2") ;
-						errorMessage("subjectErrorID2", "Subject cannot contain a literal value unless it is a blank node") ; 
+						errorMessage("subjectErrorID2", "Subject cannot contain a literal value unless it is a blank node") ;
 						throw new Error("Subject cannot be a literal value"); // Throws error because input is a literal value
 					} else if (str.indexOf(' ') >= 0){
 						setInputColor('subjectID2') ;
-						errorMessage("subjectErrorID2", "Subject cannot contain spaces unless it is a blank node") ; 
+						errorMessage("subjectErrorID2", "Subject cannot contain spaces unless it is a blank node") ;
 						throw new Error("Subject cannot contain spaces");
-					} 
+					}
 					else {
-						errorMessage("subjectErrorID2", "") ; 
+						errorMessage("subjectErrorID2", "") ;
 						removeInputColor("subjectID2") ;
 						return formatSubject(); // Returns formatted subject because it is valid
 					}
@@ -655,9 +655,9 @@
 			} catch(e) {
 				console.error('Invalid Subject', e) ;
 			}
-		
+
 		}
-	
+
 		// This function formats the Predicate input. Comments are inline
 		function formatPredicate() {
 			var str = checkValue("predicateID", "predicateID2") ;
@@ -665,9 +665,9 @@
 				return '<' + str + '>' ; // Case: input is a uri. Solution: quote it
 			} else if (str.charAt(0) == "#") {
 				return '<' + str + '>' ; // Case: input is an unquoted relative uri. Solution: quote it
-			} else if (str.charAt(0) == '<' && str.charAt(1) == '#' && str.charAt(str.length-1) == '>') { 
+			} else if (str.charAt(0) == '<' && str.charAt(1) == '#' && str.charAt(str.length-1) == '>') {
 				return str ; // Case: input is already a relative uri. Solution: return it as is
-			} else if (str.includes(":")) {
+			} else if (str.includes(":") || str.includes("<#")) {
 				return str; // Case: input is a curie. Solution: return it as is
 			} else if (str.charAt(0) == "?") {
 				return str ; // checks if input is a variable for deletion
@@ -681,13 +681,13 @@
 				}
 	        }
 		}
-	
+
 		// If the predicate is quoted, contains, or is a blank node a space this function throws and error
 		document.getElementById("predicateID").addEventListener("input", validatePredicate);
 		document.getElementById("predicateID2").addEventListener("input", validatePredicate);
 		function validatePredicate() {
 			var str = checkValue("predicateID", "predicateID2") ;
-		
+
 			try {
 				if (document.getElementById('dbmsTabID').getAttribute('class') == "active"){
 					if (str.includes('"') || str.includes("'")) {
@@ -696,11 +696,11 @@
 						throw new Error("Predicate cannot be a literal value"); // Throws error because input is a literal value
 					} else if (str.indexOf(' ') >= 0){
 						setInputColor('predicateID') ;
-						errorMessage("predicateErrorID", "Predicate cannot contain spaces") ; 
+						errorMessage("predicateErrorID", "Predicate cannot contain spaces") ;
 						throw new Error("Predicate cannot contain spaces"); // Throws error because input subject can't contain spaces
 					} else {
 						removeInputColor('predicateID') ;
-						errorMessage("predicateErrorID", "") ; 
+						errorMessage("predicateErrorID", "") ;
 						return formatPredicate(); // Returns formatted subject because it is valid
 					}
 				} else if (document.getElementById('fsTabID').getAttribute('class') == "active"){
@@ -710,63 +710,62 @@
 						throw new Error("Predicate cannot be a literal value"); // Throws error because input is a literal value
 					} else if (str.indexOf(' ') >= 0){
 						setInputColor('predicateID2') ;
-						errorMessage("predicateErrorID2", "Predicate cannot contain spaces") ; 
+						errorMessage("predicateErrorID2", "Predicate cannot contain spaces") ;
 						throw new Error("Predicate cannot contain spaces"); // Throws error because input subject can't contain spaces
 					} else {
 						removeInputColor('predicateID2') ;
-						errorMessage("predicateErrorID2", "") ; 
+						errorMessage("predicateErrorID2", "") ;
 						return formatPredicate(); // Returns formatted subject because it is valid
 					}
 				}
 			} catch(e) {
 				console.error('Invalid Predicate', e) ;
-			}	
+			}
 		}
-	
+
 		// This function formats the Object input. Comments are inline
 		async function validateObject(str) {
 			var range = await predicateRange() ; // function waits until range is a value rather than a promise
 			var str = checkValue("objectID", "objectID2") ;
-		
+
 			if (str.includes('"') || str.includes("'")) {
 				range = true ;
 			}
-		
+
 			if (!range) {
 				if (str.charAt(0) == '<' && str.charAt(str.length-1) == '>') { //Case: input is already qutoed uri. Return as is
 					return str
 				} else if (regexp.test(str) && !isBlankNode(str)) {
-					console.log("CASE 1 HIT")
 					return '<' + str + '>' ; // Case: input is a uri. Solution: quote it
 				} else if (str.charAt(0) == "#") {
 					return '<' + str + '>' ; // Case: input is an unquoted relative uri. Solution: quote it
-				} else if (str.charAt(0) == '<' && str.charAt(1) == '#' && str.charAt(str.length-1) == '>') { 
+				} else if (str.charAt(0) == '<' && str.charAt(1) == '#' && str.charAt(str.length-1) == '>') {
 					return str ; // Case: input is already a relative uri. Solution: return it as is
-				} else if (str.includes(":")) {
+				} else if (str.includes(":") || str.includes("<#")) {
 					return str; // Case: input is a curie. Solution: return it as is
 				}
 				else {
 					return ':' + str ; // Case: input is not a uri or a blank node. Solution: make it a relative uri
 		        }
-			} 
+			}
 			if (isBlankNode(str)){
 					return str; // Case : blank node
 			} else {
-				return formatLiteral(str);			
+				return formatLiteral(str);
 	        }
 		}
-	
+
 		// This function formats the Object input. Comments are inline
 		function nonvalidatedObject() {
 			var str = checkValue("objectID", "objectID2") ;
-		
+
 			if (regexp.test(str) && !isBlankNode(str)) {
 				return '<' + str + '>' ; // Case: input is a uri. Solution: quote it
 			} else if (str.charAt(0) == "#") {
 				return '<' + str + '>' ; // Case: input is an unquoted relative uri. Solution: quote it
-			} else if (str.charAt(0) == '<' && str.charAt(1) == '#' && str.charAt(str.length-1) == '>') { 
+			} else if (str.charAt(0) == '<' && str.charAt(1) == '#' && str.charAt(str.length-1) == '>') {
 				return str ; // Case: input is already a relative uri. Solution: return it as is
-			} else if (str.includes(":")) {
+			} else if (str.includes(":") || str.includes("<#")) {
 				return str; // Case: input is a curie. Solution: return it as is
 			} else if (str.charAt(0) == "?") {
 				return str ; // checks if input is a variable for deletion
@@ -780,14 +779,14 @@
 			}
 			else {
 				return ':' + str ; // Case: input is not a uri or a blank node. Solution: make it a relative uri
-				} 			
+				}
 		}
-		
+
 	</script>
-	
+
 	<!-- These functions handle the data table -->
 	<script>
-		
+
 		// update table and permalink on tab switch
 		$('.nav-tabs a').on('shown.bs.tab', function(event){
 			var currTab = $(event.target).text();
@@ -797,14 +796,14 @@
 				updatePermalink();
 			}
 		});
-		
+
 		// This function allows hyperlinks to be used in the table
 		function tableFormat(str) {
 			// Regular Expression for URIs in table specifically
 			const tableexp = /(https|http|mailto|tel|dav|ftp|ftps)[:^/s]/i;
 			var graph = checkValue("docNameID", "docNameID2") ;
 			var strLabel = str ; // variable for what is show on screen in the href
-			
+
 			if (document.getElementById("uriID").checked == true) { //if user wants short URIs
 				if (str.includes(graph)) { //if str is in fct format it still includes the docname
 					strLabel = strLabel.replace(graph, ""); //remove the docName from string
@@ -820,8 +819,8 @@
 					var strList = str.split("/");
 					strLabel = strList.pop();
 				}
-			} 
-			
+			}
+
 			if (tableexp.test(str)) { // if str is an absolute or relative uri
 				str = '<a href="' + str + '">' + strLabel + '</a>'
 				return str
@@ -830,7 +829,7 @@
 				return strLabel
 			}
 		}
-		
+
 		// This function is used to referesh the table when view data is clicked
 		function refreshTable() {
 			var table = checkId("dbmsTableID", "fsTableID") ;
@@ -839,36 +838,36 @@
 				document.getElementById(table.id).deleteRow(i -1);
 			}
 		}
-	
+
 		// This function is used to create header row of table
 		function createHeader() {
 			var table = checkId("dbmsTableID", "fsTableID") ;
-			
+
 			var header = table.createTHead(); // creates empty tHead
 			var row = header.insertRow(0); // inserts row into tHead
-		
+
 			var cell0 = row.insertCell(0); // inserts new cell at position 0 in the row
 			var cell1 = row.insertCell(1); // inserts new cell at position 1 in the row
 			var cell2 = row.insertCell(2); // inserts new cell at position 2 in the row
-		
+
 			cell0.innerHTML = "<b>Subject</b>"; // adds bold text
 			cell1.innerHTML = "<b>Predicate</b>";
 			cell2.innerHTML = "<b>Object</b>";
 		}
-		
+
 		var limit = Number("0") ;
 		var offset = Number("0") ;
 		var tableSize = Number(setTableSize()) ;
 		var resultMode = null ;
-		
-		// This function sets the limit based on input and adjusts offset accordingly 
-		function setLimit() { // reset offset when limit is changed 
+
+		// This function sets the limit based on input and adjusts offset accordingly
+		function setLimit() { // reset offset when limit is changed
 			if (limit != document.getElementById("resultsID").value) {
 				offset = Number("0") ;
 			}
 			limit = Number(document.getElementById("resultsID").value) ;
 		}
-		
+
 		// this function hides or shows buttons
 		function buttonDisplay() {
 			var firstButton = checkId("firstBtnID", "firstBtnID2") ;
@@ -876,7 +875,7 @@
 			var prevButton = checkId("prevBtnID", "prevBtnID2") ;
 			var lastButton = checkId("lastBtnID", "lastBtnID2") ;
 			var remainder = tableSize - limit ;
-			
+
 			if (offset < remainder) { // if there is a next page
 				if (nextButton.classList.contains('disabled')) { // show next button
 					nextButton.classList.remove('disabled') ;
@@ -892,7 +891,7 @@
 					lastButton.classList.add('disabled') ;
 				}
 			}
-			
+
 			if (offset > 0) { // if there is a previous page
 				if (prevButton.classList.contains('disabled')) { // show prev button
 					prevButton.classList.remove('disabled') ;
@@ -909,22 +908,22 @@
 				}
 			}
 		}
-		
+
 		// This function goes to next page in table
 		function next() {
 			var nextButton = checkId("nextBtnID", "nextBtnID2") ;
 			var prevButton = checkId("prevBtnID", "prevBtnID2") ;
 			var remainder = tableSize - limit ;
-			
+
 			if (nextButton.classList.contains('disabled')) { // stop action if button is disabled
 				return false ;
 			}
-			
+
 			if (offset < remainder) { // if there is a next page
 				offset += parseInt(limit) ;
 				buttonDisplay() ;
 			}
-			
+
 			// refresh table
 			if (resultMode == "bn") {
 				bnQueryGen() ;
@@ -934,22 +933,22 @@
 				updateTable() ;
 			}
 		}
-		
+
 		// this function goes to previous page in table
 		function previous() {
 			var nextButton = checkId("nextBtnID", "nextBtnID2") ;
 			var prevButton = checkId("prevBtnID", "prevBtnID2") ;
 			var remainder = tableSize - limit ;
-			
+
 			if (prevButton.classList.contains('disabled')) { // stop action if button is disabled
 				return false ;
 			}
-			
+
 			if (offset > 0) { // if there is a previous page
 				offset -= parseInt(limit) ;
 				buttonDisplay() ;
 			}
-			
+
 			// refresh table
 			if (resultMode == "bn") {
 				bnQueryGen() ;
@@ -959,16 +958,16 @@
 				updateTable() ;
 			}
 		}
-		
+
 		// this function goes to the first page
 		function first() {
 			var firstButton = checkId("firstBtnID", "firstBtnID2") ;
 			var prevButton = checkId("prevBtnID", "prevBtnID2") ;
-			
+
 			if (firstButton.classList.contains('disabled')) { // stop action if button is disabled
 				return false ;
 			}
-			
+
 			if (offset > 0) {
 				offset = Number("0") ;
 
@@ -980,25 +979,25 @@
 				} else {
 					updateTable() ;
 				}
-				
+
 				buttonDisplay() ;
 			} else {
 				if (!firstButton.classList.contains('disabled')) { // hide first button
 					firstButton.classList.add('disabled') ;
-				}	
+				}
 			}
 		}
-		
+
 		function last() {
 			var lastButton = checkId("lastBtnID", "lastBtnID2") ;
 			var nextButton = checkId("nextBtnID", "nextBtnID2") ;
 			var div = Math.floor(tableSize / limit) ;
 			var mod = Math.floor(tableSize % limit) ;
-			
+
 			if (lastButton.classList.contains('disabled')) { // stop action if button is disabled
 				return false ;
 			}
-			
+
 			if (mod != 0) {
 				console.log("CASE 1")
 				var remainder = tableSize - mod ;
@@ -1006,10 +1005,10 @@
 				console.log("CASE 2")
 				var remainder = (div - 1) * limit
 			}
-			
+
 			if (offset < remainder) {
 				offset = Number(remainder) ;
-				
+
 				// refresh table
 				if (resultMode == "bn") {
 					bnQueryGen() ;
@@ -1018,7 +1017,7 @@
 				} else {
 					updateTable() ;
 				}
-				
+
 				buttonDisplay() ;
 			} else {
 				if (!lastButton.classList.contains('disabled')) { // hide last button
@@ -1026,22 +1025,22 @@
 				}
 			}
 		}
-		
+
 		// This sets the size of the current table
 	    async function setTableSize() {
 			var graph = checkValue("docNameID", "docNameID2") ;
-			
+
 			if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
-			    var query = 
+			    var query =
 				"SELECT DISTINCT COUNT(*) AS ?count FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
 			} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
 				// Use of Sponger Pragma to force document reload during query evaluation
-				var query = 
+				var query =
 				"DEFINE get:refresh" + " " + '"clean"' + "\n"
 				+ "DEFINE get:soft" + " " + '"replace"' + "\n"
 				+ "SELECT DISTINCT COUNT(*) AS ?count FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
 			}
-			
+
 			if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
 				query = "DEFINE input:same-as" + '"yes" \n' + query ;
 			} else if (document.getElementById("ruleNameID").checked == true) {
@@ -1055,7 +1054,7 @@
 		        console.log("Retrieving Table Length From: " + url);
 				console.log("Query: " + query);
 			}
-	        
+
 	        const options = {
 	                            method: 'GET',
 	                            headers: {
@@ -1065,7 +1064,7 @@
 	                            mode: 'cors',
 	                            crossDomain: true,
 	                        };
-			
+
 			try {
 		        var resp = await fetch(url,options)
 	            if (resp.ok && resp.status == 200) {
@@ -1088,10 +1087,10 @@
 				hideSpinner() ;
 				console.error('Table Size Failed', e) ;
 				alert('Table Size Failed ' + e);
-			}	
+			}
 	    }
 	</script>
-	
+
 	<!-- These Functions Handle the Functionality of the Page -->
 	<script>
 		//updateTable(); //Table is always shown when page is loaded
@@ -1105,24 +1104,24 @@
 			var predicate = validatePredicate() ;
 			var object = await validateObject() ; // insert function awaits object value before proceeding
 			var graph = document.getElementById("docNameID").value ;
-	
+
 		    //SPARQL INSERT Query Generator
-		    var insert_cmd = 
-			"PREFIX schema: <http://schema.org/>\n" 
-			+ "PREFIX : <" + graph + "#>\n" 
+		    var insert_cmd =
+			"PREFIX schema: <http://schema.org/>\n"
+			+ "PREFIX : <" + graph + "#>\n"
 			+ "PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n"
-			+ "INSERT INTO GRAPH <" +graph+ "> \n{\n" 
+			+ "INSERT INTO GRAPH <" +graph+ "> \n{\n"
 			+ subject + ' ' + predicate + ' ' + object + " . \n"
 			+ "}";
-			
+
 			var endpoint = document.getElementById("endpointID").value ;
 	        let url = endpoint ;
-			
+
 			if (document.getElementById("cmdID").checked == true) {
 		        console.log("endpoint for Target SPARUL Service: " + endpoint);
-		        console.log(insert_cmd);	
+		        console.log(insert_cmd);
 			}
-			
+
 	        const options = {
 	                            method: 'POST',
 	                            headers: {
@@ -1133,7 +1132,7 @@
 	                            crossDomain: true,
 	                            body: insert_cmd,
 	        };
-		
+
 			try {
 		        var resp = await fetch(url,options);
 				if (resp.status >= 200 && resp.status <= 300) {
@@ -1148,11 +1147,11 @@
 				hideSpinner() ;
 				console.error('Insert Failed', e) ;
 				alert('Insert Failed ' + e)
-			}		
-			await setTableSize() ;   
-			await buttonDisplay() ;  
+			}
+			await setTableSize() ;
+			await buttonDisplay() ;
 		}
-	
+
      	//SPARQL DELETE SCRIPT
 	   	async function recordDel() {
 			await setLimit() ;
@@ -1163,24 +1162,24 @@
      		var graph = document.getElementById("docNameID").value ;
 
      	    //SPARQL DELETE Query Generator
-    		var delete_cmd = 
-   			"PREFIX : <" + graph + "#>\n" 
+    		var delete_cmd =
+   			"PREFIX : <" + graph + "#>\n"
     		+ "DELETE { GRAPH <" + graph + "> {\n"
     		+ subject + ' ' + predicate + ' ' + object + "."
     		+ "\n }"
    			+ "\n }"
     		+ "WHERE { GRAPH <" + graph + "> { \n"
     		+ subject + ' ' + predicate + ' ' + object + "."
-    		+ "} \n };"	
+    		+ "} \n };"
 
             var endpoint = document.getElementById("endpointID").value ;
             let url = endpoint ;
-			
+
 			if (document.getElementById("cmdID").checked == true) {
 	            console.log("endpoint for Target SPARUL Service: " + endpoint);
 	            console.log(delete_cmd);
 			}
-            
+
             const options = {
                                 method: 'POST',
                                 headers: {
@@ -1201,34 +1200,34 @@
 				else {
 					throw new Error("Error " + resp.status +" - " + resp.statusText) ;
 					hideSpinner() ;
-				}	
+				}
 			} catch(e) {
 				hideSpinner() ;
 				console.error('Delete Failed', e) ;
 				alert('Delete Failed ' + e)
 			}
 			await setTableSize() ;
-			await buttonDisplay() ;  
+			await buttonDisplay() ;
 	   	}
 
 		// function used to return data as CSV or XML
 		function downloadResults() {
 			resultMode = "csv" ;
 			var graph = checkValue("docNameID", "docNameID2") ;
-			
+
 			if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
-			    var data_query = 
+			    var data_query =
 				"SELECT DISTINCT * FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
 			} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
 				// Use of Sponger Pragma to force document reload during query evaluation
-				var data_query = 
+				var data_query =
 				"DEFINE get:soft" + " " + '"soft"' + "\n" + "SELECT DISTINCT * FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
 			}
-			
+
 			if (limit >= 1) { // if results per page is active
 				data_query = data_query + "\n" + "OFFSET " + offset + "\n" + "LIMIT " + limit ;
-			} 
-			
+			}
+
 			if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
 				data_query = "DEFINE input:same-as" + '"yes" \n' + data_query ;
 			} else if (document.getElementById("ruleNameID").checked == true) {
@@ -1241,18 +1240,18 @@
 			} else if (document.getElementById("xmlID").checked == true) {
 				var downloadURL = endpoint + encodeURIComponent(data_query) + "&should-sponge=&format=application%2Fsparql-results%2Bxml" ;
 			}
-	        
-			
+
+
 			if (document.getElementById("cmdID").checked == true) {
 		        console.log("Retrieving CSV From: " + downloadURL);
 				console.log("Query: " + data_query);
 			}
-			
+
 			window.open(downloadURL) ;
 		}
-		
+
 		/* Generates blank node queries and displays table reflecting them.
-		This function is required because blank node queries can 
+		This function is required because blank node queries can
 		require n number of columns. */
 		async function bnQueryGen() {
 			resultMode = "bn" ;
@@ -1262,46 +1261,46 @@
 			var predicate = validatePredicate() ;
 			var object = nonvalidatedObject() ;
 			var graph = checkValue("docNameID", "docNameID2") ;
-			
-			
-			if (document.getElementById('dbmsTabID').getAttribute('class') == "active") { 
-			    var query = 
-				"PREFIX : <" + graph + "#>\n" 
+
+
+			if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
+			    var query =
+				"PREFIX : <" + graph + "#>\n"
 				+ "SELECT DISTINCT * \n"
-				+ "FROM <" + graph + "> \n" 
+				+ "FROM <" + graph + "> \n"
 				+ "WHERE {" + " " + subject + " " + predicate + " " + object + " " + "}"
 			} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
-			    var query = 
+			    var query =
 				"DEFINE get:soft" + " " + '"soft"' + "\n"
-				+ "PREFIX : <" + graph + "#>\n" 
+				+ "PREFIX : <" + graph + "#>\n"
 				+ "SELECT DISTINCT * \n"
-				+ "FROM <" + graph + "> \n" 
+				+ "FROM <" + graph + "> \n"
 				+ "WHERE {" + " " + subject + " " + predicate + " " + object + " " + "}"
 			}
-			
+
 			if (limit >= 1) { // if results per page is active
 				query = query + "\n" + "OFFSET " + offset + "\n" + "LIMIT " + limit ;
-			} 
-			
+			}
+
 			if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
 				query = "DEFINE input:same-as" + '"yes" \n' + query ;
 			} else if (document.getElementById("ruleNameID").checked == true) {
 				query = "DEFINE input:inference" + ' ' + "'" + document.getElementById("infRuleNameID").value + "'" + ' \n' + query ;
 			}
-			
+
 			// CSV download
 			if (document.getElementById("csvID").checked == true || document.getElementById("xmlID").checked == true) {
 		        await downloadResults() ;
 			}
-			
+
 			var endpoint = checkValue("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
 	        let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
-			
+
 			if (document.getElementById("cmdID").checked == true) {
 		        console.log("SPARQL Query: " + query);
 				console.log("Query URL: " + url)
 			}
-	        
+
 	        const options = {
 	                            method: 'GET',
 	                            headers: {
@@ -1317,10 +1316,10 @@
 	              var data = await resp.json();
 
 				  refreshTable();
-				
+
 				  /*
                     Dynamic Table for processing JSON Structured Data (via "application/sparql-results+json" document content type)
-                    that enables INSERT to be handled via a 3-tuple subject, predicate, object graph (relation) while query results 
+                    that enables INSERT to be handled via a 3-tuple subject, predicate, object graph (relation) while query results
                     are handled via an N-Tuple structured table (relation).
                   */
 		          if (data.results.bindings.length > 0){
@@ -1343,7 +1342,7 @@
 						}
 					}
 					hideSpinner() ;
-		          }	
+		          }
 		          else{
 					hideSpinner() ;
 					console.log("No data returned by query");
@@ -1360,11 +1359,11 @@
 				hideSpinner() ;
 				console.error('Query Failed', e) ;
 				alert('Query Failed ' + e)
-			}		   
+			}
 			await setTableSize() ;
-			await buttonDisplay() ;  
+			await buttonDisplay() ;
 		}
-	
+
 		// This function updates table to show results of a query
 		async function queryGen() {
 			resultMode = "query" ;
@@ -1373,52 +1372,52 @@
 		    var subject = validateSubject() ;
 			var predicate = validatePredicate() ;
 			var object = nonvalidatedObject() ;
-			var graph = checkValue("docNameID", "docNameID2") ;	
-			
+			var graph = checkValue("docNameID", "docNameID2") ;
+
 			if (isBlankNode(subject) || isBlankNode(object)) {
 				bnQueryGen(); // if query includes blank node call bnQueryGen function
 				return false ; // returns false so the queryGen function stops executing
 			}
-			
-			if (document.getElementById('dbmsTabID').getAttribute('class') == "active") { 
-			    var query = 
-				"PREFIX : <" + graph + "#>\n" 
+
+			if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
+			    var query =
+				"PREFIX : <" + graph + "#>\n"
 				+ "SELECT DISTINCT" + " " + subject + " AS ?subject" + " " + predicate + " AS ?predicate" + " " + object + " AS ?object \n"
-				+ "FROM <" + graph + "> \n" 
+				+ "FROM <" + graph + "> \n"
 				+ "WHERE {" + " " + subject + " " + predicate + " " + object + " " + "}"
 			} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
-				var query = 
+				var query =
 				"DEFINE get:refresh" + " " + '"clean"' + "\n"
 				+ "DEFINE get:soft" + " " + '"replace"' + "\n"
-				+ "PREFIX : <" + graph + "#>\n" 
+				+ "PREFIX : <" + graph + "#>\n"
 				+ "SELECT DISTINCT" + " " + subject + " AS ?subject" + " " + predicate + " AS ?predicate" + " " + object + " AS ?object \n"
-				+ "FROM <" + graph + "> \n" 
+				+ "FROM <" + graph + "> \n"
 				+ "WHERE {" + " " + subject + " " + predicate + " " + object + " " + "}"
 			}
-			
+
 			if (limit >= 1) { // if results per page is active
 				query = query + "\n" + "OFFSET " + offset + "\n" + "LIMIT " + limit ;
-			} 
-			
+			}
+
 			if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
 				query = "DEFINE input:same-as" + '"yes" \n' + query ;
 			} else if (document.getElementById("ruleNameID").checked == true) {
 				query = "DEFINE input:inference" + ' ' + "'" + document.getElementById("infRuleNameID").value + "'" + ' \n' + query ;
 			}
-			
+
 			// CSV download
 			if (document.getElementById("csvID").checked == true || document.getElementById("xmlID").checked == true) {
 		        await downloadResults() ;
 			}
-			
+
 			var endpoint = checkValue("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
 	        let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
-			
+
 			if (document.getElementById("cmdID").checked == true) {
 		        console.log("SPARQL Query: " + query);
 				console.log("Query URL: " + url);
 			}
-		
+
 	        const options = {
 	                            method: 'GET',
 	                            headers: {
@@ -1449,25 +1448,25 @@
 								subject = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].subject.value ;
 								subject = subject.replace("#", "%23"); // replaces # with %23 for fct results
 							}
-							
+
 							if (predicate.includes(graph) || regexp.test(predicate)) { //if subject is not a literal value
 								predicate = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].predicate.value ;
 								predicate = predicate.replace("#", "%23");
 							}
-							
+
 							if (object.includes(graph) || regexp.test(object)) {
 								object = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].object.value ;
 								object = object.replace("#", "%23");
 							} else { //if object is literal value
 								object = data.results.bindings[i].object.value ;
 							}
-							
+
 						} else {
 							subject = data.results.bindings[i].subject.value ;
 							predicate = data.results.bindings[i].predicate.value ;
 							object = data.results.bindings[i].object.value ;
 						}
-							
+
 
 						var row = table.insertRow(-1);
 					    var cell1 = row.insertCell(0);
@@ -1476,7 +1475,7 @@
 
 					    cell1.innerHTML = tableFormat(subject);
 					    cell2.innerHTML = tableFormat(predicate);
-					    cell3.innerHTML = tableFormat(object);	
+					    cell3.innerHTML = tableFormat(object);
 					}
 					hideSpinner() ;
 		          }
@@ -1496,39 +1495,39 @@
 				hideSpinner() ;
 				console.error('Query Failed', e) ;
 				alert('Query Failed ' + e)
-			}	
+			}
 			await setTableSize() ;
-			await buttonDisplay() ;  
+			await buttonDisplay() ;
 		}
-	
+
 		// This function fetches the query results and returns them in json
 	    async function updateTable() {
 			resultMode = "all" ;
 			await setLimit() ;
 			showSpinner() ;
 			var graph = checkValue("docNameID", "docNameID2") ;
-			
+
 			if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
-			    var data_query = 
+			    var data_query =
 				"SELECT DISTINCT * FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
 			} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
 				// Use of Sponger Pragma to force document reload during query evaluation
-				var data_query = 
+				var data_query =
 				"DEFINE get:refresh" + " " + '"clean"' + "\n"
 				+ "DEFINE get:soft" + " " + '"replace"' + "\n"
  				+ "SELECT DISTINCT * FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
 			}
-			
+
 			if (limit >= 1) { // if results per page is active
 				data_query = data_query + "\n" + "OFFSET " + offset + "\n" + "LIMIT " + limit ;
-			} 
-			
+			}
+
 			if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
 				data_query = "DEFINE input:same-as" + '"yes" \n' + data_query ;
 			} else if (document.getElementById("ruleNameID").checked == true) {
 				data_query = "DEFINE input:inference" + ' ' + "'" + document.getElementById("infRuleNameID").value + "'" + ' \n' + data_query ;
 			}
-			
+
 			// CSV download
 			if (document.getElementById("csvID").checked == true || document.getElementById("xmlID").checked == true) {
 		        await downloadResults() ;
@@ -1541,8 +1540,8 @@
 		        console.log("Retrieving Table Data From: " + url);
 				console.log("Query: " + data_query);
 			}
-	        
-		
+
+
 	        const options = {
 	                            method: 'GET',
 	                            headers: {
@@ -1552,7 +1551,7 @@
 	                            mode: 'cors',
 	                            crossDomain: true,
 	                        };
-			
+
 			try {
 		        var resp = await fetch(url,options)
 
@@ -1562,36 +1561,36 @@
 				  refreshTable();
 				  createHeader();
 				  var table = checkId("dbmsTableID", "fsTableID") ;
-				
+
 		          if (data.results.bindings.length > 0){
-					for (var i = 0; i < data.results.bindings.length; i++) {	
+					for (var i = 0; i < data.results.bindings.length; i++) {
 						var subject = data.results.bindings[i].subject.value ;
 						var predicate = data.results.bindings[i].predicate.value ;
-						var object = data.results.bindings[i].object.value ;				
+						var object = data.results.bindings[i].object.value ;
 						if (document.getElementById("fctID").checked == true) { //if fct checkbox is checked
 							if (subject.includes(graph) || regexp.test(subject)) { //if subject is not a literal value
 								subject = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].subject.value ;
 								subject = subject.replace("#", "%23"); // replaces # with %23 for fct results
 							}
-							
+
 							if (predicate.includes(graph) || regexp.test(predicate)) { //if subject is not a literal value
 								predicate = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].predicate.value ;
 								predicate = predicate.replace("#", "%23");
 							}
-							
+
 							if (object.includes(graph) || regexp.test(object)) {
 								object = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].object.value ;
 								object = object.replace("#", "%23");
 							} else { //if object is literal value
 								object = data.results.bindings[i].object.value ;
 							}
-							
+
 						} else {
 							subject = data.results.bindings[i].subject.value ;
 							predicate = data.results.bindings[i].predicate.value ;
 							object = data.results.bindings[i].object.value ;
 						}
-				
+
 						var row = table.insertRow(-1);
 					    var cell1 = row.insertCell(0);
 					    var cell2 = row.insertCell(1);
@@ -1599,7 +1598,7 @@
 
 					    cell1.innerHTML = tableFormat(subject);
 					    cell2.innerHTML = tableFormat(predicate);
-					    cell3.innerHTML = tableFormat(object);	
+					    cell3.innerHTML = tableFormat(object);
 					}
 					hideSpinner() ;
 		          } else{
@@ -1618,35 +1617,35 @@
 				hideSpinner() ;
 				console.error('Table Refresh Failed', e) ;
 				alert('Table Refresh Failed ' + e);
-			}	
-			await setTableSize() ;	
-			await buttonDisplay() ;    
+			}
+			await setTableSize() ;
+			await buttonDisplay() ;
 	    }
-	
+
 		// This function gets the range of the predicate to determine if object is a literal or a reference
 		async function predicateRange() {
-			var predicate = validatePredicate() ; 
+			var predicate = validatePredicate() ;
 			var graph = checkValue("docNameID", "docNameID2") ;
-		
+
 		    var range_query =
-			"PREFIX : <" + graph + "#>\n" 
+			"PREFIX : <" + graph + "#>\n"
 			+ "ASK \n"
 			+ "WHERE \n"
 			+ "{ \n"
 			+ predicate + ' ' + "rdfs:range ?range .\n"
 			+ "filter (?range in (rdfs:Literal, xsd:string, xsd:decimal, xsd:integer, xsd:boolean, xsd:date, xsd:time))\n"
-			+"}" 		
-			
+			+"}"
+
             var endpoint = checkValue("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
 			// This sets the url for retrieving the json
-	        let url = endpoint + encodeURIComponent(range_query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ; 
+	        let url = endpoint + encodeURIComponent(range_query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
 
 			if (document.getElementById("cmdID").checked == true) {
 		        console.log("Recieving Predicate Range From: " + url);
 				console.log("Query" + range_query);
 			}
-	        
-		
+
+
 	        const options = {
 	                            method: 'GET',
 	                            headers: {
@@ -1656,10 +1655,10 @@
 	                            mode: 'cors',
 	                            crossDomain: true,
 	        };
-		
+
 			try {
-				const resp = await fetch(url,options); // resp awaits completion of fetch 
-			
+				const resp = await fetch(url,options); // resp awaits completion of fetch
+
 				if (resp.status >= 200 && resp.status <= 300) {
 					console.log(resp.status + " - " + resp.statusText);
 				} else {
@@ -1670,9 +1669,9 @@
 			} catch(e) {
 				console.error('Predicate Range Lookup Failed', e) ;
 				alert('Predicate Range Lookup Failed ' + e)
-			}		
+			}
 		}
-	
+
 		async function turtleGen() {
 			await setLimit() ;
 			showSpinner() ;
@@ -1682,16 +1681,16 @@
 			var docName = document.getElementById("docNameID2").value ;
 			console.log("subject: " + subject)
 
-			var turtle_cmd = 
+			var turtle_cmd =
 			"" + "INSERT DATA {@prefix : <" + docName + "#> ." + ' ' + subject + ' ' + predicate + ' ' + object + ' ' + ".}" + ""
-			
+
 			let url = docName ;
-			
+
 			if (document.getElementById("fctID").checked == true) {
-				console.log("Insert Command:" + turtle_cmd);	
+				console.log("Insert Command:" + turtle_cmd);
 			}
-	        
-		
+
+
 	        const options = {
 	                            method: 'PATCH',
 	                            headers: {
@@ -1702,7 +1701,7 @@
 	                            crossDomain: true,
 	                            body: turtle_cmd,
 	        };
-		
+
 			try {
 		        var resp = await solid.auth.fetch(url,options);
 				if (resp.status >= 200 && resp.status <= 300) {
@@ -1719,10 +1718,10 @@
 				console.error('Insert Failed ' + e) ;
 				alert('Insert Failed ' + e)
 			}
-			await setTableSize() ;		
-			await buttonDisplay() ;  
+			await setTableSize() ;
+			await buttonDisplay() ;
 		}
-		
+
 		async function turtleDel() {
 			await setLimit() ;
 			showSpinner() ;
@@ -1731,15 +1730,15 @@
 			var object = nonvalidatedObject() ; // insert function awaits object value before proceeding
 			var docName = document.getElementById("docNameID2").value ;
 
-			var del_cmd = 
+			var del_cmd =
 			"" + "PREFIX : <" + docName + "#> DELETE DATA" + ' ' + "{" + subject + ' ' + predicate + ' ' + object + ' ' + ".}" + ""
-		
+
 			let url = docName ;
 			if (document.getElementById("fctID").checked == true) {
-				console.log("Delete Command:" + del_cmd);	
+				console.log("Delete Command:" + del_cmd);
 			}
-	        
-		
+
+
 	        const options = {
 	                            method: 'PATCH',
 	                            headers: {
@@ -1750,7 +1749,7 @@
 	                            crossDomain: true,
 	                            body: del_cmd,
 	        };
-		
+
 			try {
 		        var resp = await solid.auth.fetch(url,options);
 				if (resp.status >= 200 && resp.status <= 300) {
@@ -1766,9 +1765,9 @@
 				hideSpinner() ;
 				console.error('Request Failed ' + e) ;
 				alert('Delete Failed ' + e)
-			}		
-			await setTableSize() ;	
-			await buttonDisplay() ;  
+			}
+			await setTableSize() ;
+			await buttonDisplay() ;
 		}
 
                 function resetPermalink () {
@@ -1779,11 +1778,11 @@
                 function updatePermalink () {
 
                        var permalink = document.getElementById("permalinkID");
-                       var subject = checkId("subjectID", "subjectID2"); 
-                       var predicate = checkId("predicateID", "predicateID2"); 
-                       var object = checkId("objectID", "objectID2"); 
-                       var documentName = checkId("docNameID", "docNameID2"); 
-                       var endpoint = checkId("endpointID", "endpointID2"); 
+                       var subject = checkId("subjectID", "subjectID2");
+                       var predicate = checkId("predicateID", "predicateID2");
+                       var object = checkId("objectID", "objectID2");
+                       var documentName = checkId("docNameID", "docNameID2");
+                       var endpoint = checkId("endpointID", "endpointID2");
                        var tab = "";
 
 			if (document.getElementById('dbmsTabID').getAttribute('class') == "active"){
@@ -1802,7 +1801,7 @@
                        permalink.href = permalink.href + "endpoint=" +  encodeURIComponent(endpoint.value);
                 }
 	</script>
-	
+
 	<!-- These functions are used for Authentication -->
 	<script>
         async function fetchProfile(webId) {
@@ -1854,11 +1853,11 @@
  		  var body = await resp.text();
  		  var contentType = resp.headers.get('content-type');
  		  return {profile: body, contentType};
-               } 
+               }
  	      else {
  	        console.log("Error " + resp.status +" - " + resp.statusText)
                }
-           } 
+           }
  	  catch(e) {
 		  console.error('Request failed', e)
 		  alert('Request failed ', e)
@@ -1881,12 +1880,12 @@
                location.reload()
             }
         }
-       
+
         async function authLogout () {
             await solid.auth.logout()
             location.reload()
         }
-		
+
 	</script>
   </body>
 </html>
