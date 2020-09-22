@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Select your Identity Provider</title>
+  <script src="./oidc-web.min.js"></script>
+
+  <style>
+    body, button, input {
+     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+     font-size: 11pt;
+    }
+
+    p {
+      margin: .75em 0;
+    }
+
+    h1 {
+      font-weight: normal;
+      padding-bottom: 10px;
+    }
+
+    button {
+      border: 1px solid grey;
+      border-radius: 2px;
+      padding: 4px;
+      margin-left: 4px;
+      cursor: pointer;
+    }
+
+    :focus {
+      outline: none;
+    }
+
+    #app-container {
+      max-width: 600px;
+      margin: auto;
+    }
+
+    .idp-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .idp {
+      flex: 1 100%;
+      margin: .5em;
+
+      border: none;
+      border-radius: 2px;
+      padding: .5em;
+      background-color: rgb(61, 109, 211);
+      color: #fff;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background-color 0.4s, box-shadow 0.4s;
+    }
+
+    .idp:hover,
+    .idp:focus {
+      background-color: rgb(55, 97, 188);
+      box-shadow: 1px 1px rgb(46, 80, 151);
+    }
+
+    .idp:active {
+      cursor: pointer;
+      box-shadow: inset 1px 1px rgb(46, 80, 152);
+    }
+
+    .idp .icon {
+      display: flex;
+      height: 42px;
+      border-radius: 2px;
+      margin-left: .5em;
+    }
+
+    .custom-idp {
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      margin: .5em;
+    }
+
+    .custom-idp input {
+      flex-grow: 2;
+    }
+
+    .hidden {
+      display: none!important;
+    }
+
+    @media all and (min-width: 500px) {
+      .idp {
+        flex: 1 200px;
+      }
+    }
+
+    #app-container {
+      max-widht: 600px;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+<div id="app-container">
+  <div>
+    <p>Please enter your WebID or the URL of your identity provider:</p>
+    <form class="custom-idp" id="custom-idp-form">
+      <input type="url" id="custom-idp" placeholder="https://my-identity.provider">
+      <button type="submit" id="login-custom">Go</button>
+    </form>
+    <p>Or pick an identity provider from the list below:</p>
+    <div class="idp-list">
+      <button type="button" id="login_community" class="idp">
+        <span class="label">Solid Community</span>
+      </button>
+      <button type="button" id="login_test_space" class="idp">
+        <span class="label">Solid Test Space</span>
+      </button>
+      <button type="button" id="login_opl_oidc" class="idp">
+        <span class="label">OpenLink WebID-OIDC</span>
+      </button>
+      <button type="button" id="login_opl_v5" class="idp">
+        <span class="label">OpenLink Solid Server ver:5.x</span>
+      </button>
+      <button type="button" id="login_opl_ds" class="idp">
+        <span class="label">OpenLink Data Spaces (QA server)</span>
+      </button>
+      <button type="button" id="login_opl_uriburner" class="idp">
+        <span class="label">OpenLink URIBurner Service</span>
+      </button>
+      <button type="button" id="login_opl_myopl" class="idp">
+        <span class="label">OpenLink My Service</span>
+      </button>
+    </div>
+  </div>
+  <div id="logged" class="container hidden">
+    <h4><p>Logged In as:</p></h4>
+    <p id="webid"></p>
+      <button type="button" id="logout" class="idp hidden" style="color:black; background:lightgray;">
+        <span class="label">Logout</span>
+      </button>
+  </div>
+</div>
+
+</body>
+<script>
+  // Lib is exported as window.OIDC
+  const { OIDCWebClient } = OIDC
+  const options = { solid: true }
+  const authClient = new OIDCWebClient(options)
+  // auth is now a client instance
+  var url = new URL(window.location.href)
+  url.hash = ''
+  const callback = url.href
+
+  /**
+   * Gets called when the page loads
+   */
+  document.addEventListener('DOMContentLoaded', async () => {
+    initButtons()
+
+    if (window.location.hash === '#relogin') {
+      await authClient.logout();
+    }
+
+    // Check if user is already logged in
+    const session = await authClient.currentSession()
+    if (session && session.hasCredentials()) {
+      show('logged')
+      show('logout')
+      setField("webid", session.idClaims.sub)
+      setTimeout(function (){
+        if (window.opener){
+          window.opener.location.reload();
+          close();
+        }
+      }, 3000);
+    }
+  })
+
+  async function login (provider) {
+    let session
+
+    document.getElementById('custom-idp').value = provider;
+
+    try {
+      session = await authClient.login({mode:'redirect', provider})
+    } catch (error) {
+      console.log('Error logging in:')
+      console.error(error)
+      console.log('Make sure this page is served via HTTPS, otherwise browser will block it')
+    }
+  }
+
+  function logout () {
+    console.log('Logging out...')
+    authClient.logout()
+    hide('logged')
+    hide('logout')
+  }
+
+  /**
+   * App/UI logic. This would normally done in React, Ember, Vue, etc.
+   */
+  function initButtons () {
+    initButton('login_community', () => login('https://solid.community'))
+    initButton('login_test_space', () => login('https://solidtest.space'))
+    initButton('login_opl_oidc', () => login('https://solid.openlinksw.com:8444'))
+    initButton('login_opl_v5', () => login('https://solid.openlinksw.com:8445'))
+    initButton('login_opl_ds', () => login('https://ods-qa.openlinksw.com'))
+    initButton('login_opl_uriburner', () => login('https://linkeddata.uriburner.com'))
+    initButton('login_opl_myopl', () => login('https://id.myopenlink.net'))
+
+    initButton('login-custom', () => {
+      var idp = document.getElementById('custom-idp').value
+      if (idp.endsWith("/"))
+        idp = idp.substring(0, idp.length - 1)
+      login(idp)
+    })
+
+    initButton('logout', () => logout())
+  }
+
+  function initButton(id, action) {
+    document.getElementById(id).addEventListener('click', action)
+  }
+
+
+  /**
+   * App-specific util functions, ignore.
+   */
+  function setField (id, value) {
+    var field = document.getElementById(id)
+    if (field) {
+      field.innerHTML = value
+    }
+  }
+  function setFieldText (id, value) {
+    var field = document.getElementById(id)
+    if (field) {
+      field.innerText = value
+    }
+  }
+  function hide (id) {
+    document.getElementById(id).classList.add('hidden')
+  }
+  function show (id) {
+    document.getElementById(id).classList.remove('hidden')
+  }
+</script>
+</html>

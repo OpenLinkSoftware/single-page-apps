@@ -1,1891 +1,1968 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title> Basic Data Entry Form </title>
-		<!-- Latest compiled and minified CSS -->
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-		<!-- jQuery library -->
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-		<!-- Latest compiled JavaScript -->
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
-		<!-- Authentication and RDF procssing library -->
-		<script src="./common/js/solid-auth-client.bundle.js"></script>
-	    <!-- <script src="https://cdn.jsdelivr.net/npm/solid-auth-client@2.3.0/dist-lib/solid-auth-client.bundle.js"></script> -->
-		<!-- <script src="./common/js/rdflib.min.js"></script> -->
-		<script src="https://cdn.jsdelivr.net/npm/rdflib@0.20.1/dist/rdflib.min.js"></script>
-	</head>
 
-	<body>
+<head>
+	<title> Basic Data Entry Form </title>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<!-- Latest compiled JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+	<!-- Authentication and RDF procssing library -->
+	<script src="./oidc_web/oidc-web.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/rdflib@0.20.1/dist/rdflib.min.js"></script>
+</head>
+
+<body>
 	<!-- Button feedback spinner -->
 	<div id="spinner"></div>
 	<!-- Start of tabs container -->
 	<div class="container">
-	  <!-- Create tabs menu -->
-	  <ul class="nav nav-tabs">
-		<li class="active" id="dbmsTabID"><a data-toggle="tab" href="#dbmsID">DBMS</a></li>
-		<li id="fsTabID"><a data-toggle="tab" href="#fsID">File System</a></li>
-		<li id="aboutTabID"><a data-toggle="tab" href="#aboutID">About</a></li>
-		<!-- Start Dropdown -->
-		<li class="pull-right" class="dropdown">
-		    <a class="dropdown-toggle" style="max-height: 40px" data-toggle="dropdown" href="#">
-			<span class="glyphicon glyphicon-cog"></span>
-		    <span class="caret"></span></a>
+		<!-- Create tabs menu -->
+		<ul class="nav nav-tabs">
+			<li class="active" id="dbmsTabID"><a data-toggle="tab" href="#dbmsID">DBMS</a></li>
+			<li id="fsTabID"><a data-toggle="tab" href="#fsID">File System</a></li>
+			<li id="aboutTabID"><a data-toggle="tab" href="#aboutID">About</a></li>
+			<!-- Start Dropdown -->
+			<li class="pull-right" class="dropdown">
+				<a class="dropdown-toggle" style="max-height: 40px" data-toggle="dropdown" href="#">
+					<span class="glyphicon glyphicon-cog"></span>
+					<span class="caret"></span></a>
 
-		    <ul class="dropdown-menu">
-			  <!-- Faceted Browser Links Checkbox  -->
-			  <div class="checkbox">
-			    <label><input id="fctID" type="checkbox" value="">Faceted Browser Links</label>
-			  </div>
-			  <!-- Full URI Query Results -->
-			  <div class="checkbox">
-			    <label><input id="uriID" type="checkbox" value="">Shortened URI Results</label>
-			  </div>
-			  <!-- Reasoning and Inference -->
-			  <div class="checkbox">
-			    <label><input id="riID" type="checkbox" value="">owl:sameAs Reasoning & Inference</label>
-			  </div>
-			  <!-- Inference Rule Name -->
-			  <div class="checkbox">
-			    <label><input id="ruleNameID" type="checkbox" value="">Inference Rule</label> <br>
-				<input type="text" style="max-width: 250px" value="urn:ifp:inference:rule" id="infRuleNameID">
-			  </div>
-			  <!-- Console Print Commands Checkbox  -->
-			  <div class="checkbox">
-			    <label><input id="cmdID" type="checkbox" value="">Console Log Commands</label>
-			  </div>
-  			  <!-- Number of Results per Page -->
-			  <div class="form-group">
-				  <label style="font-weight: normal" for="resultsID">Results per Page:</label>
-				  <input type="text" style="max-width: 250px" value="5" id="resultsID">
-			  </div>
-			  <h5> Return Data As: </h4>
-			  <!-- Default Download Type -->
-			  <div class="radio">
-			    <label><input id="defaultID" type="radio" name="radiogroup" checked>Default (JSON)</label>
-			  </div>
-  			  <!-- CSV Download Checkbox  -->
-			  <div class="radio">
-			    <label><input id="csvID" type="radio" name="radiogroup">CSV</label>
-			  </div>
-  			  <!-- XML Download Checkbox  -->
-			  <div class="radio">
-			    <label><input id="xmlID" type="radio" name="radiogroup">XML</label>
-			  </div>
-		    </ul>
-		  </li>
-		  <!-- End Dropdown -->
-		  <a id="logged-href" href="" title="" style="margin-top: 5px; margin-left: 15px; max-height: 35px" class="pull-right" class="hidden"><img id="uid-icon" src="./common/uid.png"></a>
-		  <li class="pull-right"> <button id="loginID" style="margin-top: 5px" type="button" onclick="authLogin()" class="hidden btn btn-primary">Login</button> </li>
-		  <li class="pull-right"><button id="logoutID" style="margin-top: 5px" type="button" onclick="authLogout()" class="hidden btn btn-danger">Logout</button></li>
-		  <li class="pull-right"><a id="permalinkID">Permalink</a></li>
-
-	  </ul>
-	  <!-- End of tabs menu -->
-
-	  <!-- Add content to the tabs-->
-	  <div class="tab-content">
-		<!-- Start DBMS Tab -->
-	    <div id="dbmsID" class="tab-pane fade in active">
-		  	<div class="container">
-		  	    <div class="row">
-			  		<!-- Form Div (Left Side) -->
-		  	        <div class="col-xs-6">
-		  				<h1 style="text-align:center">Data Entry</h1>
-		  				<form id="dbmsFormID" class="form" method="post">
-		  					<div class="form-group">
-		  						<label for="subjectID">Subject</label>
-		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="If the subject is not a URI it will be used as the fragment identifier of a Relative URI."></span>
-		  						<textarea class="form-control" placeholder="Subject" rows="1" style="resize:vertical" id="subjectID" onchange="updatePermalink()"></textarea>
-		  						<p class="errorMessage" id="subjectErrorID" ></p>
-		  					</div>
-		  					<div class="form-group">
-		  						<label for="predicateID">Predicate</label>
-		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The predicate can either be a URI (ex. http://xmlns.com/foaf/0.1/name) or a curie (ex. foaf:name) because these are preloaded in Virtuoso."></span>
-		  						<input type="text" class="form-control" placeholder="Predicate" id="predicateID" onchange="updatePermalink()">
-		  						<p class="errorMessage" id="predicateErrorID" ></p>
-		  					</div>
-		  					<div class="form-group">
-		  						<label for="objectID">Object</label> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Whether or not the Object is a literal value or a reference is determined by the range of the predicate. Quoting the Object will override this feature and make it a literal value."></span>
-		  						<textarea class="form-control" placeholder="Object" rows="1" style="resize:vertical" id="objectID" onchange="updatePermalink()"></textarea>
-		  					</div>
-		  					<div class="form-group">
-		  						<label for="docNameID">Document Name</label>
-		  						<input type="text" class="form-control" value="urn:records:test" id="docNameID" onchange="updatePermalink()">
-		  						<p class="errorMessage" id="docNameErrorID" ></p>
-		  					</div>
-		  					<div class="form-group">
-		  						<label for="endpointID">SPARQL Endpoint</label> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Required for accepted relation object (values) lookup"></span>
-		  						<input type="text" class="form-control" id="endpointID" size="35" value="https://linkeddata.uriburner.com/sparql" onchange="updatePermalink()"/>
-		  					</div>
-
-		  					<!-- Start Buttons -->
-		  					<div class=button-wrapper>
-		  					<span>
-							<button id="clearBtnID" type="button" onclick="clearInput()" class="btn btn-primary">Clear</button>
-		  					<button id="insertBtnID" type="button" onclick="recordGen()" class="btn btn-success">Add</button>
-		  					<button id="deleteBtnID" type="button" onclick="recordDel()" class="btn btn-danger">Delete</button>
-		  					<button id="queryBtnID" type="button" onclick="queryGen()" class="btn btn-warning">Query</button>
-		  					<button id="dataBtnID" type="button" onclick="updateTable()" class="btn btn-info">All Data</button>
-							</span>
-		  					</div>
-		  					<!-- End Buttons -->
-		  				</form>
-		  				<!-- End of Form Div -->
-
-		  			<!--Start Table Div (Right Side) -->
-		  	        </div>
-		  	        <div class="col-xs-6">
-		  				<h1 style="text-align:center">Data</h1>
-		  				<table id="dbmsTableID" class="table table-bordered" style="table-layout: fixed; max-width:600px;">
-		  					<div style="padding-top: 25px">
-		  				    <!-- Table is empty because it is created by the updateTable, queryGen, or bnQueryGen method -->
-		  					</div>
-		  				</table>
-						<div class="button-wrapper">
-							<button id="firstBtnID" type="button" onclick="first()" style="background-color: #99A3A4; color: #FDFEFE; margin-right: 5px" class="btn pull-left">First</button>
-							<button id="prevBtnID" type="button" onclick="previous()" style="background-color: #99A3A4; color: #FDFEFE" class="btn pull-left">Prev</button>
-							<button id="lastBtnID" type="button" onclick="last()" style="background-color: #99A3A4; color: #FDFEFE; margin-left: 5px" class="btn pull-right">Last</button>
-
-							<button id="nextBtnID" type="button" onclick="next()" style="background-color: #99A3A4; color: #FDFEFE" class="btn pull-right ">Next</button>
+				<ul class="dropdown-menu">
+					<!-- Faceted Browser Links Checkbox  -->
+					<div class="checkbox">
+						<label><input id="fctID" type="checkbox" value="">Faceted Browser Links</label>
+					</div>
+					<!-- Full URI Query Results -->
+					<div class="checkbox">
+						<label><input id="uriID" type="checkbox" value="">Shortened URI Results</label>
+					</div>
+					<!-- Reasoning and Inference -->
+					<div class="checkbox">
+						<label><input id="riID" type="checkbox" value="">owl:sameAs Reasoning & Inference</label>
+					</div>
+					<!-- Inference Rule Name -->
+					<div class="checkbox">
+						<label><input id="ruleNameID" type="checkbox" value="">Inference Rule</label> <br>
+						<input type="text" style="max-width: 250px" value="urn:ifp:inference:rule" id="infRuleNameID">
+					</div>
+					<!-- Console Print Commands Checkbox  -->
+					<div class="checkbox">
+						<label><input id="cmdID" type="checkbox" value="">Console Log Commands</label>
+					</div>
+					<!-- Number of Results per Page -->
+					<div class="form-group">
+						<label style="font-weight: normal" for="resultsID">Results per Page:</label>
+						<input type="text" style="max-width: 250px" value="5" id="resultsID">
+					</div>
+					<h5> Return Data As: </h4>
+						<!-- Default Download Type -->
+						<div class="radio">
+							<label><input id="defaultID" type="radio" name="radiogroup" checked>Default (JSON)</label>
 						</div>
-		  	        </div>
-		  			<!--Table Div End (Right Side) -->
-		  	    </div>
-		  	</div>
-	    </div>
-		<!-- End DBMS Tab -->
-
-		<!-- Start File System Tab -->
-	    <div id="fsID" class="tab-pane fade">
-		  	<div class="container">
-		  	    <div class="row">
-		  			<!-- Form Div (Left Side) -->
-		  	        <div class="col-xs-6">
-		  				<h1 style="text-align:center">Data Entry</h1>
-		  				<form id="fsFormID" class="form" method="post">
-		  					<div class="form-group">
-		  						<label for="subjectID2">Subject</label>
-		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="If the subject is not a URI it will be used as the fragment identifier of a Relative URI."></span>
-		  						<textarea class="form-control" placeholder="Subject" rows="1" style="resize:vertical" id="subjectID2" onchange="updatePermalink()"></textarea>
-		  						<p class="errorMessage" id="subjectErrorID2" ></p>
-		  					</div>
-		  					<div class="form-group">
-		  						<label for="predicateID2">Predicate</label>
-		  						<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="The predicate can either be a URI (ex. http://xmlns.com/foaf/0.1/name) or a curie (ex. foaf:name) because these are preloaded in Virtuoso."></span>
-		  						<input type="text" class="form-control" placeholder="Predicate" id="predicateID2">
-		  						<p class="errorMessage" id="predicateErrorID2" ></p>
-		  					</div>
-		  					<div class="form-group">
-		  						<label for="objectID2">Object</label> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Wether or not the Object is a literal value or a reference is determined by the range of the predicate. Quoting the Object will override this feature and make it a literal value."></span>
-		  						<textarea class="form-control" placeholder="Object" rows="1" style="resize:vertical" id="objectID2" onchange="updatePermalink()"></textarea>
-		  					</div>
-		  					<div class="form-group">
-		  						<label for="docNameID2">Document Name</label>
-		  						<input type="text" class="form-control" value="https://kingsley.idehen.net/public_home/jordan/Public/record-test.ttl" id="docNameID2" onchange="updatePermalink()">
-		  						<p class="errorMessage" id="docNameErrorID2" ></p>
-		  					</div>
-		  					<div class="form-group">
-		  						<label for="endpointID2">SPARQL Endpoint (required for predicate lookup)</label> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-original-title="Required for accepted relation object (values) lookup"></span>
-		  						<input type="text" class="form-control" id="endpointID2" size="35" value="https://linkeddata.uriburner.com/sparql" onchange="updatePermalink()"/>
-		  					</div>
-
-		  					<!-- Start Buttons -->
-		  					<div class=button-wrapper>
-		  					<span>
-							<button id="clearBtnID" type="button" onclick="clearInput()" class="btn btn-primary">Clear</button>
-							<button id="insertBtnID2" type="button" onclick="turtleGen()" class="btn btn-success">Add</button>
-							<button id="deleteBtnID2" type="button" onclick="turtleDel()" class="btn btn-danger">Delete</button>
-		  					<button id="queryBtnID2" type="button" onclick="queryGen()" class="btn btn-warning">Query</button>
-		  					<button id="dataBtnID2" type="button" onclick="updateTable()" class="btn btn-info">All Data</button>
-		  				    </span>
-		  					</div>
-		  					<!-- End Buttons -->
-		  				</form>
-		  				<!-- End of Form Div -->
-
-		  			<!--Start Table Div (Right Side) -->
-		  	        </div>
-		  	        <div class="col-xs-6">
-		  				<h1 style="text-align:center">Data</h1>
-		  				<table id="fsTableID" class="table table-bordered" style="table-layout: fixed; max-width:600px;">
-		  					<div style="padding-top: 25px">
-		  				    <!-- Table is empty because it is created by the updateTable method -->
-		  					</div>
-		  				</table>
-						<div class="button-wrapper">
-							<button id="firstBtnID2" type="button" onclick="first()" style="background-color: #99A3A4; color: #FDFEFE; margin-right: 5px" class="btn pull-left disabled">First</button>
-							<button id="prevBtnID2" type="button" onclick="previous()" style="background-color: #99A3A4; color: #FDFEFE" class="btn pull-left disabled">Prev</button>
-							<button id="lastBtnID2" type="button" onclick="last()" style="background-color: #99A3A4; color: #FDFEFE; margin-left: 5px" class="btn pull-right disabled">Last</button>
-
-							<button id="nextBtnID2" type="button" onclick="next()" style="background-color: #99A3A4; color: #FDFEFE" class="btn pull-right disabled">Next</button>
+						<!-- CSV Download Checkbox  -->
+						<div class="radio">
+							<label><input id="csvID" type="radio" name="radiogroup">CSV</label>
 						</div>
-		  	        </div>
-		  			<!--Table Div End (Right Side) -->
-		  	    </div>
-		  	</div>
-	    </div>
-		<!-- End File System Tab -->
-		<!-- Start About Tab -->
-	    <div id="aboutID" class="tab-pane fade">
-		  	<div class="container">
-				<p style="padding-top: 10px"> Generic SPARQL Data Entry Form 1.0.4<br>
-					Description: Simple Data Entry Form that helps unravel the power of RDF and SPARQL with regards to Structured Data creation and interaction. <br>
-					Creator: <a href="https://jordan.solid.openlinksw.com:8444/profile/card#me">Jordan Idehen</a> (<a href="https://github.com/jidehen#this">Github</a>, <a href="https://www.linkedin.com/in/jordan-idehen-143934157/#this">LinkedIn</a>) <br>
-					Supervisor: <a href="https://github.com/OpenLinkSoftware#this">OpenLink Software</a> <br>
-					License: Public Domain
-				</p>
+						<!-- XML Download Checkbox  -->
+						<div class="radio">
+							<label><input id="xmlID" type="radio" name="radiogroup">XML</label>
+						</div>
+				</ul>
+			</li>
+			<!-- End Dropdown -->
+			<a id="logged-href" href="" title="" style="margin-top: 5px; margin-left: 15px; max-height: 35px"
+				class="pull-right" class="hidden"><img id="uid-icon" src="./common/uid.png"></a>
+			<li class="pull-right"> <button id="loginID" style="margin-top: 5px" type="button" onclick="authLogin()"
+					class="hidden btn btn-primary">Login</button> </li>
+			<li class="pull-right"><button id="logoutID" style="margin-top: 5px" type="button" onclick="authLogout()"
+					class="hidden btn btn-danger">Logout</button></li>
+			<li class="pull-right"><a id="permalinkID">Permalink</a></li>
+
+		</ul>
+		<!-- End of tabs menu -->
+
+		<!-- Add content to the tabs-->
+		<div class="tab-content">
+			<!-- Start DBMS Tab -->
+			<div id="dbmsID" class="tab-pane fade in active">
+				<div class="container">
+					<div class="row">
+						<!-- Form Div (Left Side) -->
+						<div class="col-xs-6">
+							<h1 style="text-align:center">Data Entry</h1>
+							<form id="dbmsFormID" class="form" method="post">
+								<div class="form-group">
+									<label for="subjectID">Subject</label>
+									<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip"
+										data-original-title="If the subject is not a URI it will be used as the fragment identifier of a Relative URI."></span>
+									<textarea class="form-control" placeholder="Subject" rows="1"
+										style="resize:vertical" id="subjectID" onchange="updatePermalink()"></textarea>
+									<p class="errorMessage" id="subjectErrorID"></p>
+								</div>
+								<div class="form-group">
+									<label for="predicateID">Predicate</label>
+									<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip"
+										data-original-title="The predicate can either be a URI (ex. http://xmlns.com/foaf/0.1/name) or a curie (ex. foaf:name) because these are preloaded in Virtuoso."></span>
+									<input type="text" class="form-control" placeholder="Predicate" id="predicateID"
+										onchange="updatePermalink()">
+									<p class="errorMessage" id="predicateErrorID"></p>
+								</div>
+								<div class="form-group">
+									<label for="objectID">Object</label> <span class="glyphicon glyphicon-question-sign"
+										data-toggle="tooltip"
+										data-original-title="Whether or not the Object is a literal value or a reference is determined by the range of the predicate. Quoting the Object will override this feature and make it a literal value."></span>
+									<textarea class="form-control" placeholder="Object" rows="1" style="resize:vertical"
+										id="objectID" onchange="updatePermalink()"></textarea>
+								</div>
+								<div class="form-group">
+									<label for="docNameID">Document Name</label>
+									<input type="text" class="form-control" value="urn:records:test" id="docNameID"
+										onchange="updatePermalink()">
+									<p class="errorMessage" id="docNameErrorID"></p>
+								</div>
+								<div class="form-group">
+									<label for="endpointID">SPARQL Endpoint</label> <span
+										class="glyphicon glyphicon-question-sign" data-toggle="tooltip"
+										data-original-title="Required for accepted relation object (values) lookup"></span>
+									<input type="text" class="form-control" id="endpointID" size="35"
+										value="https://linkeddata.uriburner.com/sparql" onchange="updatePermalink()" />
+								</div>
+
+								<!-- Start Buttons -->
+								<div class=button-wrapper>
+									<span>
+										<button id="clearBtnID" type="button" onclick="clearInput()"
+											class="btn btn-primary">Clear</button>
+										<button id="insertBtnID" type="button" onclick="recordGen()"
+											class="btn btn-success">Add</button>
+										<button id="deleteBtnID" type="button" onclick="recordDel()"
+											class="btn btn-danger">Delete</button>
+										<button id="queryBtnID" type="button" onclick="queryGen()"
+											class="btn btn-warning">Query</button>
+										<button id="dataBtnID" type="button" onclick="updateTable()"
+											class="btn btn-info">All Data</button>
+									</span>
+								</div>
+								<!-- End Buttons -->
+							</form>
+							<!-- End of Form Div -->
+
+							<!--Start Table Div (Right Side) -->
+						</div>
+						<div class="col-xs-6">
+							<h1 style="text-align:center">Data</h1>
+							<table id="dbmsTableID" class="table table-bordered"
+								style="table-layout: fixed; max-width:600px;">
+								<div style="padding-top: 25px">
+									<!-- Table is empty because it is created by the updateTable, queryGen, or bnQueryGen method -->
+								</div>
+							</table>
+							<div class="button-wrapper">
+								<button id="firstBtnID" type="button" onclick="first()"
+									style="background-color: #99A3A4; color: #FDFEFE; margin-right: 5px"
+									class="btn pull-left">First</button>
+								<button id="prevBtnID" type="button" onclick="previous()"
+									style="background-color: #99A3A4; color: #FDFEFE"
+									class="btn pull-left">Prev</button>
+								<button id="lastBtnID" type="button" onclick="last()"
+									style="background-color: #99A3A4; color: #FDFEFE; margin-left: 5px"
+									class="btn pull-right">Last</button>
+
+								<button id="nextBtnID" type="button" onclick="next()"
+									style="background-color: #99A3A4; color: #FDFEFE"
+									class="btn pull-right ">Next</button>
+							</div>
+						</div>
+						<!--Table Div End (Right Side) -->
+					</div>
+				</div>
 			</div>
-		<!-- End About Tab -->
-	  </div>
-	<!-- End of tabs container -->
-	</div>
+			<!-- End DBMS Tab -->
 
-	<!-- Error Display CSS -->
-	<style>
-		/* sets input field red if invalid */
-		.error {
-		  border:2px solid red;
-		}
+			<!-- Start File System Tab -->
+			<div id="fsID" class="tab-pane fade">
+				<div class="container">
+					<div class="row">
+						<!-- Form Div (Left Side) -->
+						<div class="col-xs-6">
+							<h1 style="text-align:center">Data Entry</h1>
+							<form id="fsFormID" class="form" method="post">
+								<div class="form-group">
+									<label for="subjectID2">Subject</label>
+									<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip"
+										data-original-title="If the subject is not a URI it will be used as the fragment identifier of a Relative URI."></span>
+									<textarea class="form-control" placeholder="Subject" rows="1"
+										style="resize:vertical" id="subjectID2" onchange="updatePermalink()"></textarea>
+									<p class="errorMessage" id="subjectErrorID2"></p>
+								</div>
+								<div class="form-group">
+									<label for="predicateID2">Predicate</label>
+									<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip"
+										data-original-title="The predicate can either be a URI (ex. http://xmlns.com/foaf/0.1/name) or a curie (ex. foaf:name) because these are preloaded in Virtuoso."></span>
+									<input type="text" class="form-control" placeholder="Predicate" id="predicateID2">
+									<p class="errorMessage" id="predicateErrorID2"></p>
+								</div>
+								<div class="form-group">
+									<label for="objectID2">Object</label> <span
+										class="glyphicon glyphicon-question-sign" data-toggle="tooltip"
+										data-original-title="Wether or not the Object is a literal value or a reference is determined by the range of the predicate. Quoting the Object will override this feature and make it a literal value."></span>
+									<textarea class="form-control" placeholder="Object" rows="1" style="resize:vertical"
+										id="objectID2" onchange="updatePermalink()"></textarea>
+								</div>
+								<div class="form-group">
+									<label for="docNameID2">Document Name</label>
+									<input type="text" class="form-control"
+										value="https://kingsley.idehen.net/public_home/jordan/Public/record-test.ttl"
+										id="docNameID2" onchange="updatePermalink()">
+									<p class="errorMessage" id="docNameErrorID2"></p>
+								</div>
+								<div class="form-group">
+									<label for="endpointID2">SPARQL Endpoint (required for predicate lookup)</label>
+									<span class="glyphicon glyphicon-question-sign" data-toggle="tooltip"
+										data-original-title="Required for accepted relation object (values) lookup"></span>
+									<input type="text" class="form-control" id="endpointID2" size="35"
+										value="https://linkeddata.uriburner.com/sparql" onchange="updatePermalink()" />
+								</div>
 
-		/* sets error message color red */
-		.errorMessage {
-			color:red;
-		}
+								<!-- Start Buttons -->
+								<div class=button-wrapper>
+									<span>
+										<button id="clearBtnID" type="button" onclick="clearInput()"
+											class="btn btn-primary">Clear</button>
+										<button id="insertBtnID2" type="button" onclick="turtleGen()"
+											class="btn btn-success">Add</button>
+										<button id="deleteBtnID2" type="button" onclick="turtleDel()"
+											class="btn btn-danger">Delete</button>
+										<button id="queryBtnID2" type="button" onclick="queryGen()"
+											class="btn btn-warning">Query</button>
+										<button id="dataBtnID2" type="button" onclick="updateTable()"
+											class="btn btn-info">All Data</button>
+									</span>
+								</div>
+								<!-- End Buttons -->
+							</form>
+							<!-- End of Form Div -->
 
-		/* wraps text in table */
-		td {
-		  word-wrap: break-word;
-		}
-	</style>
+							<!--Start Table Div (Right Side) -->
+						</div>
+						<div class="col-xs-6">
+							<h1 style="text-align:center">Data</h1>
+							<table id="fsTableID" class="table table-bordered"
+								style="table-layout: fixed; max-width:600px;">
+								<div style="padding-top: 25px">
+									<!-- Table is empty because it is created by the updateTable method -->
+								</div>
+							</table>
+							<div class="button-wrapper">
+								<button id="firstBtnID2" type="button" onclick="first()"
+									style="background-color: #99A3A4; color: #FDFEFE; margin-right: 5px"
+									class="btn pull-left disabled">First</button>
+								<button id="prevBtnID2" type="button" onclick="previous()"
+									style="background-color: #99A3A4; color: #FDFEFE"
+									class="btn pull-left disabled">Prev</button>
+								<button id="lastBtnID2" type="button" onclick="last()"
+									style="background-color: #99A3A4; color: #FDFEFE; margin-left: 5px"
+									class="btn pull-right disabled">Last</button>
 
-	<!-- Spinner CSS -->
-	<style>
-		#spinner{
-		    position:fixed;
-		    width:100%;
-		    left:0;right:0;top:0;bottom:0;
-		    background-color: rgba(255,255,255,0.7);
-		    z-index:9999;
-		    display:none;
-		}
+								<button id="nextBtnID2" type="button" onclick="next()"
+									style="background-color: #99A3A4; color: #FDFEFE"
+									class="btn pull-right disabled">Next</button>
+							</div>
+						</div>
+						<!--Table Div End (Right Side) -->
+					</div>
+				</div>
+			</div>
+			<!-- End File System Tab -->
+			<!-- Start About Tab -->
+			<div id="aboutID" class="tab-pane fade">
+				<div class="container">
+					<p style="padding-top: 10px"> Generic SPARQL Data Entry Form 1.0.4<br>
+						Description: Simple Data Entry Form that helps unravel the power of RDF and SPARQL with regards
+						to Structured Data creation and interaction. <br>
+						Creator: <a href="https://jordan.solid.openlinksw.com:8444/profile/card#me">Jordan Idehen</a>
+						(<a href="https://github.com/jidehen#this">Github</a>, <a
+							href="https://www.linkedin.com/in/jordan-idehen-143934157/#this">LinkedIn</a>) <br>
+						Supervisor: <a href="https://github.com/OpenLinkSoftware#this">OpenLink Software</a> <br>
+						License: Public Domain
+					</p>
+				</div>
+				<!-- End About Tab -->
+			</div>
+			<!-- End of tabs container -->
+		</div>
 
-		@keyframes spin {
-		  from {
-		      transform: rotate(0deg);
-		  } to {
-		      transform: rotate(360deg);
-		  }
-		}
-
-		#spinner::after {
-		    content:'';
-		    display:block;
-		    position:absolute;
-		    left:48%;top:40%;
-		    width:40px;height:40px;
-		    border-style:solid;
-		    border-color:black;
-		    border-top-color:transparent;
-		    border-width: 4px;
-		    border-radius:50%;
-		    -webkit-animation: spin .8s linear infinite;
-		    animation: spin .8s linear infinite;
-		}
-	</style>
-
-	<!-- Dropdown menu CSS-->
-	<style>
-		.dropdown-menu {
-		   padding-left: 15px;
-		   width: 250px;
-		}
-		.glyphicon.glyphicon-cog {
-		    font-size: 20px;
-		}
-	</style>
-
-	<!-- Spinner Javascript -->
-	<script>
-		function showSpinner() {
-		  document.getElementById("spinner").className = "show";
-		}
-
-		function hideSpinner() {
-		  document.getElementById("spinner").className = document.getElementById("spinner").className.replace("show", "");
-		}
-	</script>
-
-	<!-- These Functions Modify the Onscreen Display -->
-	<script>
-		//docNameValue() ; //Checks/Updates document name when page is loaded
-		var solid_storage = null;
-                var initialTab = "";
-                var initialSubject = "";
-                var initialPredicate = "";
-                var initialObject = "";
-                var initialDocumentName = "";
-                var initialEndpoint = "";
-
-		//Tooltip activation function
-		$(document).ready(function(){
-		    $('[data-toggle="tooltip"]').tooltip({
-		        placement : 'right'
-		    });
-
-                  // check for permalink
-                  var queryString = window.location.search;
-                  var params = new URLSearchParams(queryString);
-                  var setInputs = params.get("setInputs");
-
-                  resetPermalink();
-                  if (setInputs == "true") {
-                       initialTab = decodeURIComponent(params.get("tab"));
-                       initialSubject = decodeURIComponent(params.get("subject"));
-                       initialPredicate = decodeURIComponent(params.get("predicate"));
-                       initialObject = decodeURIComponent(params.get("object"));
-                       initialDocumentName = decodeURIComponent(params.get("documentName"));
-                       initialEndpoint = decodeURIComponent(params.get("endpoint"));
-                       handlePermalink();
-                       if (initialTab == "dbms")
-                          $('a[href="#dbmsID"]').tab('show');
-                       else if (initialTab == "fs")
-                          $('a[href="#fsID"]').tab('show');
-                  }
-
-		  const loginButton = document.getElementById('loginID');
-		  const logoutButton = document.getElementById('logoutID');
-
-		  solid.auth.trackSession(async (session) => {
-	              const loggedHref = document.getElementById('logged-href')
-	              const loggedIn = !!session
-	              loginButton.classList.toggle('hidden', loggedIn)
-	              logoutButton.classList.toggle('hidden', !loggedIn)
-	              if (loggedIn) {
-	                if (session.webId) {
-	                  loggedHref.classList.remove('hidden')
-	                  loggedHref.href = session.webId
-	                  loggedHref.title = session.webId
-
-	                  solid_storage = await fetchProfile(session.webId);
-	                  sessionStorage.setItem('solid_storage', solid_storage);
-                          await docNameValue()
-	                }
-
-	              } else {
-	                loggedHref.classList.add('hidden')
-	                loggedHref.href = ''
-	                loggedHref.title = ''
-	                solid_storage = null;
-	                sessionStorage.removeItem('solid_storage');
-	              }
-                      updateTable();
-	            });
-		});
-
-                function checkPermalinkTab (id1, id2) {
-			if (initialTab == 'dbms') {
-				return document.getElementById(id1) ;
-			} else if (initialTab == 'fs'){
-				return document.getElementById(id2) ;
-			}
-		}
-
-		// Handle the permalink parameters
-                function handlePermalink() {
-                    var subject = checkPermalinkTab("subjectID", "subjectID2");
-                    var predicate = checkPermalinkTab("predicateID", "predicateID2");
-                    var object = checkPermalinkTab("objectID", "objectID2");
-                    var documentName = checkPermalinkTab("docNameID", "docNameID2");
-                    var endpoint = checkPermalinkTab("endpointID", "endpointID2");
-
-                    if (initialSubject != "") {
-                      subject.value = initialSubject;
-                      initialSubject = "";
-                    }
-                    if (initialPredicate != "") {
-                      predicate.value = initialPredicate;
-                      initialPredicate = "";
-                    }
-                    if (initialObject != "") {
-                      object.value = initialObject;
-                      initialObject = "";
-                    }
-                    if (initialDocumentName != "") {
-                      documentName.value = initialDocumentName;
-                      //initialDocumentName = "";
-                    }
-                    if (initialEndpoint != "") {
-                      endpoint.value = initialEndpoint;
-                      initialEndpoint = "";
-                    }
-                }
-
-		/* Gets the solid storage from window > application > session storage
-		so it can be used as the document name for functions
-		function is called when page is loaded/reloaded */
-		async function docNameValue() {
-			solid_storage = await sessionStorage.getItem("solid_storage")
-			var solid_storage_value = solid_storage ;
-			if (document.getElementById("cmdID").checked == true) {
-				console.log('solid storage: ' + solid_storage);
+		<!-- Error Display CSS -->
+		<style>
+			/* sets input field red if invalid */
+			.error {
+				border: 2px solid red;
 			}
 
-			if (solid_storage == null) {
-				document.getElementById("docNameID").value = "urn:records:test" ;
-				document.getElementById("docNameID2").value = "https://kingsley.idehen.net/public_home/jordan/Public/record-test.ttl" ;
-			} else {
-				document.getElementById("docNameID").value = solid_storage_value ;
-				document.getElementById("docNameID2").value = solid_storage_value ;
+			/* sets error message color red */
+			.errorMessage {
+				color: red;
 			}
 
- 		        // value from permalink
- 			if (initialDocumentName != "" && initialTab != "") {
- 			        var documentName = checkPermalinkTab("docNameID", "docNameID2");
- 				documentName.value = initialDocumentName;
-		        }
-
-		}
-
-		// Clears subject, predicate, object input fields
-		function clearInput() {
-			if (document.getElementById('dbmsTabID').getAttribute('class') == "active"){
-				var curDocName = document.getElementById("docNameID").value ; // Stores current value of docName
-				var curEndpoint = document.getElementById("endpointID").value ; // Stores current value of endpoint
-				document.getElementById("dbmsFormID").reset(); // Resets entire form
-				document.getElementById("docNameID").value = curDocName ; // Added so docname is not reset
-				document.getElementById("endpointID").value = curEndpoint ; // Added so endpoint is not reset
-			} else if (document.getElementById('fsTabID').getAttribute('class') == "active"){
-				var curDocName = document.getElementById("docNameID2").value ;
-				var curEndpoint = document.getElementById("endpointID2").value ;
-				document.getElementById("fsFormID").reset();
-				document.getElementById("docNameID2").value = curDocName ;
-				document.getElementById("endpointID2").value = curEndpoint ;
+			/* wraps text in table */
+			td {
+				word-wrap: break-word;
 			}
-		}
+		</style>
 
-		// This function checks which tab the user is in to determine focus of functions
-		function checkValue(id1, id2) {
-			if (document.getElementById('dbmsTabID').getAttribute('class') == "active"){
-				return document.getElementById(id1).value ;
-			} else if (document.getElementById('fsTabID').getAttribute('class') == "active"){
-				return document.getElementById(id2).value ;
+		<!-- Spinner CSS -->
+		<style>
+			#spinner {
+				position: fixed;
+				width: 100%;
+				left: 0;
+				right: 0;
+				top: 0;
+				bottom: 0;
+				background-color: rgba(255, 255, 255, 0.7);
+				z-index: 9999;
+				display: none;
 			}
-		}
 
-		// This function checks which tab the user is in to determine table to display data (different because of .value)
-		function checkId(id1, id2) {
-			if (document.getElementById('dbmsTabID').getAttribute('class') == "active"){
-				return document.getElementById(id1) ;
-			} else if (document.getElementById('fsTabID').getAttribute('class') == "active"){
-				return document.getElementById(id2) ;
-			}
-		}
-	</script>
-
-	<!-- These Functions are Used to Display Validation Errors -->
-	<script>
-		// Function is used to remove input field border color
-		function setInputColor(id) {
-			document.getElementById(id).className = document.getElementById(id).className + " error";  // this adds the error class
-		}
-
-		// Function is used to remove input field border color
-		function removeInputColor(id) {
-			document.getElementById(id).className = "form-control"; // removes error class
-		}
-
-		// Function is used to display error message
-		function errorMessage(id, error) {
-			document.getElementById(id).innerHTML = error ;
-		}
-	</script>
-
-	<!-- These Functions Handle the Form Validation -->
-	<script>
-		// Regular Expression for URIs
-		const regexp = /(https|http|mailto|tel|dav|ftp|ftps|urn)[:^/s]/i;
-
-		// This function validates the uri used for PATCH
-		document.getElementById("docNameID2").addEventListener("input", docNameValidation);
-		function docNameValidation() {
-			var str = document.getElementById("docNameID2").value ;
-
-			try {
-				if (regexp.test(str)) { //removes error for valid uri
-					errorMessage("docNameErrorID2", "") ;
-					removeInputColor('docNameID2') ;
-				} else {
-					setInputColor("docNameID2") ;
-					errorMessage("docNameErrorID2", "Document name must be a full uri for patch method") ;
-					throw new Error("Document Name must be a full uri for patch method"); // Throws error because input is not a valid uri
+			@keyframes spin {
+				from {
+					transform: rotate(0deg);
 				}
-			} catch(e) {
-				console.error('Invalid uri', e) ;
-			}
-		}
 
-		// Function checks if input is a blank node
-		function isBlankNode(str) {
-			str = str.trim();
-			if (str.charAt(0) == "_" && str.charAt(1) == ":") {
-				return str ;
-			} else if (str.charAt(0) == "[" && str.charAt(str.length-1) == "]") {
-				return str ;
-			} else {
-				return false ;
-			}
-		}
-
-		// Function checks if input contains a language tag
-		function langTag(str) {
-			const langexp = /@[a-zA-Z][a-zA-Z]/ ; // regexp for languge tag ex. @en
-			if (langexp.test(str)) {
-				return true ;
-			} else {
-				return false ;
-			}
-		}
-
-		// Function formats literal inputs
-		function formatLiteral(str) {
-			if (langTag(str)) { // str has lang tag
-				strArray = str.split('@') ; // split string at @ so the langtag is removed from string
-				str = strArray[0].trim() ;
-				langtag = '@' + strArray[1].trim() ; // need to add @ because it is removed by split
-				if (str.charAt(0) != '"' && str.charAt(0) != "'") {
-					return '"' + str + '"' + langtag
-				} else {
-					return str + langtag
+				to {
+					transform: rotate(360deg);
 				}
-			} else { // str does not have lang tag
-				if (isBlankNode(str)) {
-					return str ;
-				} else if (str.charAt(0) == "'" && str.charAt(str.length-1) == "'") {
-					return str // If string begins and ends with single quote return it as is
-				} else if (str.charAt(0) == '"' && str.charAt(str.length-1) == '"') {
-					return str ;
-				} else if (str.indexOf(' ') >= 0){
-					if (str.charAt(0) != '"' && str.charAt(0) != "'") {
-						return '"' + str + '"' ;
-					} else {
-						return str ;
+			}
+
+			#spinner::after {
+				content: '';
+				display: block;
+				position: absolute;
+				left: 48%;
+				top: 40%;
+				width: 40px;
+				height: 40px;
+				border-style: solid;
+				border-color: black;
+				border-top-color: transparent;
+				border-width: 4px;
+				border-radius: 50%;
+				-webkit-animation: spin .8s linear infinite;
+				animation: spin .8s linear infinite;
+			}
+		</style>
+
+		<!-- Dropdown menu CSS-->
+		<style>
+			.dropdown-menu {
+				padding-left: 15px;
+				width: 250px;
+			}
+
+			.glyphicon.glyphicon-cog {
+				font-size: 20px;
+			}
+		</style>
+
+		<!-- Spinner Javascript -->
+		<script>
+			function showSpinner() {
+				document.getElementById("spinner").className = "show";
+			}
+
+			function hideSpinner() {
+				document.getElementById("spinner").className = document.getElementById("spinner").className.replace("show", "");
+			}
+		</script>
+
+		<!-- These Functions Modify the Onscreen Display -->
+		<script>
+			//docNameValue() ; //Checks/Updates document name when page is loaded
+			var solid_storage = null;
+			var initialTab = "";
+			var initialSubject = "";
+			var initialPredicate = "";
+			var initialObject = "";
+			var initialDocumentName = "";
+			var initialEndpoint = "";
+			const { OIDCWebClient } = OIDC;
+			const authClient = new OIDCWebClient({ solid: true });
+
+
+			//Tooltip activation function
+			$(document).ready(function () {
+				$('[data-toggle="tooltip"]').tooltip({
+					placement: 'right'
+				});
+
+				// check for permalink
+				var queryString = window.location.search;
+				var params = new URLSearchParams(queryString);
+				var setInputs = params.get("setInputs");
+
+				resetPermalink();
+				if (setInputs == "true") {
+					initialTab = decodeURIComponent(params.get("tab"));
+					initialSubject = decodeURIComponent(params.get("subject"));
+					initialPredicate = decodeURIComponent(params.get("predicate"));
+					initialObject = decodeURIComponent(params.get("object"));
+					initialDocumentName = decodeURIComponent(params.get("documentName"));
+					initialEndpoint = decodeURIComponent(params.get("endpoint"));
+					handlePermalink();
+					if (initialTab == "dbms")
+						$('a[href="#dbmsID"]').tab('show');
+					else if (initialTab == "fs")
+						$('a[href="#fsID"]').tab('show');
+				}
+				updateLoginState();
+			});
+
+
+			async function updateLoginState() {
+				const loginButton = document.getElementById('loginID');
+				const logoutButton = document.getElementById('logoutID');
+
+				const session = await authClient.currentSession()
+				const loggedHref = document.getElementById('logged-href')
+				const loggedIn = (session && session.hasCredentials());
+				loginButton.classList.toggle('hidden', loggedIn)
+				logoutButton.classList.toggle('hidden', !loggedIn)
+				if (loggedIn) {
+					var webid = session.idClaims.sub;
+					if (webid) {
+						loggedHref.classList.remove('hidden')
+						loggedHref.href = webid
+						loggedHref.title = webid
+
+						solid_storage = await fetchProfile(webid);
+						sessionStorage.setItem('solid_storage', solid_storage);
+						await docNameValue()
 					}
+
 				} else {
-					return '"' + str + '"' ;
+					loggedHref.classList.add('hidden')
+					loggedHref.href = ''
+					loggedHref.title = ''
+					solid_storage = null;
+					sessionStorage.removeItem('solid_storage');
+				}
+				updateTable();
+			}
+
+
+			function checkPermalinkTab(id1, id2) {
+				if (initialTab == 'dbms') {
+					return document.getElementById(id1);
+				} else if (initialTab == 'fs') {
+					return document.getElementById(id2);
 				}
 			}
-		}
 
-		// This function formats the Subject input. Comments are inline
-		function formatSubject() {
-			if (document.getElementById('dbmsTabID').getAttribute('class') == "active"){
-				var str = document.getElementById("subjectID").value ;
-			} else if (document.getElementById('fsTabID').getAttribute('class') == "active"){
-				var str = document.getElementById("subjectID2").value ;
-			}
+			// Handle the permalink parameters
+			function handlePermalink() {
+				var subject = checkPermalinkTab("subjectID", "subjectID2");
+				var predicate = checkPermalinkTab("predicateID", "predicateID2");
+				var object = checkPermalinkTab("objectID", "objectID2");
+				var documentName = checkPermalinkTab("docNameID", "docNameID2");
+				var endpoint = checkPermalinkTab("endpointID", "endpointID2");
 
-			if (str.charAt(0) == '<' && str.charAt(str.length-1) == '>') {
-				return str ;
-			} else if (regexp.test(str) && !isBlankNode(str)) {
-				return '<' + str + '>' ; // Case: input is a uri. Solution: quote it
-			} else if (str.charAt(0) == "#") {
-				return '<' + str + '>' ; // Case: input is an unquoted relative uri. Solution: quote it
-			} else if (str.charAt(0) == '<' && str.charAt(1) == '#' && str.charAt(str.length-1) == '>') {
-				return str ; // Case: input is already a relative uri. Solution: return it as is
-			} else if (str.includes(":") || str.includes("<#")) {
-				return str ; // Case: input is a curie. Solution: return it as is
-			} else if (str.charAt(0) == "?") {
-				return str ; // checks if input is a variable for deletion
-			}
-			else {
-				 if (isBlankNode(str)) {
-					return isBlankNode(str) ; // Case: input is a blank node. Solution: return it as is
-				} else {
-					return ':' + str ; // Case: input is not a uri or a blank node. Solution: make it a relative uri
+				if (initialSubject != "") {
+					subject.value = initialSubject;
+					initialSubject = "";
 				}
-	        }
-		}
+				if (initialPredicate != "") {
+					predicate.value = initialPredicate;
+					initialPredicate = "";
+				}
+				if (initialObject != "") {
+					object.value = initialObject;
+					initialObject = "";
+				}
+				if (initialDocumentName != "") {
+					documentName.value = initialDocumentName;
+					//initialDocumentName = "";
+				}
+				if (initialEndpoint != "") {
+					endpoint.value = initialEndpoint;
+					initialEndpoint = "";
+				}
+			}
 
-		// If the subject is quoted or contains a space this function throws and error
-		document.getElementById("subjectID").addEventListener("input", validateSubject);
-		document.getElementById("subjectID2").addEventListener("input", validateSubject);
-		function validateSubject() {
-			var str = checkValue("subjectID", "subjectID2") ;
+			/* Gets the solid storage from window > application > session storage
+			so it can be used as the document name for functions
+			function is called when page is loaded/reloaded */
+			async function docNameValue() {
+				solid_storage = await sessionStorage.getItem("solid_storage")
+				var solid_storage_value = solid_storage;
+				if (document.getElementById("cmdID").checked == true) {
+					console.log('solid storage: ' + solid_storage);
+				}
 
-			try {
+				if (solid_storage == null) {
+					document.getElementById("docNameID").value = "urn:records:test";
+					document.getElementById("docNameID2").value = "https://kingsley.idehen.net/public_home/jordan/Public/record-test.ttl";
+				} else {
+					document.getElementById("docNameID").value = solid_storage_value;
+					document.getElementById("docNameID2").value = solid_storage_value;
+				}
+
+				// value from permalink
+				if (initialDocumentName != "" && initialTab != "") {
+					var documentName = checkPermalinkTab("docNameID", "docNameID2");
+					documentName.value = initialDocumentName;
+				}
+
+			}
+
+			// Clears subject, predicate, object input fields
+			function clearInput() {
 				if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
-					if (isBlankNode(str)) { // removes error message for complete blank node
-						errorMessage("subjectErrorID", "") ;
-						removeInputColor('subjectID') ;
-						return formatSubject();
-					} else if (str.includes('"') || str.includes("'")) {
-						setInputColor("subjectID") ;
-						errorMessage("subjectErrorID", "Subject cannot contain a literal value unless it is a blank node") ;
-						throw new Error("Subject cannot be a literal value"); // Throws error because input is a literal value
-					} else if (str.indexOf(' ') >= 0){
-						setInputColor('subjectID') ;
-						errorMessage("subjectErrorID", "Subject cannot contain spaces unless it is a blank node") ;
-						throw new Error("Subject cannot contain spaces");
-					}
-					else {
-						errorMessage("subjectErrorID", "") ;
-						removeInputColor("subjectID") ;
-						return formatSubject(); // Returns formatted subject because it is valid
-					}
+					var curDocName = document.getElementById("docNameID").value; // Stores current value of docName
+					var curEndpoint = document.getElementById("endpointID").value; // Stores current value of endpoint
+					document.getElementById("dbmsFormID").reset(); // Resets entire form
+					document.getElementById("docNameID").value = curDocName; // Added so docname is not reset
+					document.getElementById("endpointID").value = curEndpoint; // Added so endpoint is not reset
 				} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
-					if (isBlankNode(str)) { // removes error message for complete blank node
-						errorMessage("subjectErrorID2", "") ;
-						removeInputColor('subjectID2') ;
-						return formatSubject();
-					} else if (str.includes('"') || str.includes("'")) {
-						setInputColor("subjectID2") ;
-						errorMessage("subjectErrorID2", "Subject cannot contain a literal value unless it is a blank node") ;
-						throw new Error("Subject cannot be a literal value"); // Throws error because input is a literal value
-					} else if (str.indexOf(' ') >= 0){
-						setInputColor('subjectID2') ;
-						errorMessage("subjectErrorID2", "Subject cannot contain spaces unless it is a blank node") ;
-						throw new Error("Subject cannot contain spaces");
-					}
-					else {
-						errorMessage("subjectErrorID2", "") ;
-						removeInputColor("subjectID2") ;
-						return formatSubject(); // Returns formatted subject because it is valid
-					}
+					var curDocName = document.getElementById("docNameID2").value;
+					var curEndpoint = document.getElementById("endpointID2").value;
+					document.getElementById("fsFormID").reset();
+					document.getElementById("docNameID2").value = curDocName;
+					document.getElementById("endpointID2").value = curEndpoint;
 				}
-			} catch(e) {
-				console.error('Invalid Subject', e) ;
 			}
 
-		}
-
-		// This function formats the Predicate input. Comments are inline
-		function formatPredicate() {
-			var str = checkValue("predicateID", "predicateID2") ;
-			if (regexp.test(str) && !isBlankNode(str)) {
-				return '<' + str + '>' ; // Case: input is a uri. Solution: quote it
-			} else if (str.charAt(0) == "#") {
-				return '<' + str + '>' ; // Case: input is an unquoted relative uri. Solution: quote it
-			} else if (str.charAt(0) == '<' && str.charAt(1) == '#' && str.charAt(str.length-1) == '>') {
-				return str ; // Case: input is already a relative uri. Solution: return it as is
-			} else if (str.includes(":") || str.includes("<#")) {
-				return str; // Case: input is a curie. Solution: return it as is
-			} else if (str.charAt(0) == "?") {
-				return str ; // checks if input is a variable for deletion
+			// This function checks which tab the user is in to determine focus of functions
+			function checkValue(id1, id2) {
+				if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
+					return document.getElementById(id1).value;
+				} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
+					return document.getElementById(id2).value;
+				}
 			}
-			else {
-				if (str.charAt(0) == '<' && str.charAt(str.length-1) == '>') {
-					var newStr = str.slice(1,-1); // Case: input is quoted uri. Solution: must be unquotted to be recognize as a uri by regexp
-					return formatPredicate(newStr) ;
+
+			// This function checks which tab the user is in to determine table to display data (different because of .value)
+			function checkId(id1, id2) {
+				if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
+					return document.getElementById(id1);
+				} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
+					return document.getElementById(id2);
+				}
+			}
+		</script>
+
+		<!-- These Functions are Used to Display Validation Errors -->
+		<script>
+			// Function is used to remove input field border color
+			function setInputColor(id) {
+				document.getElementById(id).className = document.getElementById(id).className + " error";  // this adds the error class
+			}
+
+			// Function is used to remove input field border color
+			function removeInputColor(id) {
+				document.getElementById(id).className = "form-control"; // removes error class
+			}
+
+			// Function is used to display error message
+			function errorMessage(id, error) {
+				document.getElementById(id).innerHTML = error;
+			}
+		</script>
+
+		<!-- These Functions Handle the Form Validation -->
+		<script>
+			// Regular Expression for URIs
+			const regexp = /(https|http|mailto|tel|dav|ftp|ftps|urn)[:^/s]/i;
+
+			// This function validates the uri used for PATCH
+			document.getElementById("docNameID2").addEventListener("input", docNameValidation);
+			function docNameValidation() {
+				var str = document.getElementById("docNameID2").value;
+
+				try {
+					if (regexp.test(str)) { //removes error for valid uri
+						errorMessage("docNameErrorID2", "");
+						removeInputColor('docNameID2');
+					} else {
+						setInputColor("docNameID2");
+						errorMessage("docNameErrorID2", "Document name must be a full uri for patch method");
+						throw new Error("Document Name must be a full uri for patch method"); // Throws error because input is not a valid uri
+					}
+				} catch (e) {
+					console.error('Invalid uri', e);
+				}
+			}
+
+			// Function checks if input is a blank node
+			function isBlankNode(str) {
+				str = str.trim();
+				if (str.charAt(0) == "_" && str.charAt(1) == ":") {
+					return str;
+				} else if (str.charAt(0) == "[" && str.charAt(str.length - 1) == "]") {
+					return str;
 				} else {
-					return ':' + str ; // Case: input is not a uri or a blank node. Solution: make it a relative uri
+					return false;
 				}
-	        }
-		}
-
-		// If the predicate is quoted, contains, or is a blank node a space this function throws and error
-		document.getElementById("predicateID").addEventListener("input", validatePredicate);
-		document.getElementById("predicateID2").addEventListener("input", validatePredicate);
-		function validatePredicate() {
-			var str = checkValue("predicateID", "predicateID2") ;
-
-			try {
-				if (document.getElementById('dbmsTabID').getAttribute('class') == "active"){
-					if (str.includes('"') || str.includes("'")) {
-						setInputColor('predicateID') ;
-						errorMessage("predicateErrorID", "Predicate cannot be a literal value") ;
-						throw new Error("Predicate cannot be a literal value"); // Throws error because input is a literal value
-					} else if (str.indexOf(' ') >= 0){
-						setInputColor('predicateID') ;
-						errorMessage("predicateErrorID", "Predicate cannot contain spaces") ;
-						throw new Error("Predicate cannot contain spaces"); // Throws error because input subject can't contain spaces
-					} else {
-						removeInputColor('predicateID') ;
-						errorMessage("predicateErrorID", "") ;
-						return formatPredicate(); // Returns formatted subject because it is valid
-					}
-				} else if (document.getElementById('fsTabID').getAttribute('class') == "active"){
-					if (str.includes('"') || str.includes("'")) {
-						setInputColor('predicateID2') ;
-						errorMessage("predicateErrorID2", "Predicate cannot be a literal value") ;
-						throw new Error("Predicate cannot be a literal value"); // Throws error because input is a literal value
-					} else if (str.indexOf(' ') >= 0){
-						setInputColor('predicateID2') ;
-						errorMessage("predicateErrorID2", "Predicate cannot contain spaces") ;
-						throw new Error("Predicate cannot contain spaces"); // Throws error because input subject can't contain spaces
-					} else {
-						removeInputColor('predicateID2') ;
-						errorMessage("predicateErrorID2", "") ;
-						return formatPredicate(); // Returns formatted subject because it is valid
-					}
-				}
-			} catch(e) {
-				console.error('Invalid Predicate', e) ;
-			}
-		}
-
-		// This function formats the Object input. Comments are inline
-		async function validateObject(str) {
-			var range = await predicateRange() ; // function waits until range is a value rather than a promise
-			var str = checkValue("objectID", "objectID2") ;
-
-			if (str.includes('"') || str.includes("'")) {
-				range = true ;
 			}
 
-			if (!range) {
-				if (str.charAt(0) == '<' && str.charAt(str.length-1) == '>') { //Case: input is already qutoed uri. Return as is
-					return str
+			// Function checks if input contains a language tag
+			function langTag(str) {
+				const langexp = /@[a-zA-Z][a-zA-Z]/; // regexp for languge tag ex. @en
+				if (langexp.test(str)) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+
+			// Function formats literal inputs
+			function formatLiteral(str) {
+				if (langTag(str)) { // str has lang tag
+					strArray = str.split('@'); // split string at @ so the langtag is removed from string
+					str = strArray[0].trim();
+					langtag = '@' + strArray[1].trim(); // need to add @ because it is removed by split
+					if (str.charAt(0) != '"' && str.charAt(0) != "'") {
+						return '"' + str + '"' + langtag
+					} else {
+						return str + langtag
+					}
+				} else { // str does not have lang tag
+					if (isBlankNode(str)) {
+						return str;
+					} else if (str.charAt(0) == "'" && str.charAt(str.length - 1) == "'") {
+						return str // If string begins and ends with single quote return it as is
+					} else if (str.charAt(0) == '"' && str.charAt(str.length - 1) == '"') {
+						return str;
+					} else if (str.indexOf(' ') >= 0) {
+						if (str.charAt(0) != '"' && str.charAt(0) != "'") {
+							return '"' + str + '"';
+						} else {
+							return str;
+						}
+					} else {
+						return '"' + str + '"';
+					}
+				}
+			}
+
+			// This function formats the Subject input. Comments are inline
+			function formatSubject() {
+				if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
+					var str = document.getElementById("subjectID").value;
+				} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
+					var str = document.getElementById("subjectID2").value;
+				}
+
+				if (str.charAt(0) == '<' && str.charAt(str.length - 1) == '>') {
+					return str;
 				} else if (regexp.test(str) && !isBlankNode(str)) {
-					return '<' + str + '>' ; // Case: input is a uri. Solution: quote it
+					return '<' + str + '>'; // Case: input is a uri. Solution: quote it
 				} else if (str.charAt(0) == "#") {
-					return '<' + str + '>' ; // Case: input is an unquoted relative uri. Solution: quote it
-				} else if (str.charAt(0) == '<' && str.charAt(1) == '#' && str.charAt(str.length-1) == '>') {
-					return str ; // Case: input is already a relative uri. Solution: return it as is
+					return '<' + str + '>'; // Case: input is an unquoted relative uri. Solution: quote it
+				} else if (str.charAt(0) == '<' && str.charAt(1) == '#' && str.charAt(str.length - 1) == '>') {
+					return str; // Case: input is already a relative uri. Solution: return it as is
 				} else if (str.includes(":") || str.includes("<#")) {
 					return str; // Case: input is a curie. Solution: return it as is
+				} else if (str.charAt(0) == "?") {
+					return str; // checks if input is a variable for deletion
 				}
 				else {
-					return ':' + str ; // Case: input is not a uri or a blank node. Solution: make it a relative uri
-		        }
+					if (isBlankNode(str)) {
+						return isBlankNode(str); // Case: input is a blank node. Solution: return it as is
+					} else {
+						return ':' + str; // Case: input is not a uri or a blank node. Solution: make it a relative uri
+					}
+				}
 			}
-			if (isBlankNode(str)){
+
+			// If the subject is quoted or contains a space this function throws and error
+			document.getElementById("subjectID").addEventListener("input", validateSubject);
+			document.getElementById("subjectID2").addEventListener("input", validateSubject);
+			function validateSubject() {
+				var str = checkValue("subjectID", "subjectID2");
+
+				try {
+					if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
+						if (isBlankNode(str)) { // removes error message for complete blank node
+							errorMessage("subjectErrorID", "");
+							removeInputColor('subjectID');
+							return formatSubject();
+						} else if (str.includes('"') || str.includes("'")) {
+							setInputColor("subjectID");
+							errorMessage("subjectErrorID", "Subject cannot contain a literal value unless it is a blank node");
+							throw new Error("Subject cannot be a literal value"); // Throws error because input is a literal value
+						} else if (str.indexOf(' ') >= 0) {
+							setInputColor('subjectID');
+							errorMessage("subjectErrorID", "Subject cannot contain spaces unless it is a blank node");
+							throw new Error("Subject cannot contain spaces");
+						}
+						else {
+							errorMessage("subjectErrorID", "");
+							removeInputColor("subjectID");
+							return formatSubject(); // Returns formatted subject because it is valid
+						}
+					} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
+						if (isBlankNode(str)) { // removes error message for complete blank node
+							errorMessage("subjectErrorID2", "");
+							removeInputColor('subjectID2');
+							return formatSubject();
+						} else if (str.includes('"') || str.includes("'")) {
+							setInputColor("subjectID2");
+							errorMessage("subjectErrorID2", "Subject cannot contain a literal value unless it is a blank node");
+							throw new Error("Subject cannot be a literal value"); // Throws error because input is a literal value
+						} else if (str.indexOf(' ') >= 0) {
+							setInputColor('subjectID2');
+							errorMessage("subjectErrorID2", "Subject cannot contain spaces unless it is a blank node");
+							throw new Error("Subject cannot contain spaces");
+						}
+						else {
+							errorMessage("subjectErrorID2", "");
+							removeInputColor("subjectID2");
+							return formatSubject(); // Returns formatted subject because it is valid
+						}
+					}
+				} catch (e) {
+					console.error('Invalid Subject', e);
+				}
+
+			}
+
+			// This function formats the Predicate input. Comments are inline
+			function formatPredicate() {
+				var str = checkValue("predicateID", "predicateID2");
+				if (regexp.test(str) && !isBlankNode(str)) {
+					return '<' + str + '>'; // Case: input is a uri. Solution: quote it
+				} else if (str.charAt(0) == "#") {
+					return '<' + str + '>'; // Case: input is an unquoted relative uri. Solution: quote it
+				} else if (str.charAt(0) == '<' && str.charAt(1) == '#' && str.charAt(str.length - 1) == '>') {
+					return str; // Case: input is already a relative uri. Solution: return it as is
+				} else if (str.includes(":") || str.includes("<#")) {
+					return str; // Case: input is a curie. Solution: return it as is
+				} else if (str.charAt(0) == "?") {
+					return str; // checks if input is a variable for deletion
+				}
+				else {
+					if (str.charAt(0) == '<' && str.charAt(str.length - 1) == '>') {
+						var newStr = str.slice(1, -1); // Case: input is quoted uri. Solution: must be unquotted to be recognize as a uri by regexp
+						return formatPredicate(newStr);
+					} else {
+						return ':' + str; // Case: input is not a uri or a blank node. Solution: make it a relative uri
+					}
+				}
+			}
+
+			// If the predicate is quoted, contains, or is a blank node a space this function throws and error
+			document.getElementById("predicateID").addEventListener("input", validatePredicate);
+			document.getElementById("predicateID2").addEventListener("input", validatePredicate);
+			function validatePredicate() {
+				var str = checkValue("predicateID", "predicateID2");
+
+				try {
+					if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
+						if (str.includes('"') || str.includes("'")) {
+							setInputColor('predicateID');
+							errorMessage("predicateErrorID", "Predicate cannot be a literal value");
+							throw new Error("Predicate cannot be a literal value"); // Throws error because input is a literal value
+						} else if (str.indexOf(' ') >= 0) {
+							setInputColor('predicateID');
+							errorMessage("predicateErrorID", "Predicate cannot contain spaces");
+							throw new Error("Predicate cannot contain spaces"); // Throws error because input subject can't contain spaces
+						} else {
+							removeInputColor('predicateID');
+							errorMessage("predicateErrorID", "");
+							return formatPredicate(); // Returns formatted subject because it is valid
+						}
+					} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
+						if (str.includes('"') || str.includes("'")) {
+							setInputColor('predicateID2');
+							errorMessage("predicateErrorID2", "Predicate cannot be a literal value");
+							throw new Error("Predicate cannot be a literal value"); // Throws error because input is a literal value
+						} else if (str.indexOf(' ') >= 0) {
+							setInputColor('predicateID2');
+							errorMessage("predicateErrorID2", "Predicate cannot contain spaces");
+							throw new Error("Predicate cannot contain spaces"); // Throws error because input subject can't contain spaces
+						} else {
+							removeInputColor('predicateID2');
+							errorMessage("predicateErrorID2", "");
+							return formatPredicate(); // Returns formatted subject because it is valid
+						}
+					}
+				} catch (e) {
+					console.error('Invalid Predicate', e);
+				}
+			}
+
+			// This function formats the Object input. Comments are inline
+			async function validateObject(str) {
+				var range = await predicateRange(); // function waits until range is a value rather than a promise
+				var str = checkValue("objectID", "objectID2");
+
+				if (str.includes('"') || str.includes("'")) {
+					range = true;
+				}
+
+				if (!range) {
+					if (str.charAt(0) == '<' && str.charAt(str.length - 1) == '>') { //Case: input is already qutoed uri. Return as is
+						return str
+					} else if (regexp.test(str) && !isBlankNode(str)) {
+						return '<' + str + '>'; // Case: input is a uri. Solution: quote it
+					} else if (str.charAt(0) == "#") {
+						return '<' + str + '>'; // Case: input is an unquoted relative uri. Solution: quote it
+					} else if (str.charAt(0) == '<' && str.charAt(1) == '#' && str.charAt(str.length - 1) == '>') {
+						return str; // Case: input is already a relative uri. Solution: return it as is
+					} else if (str.includes(":") || str.includes("<#")) {
+						return str; // Case: input is a curie. Solution: return it as is
+					}
+					else {
+						return ':' + str; // Case: input is not a uri or a blank node. Solution: make it a relative uri
+					}
+				}
+				if (isBlankNode(str)) {
 					return str; // Case : blank node
-			} else {
-				return formatLiteral(str);
-	        }
-		}
+				} else {
+					return formatLiteral(str);
+				}
+			}
 
-		// This function formats the Object input. Comments are inline
-		function nonvalidatedObject() {
-			var str = checkValue("objectID", "objectID2") ;
+			// This function formats the Object input. Comments are inline
+			function nonvalidatedObject() {
+				var str = checkValue("objectID", "objectID2");
 
-			if (regexp.test(str) && !isBlankNode(str)) {
-				return '<' + str + '>' ; // Case: input is a uri. Solution: quote it
-			} else if (str.charAt(0) == "#") {
-				return '<' + str + '>' ; // Case: input is an unquoted relative uri. Solution: quote it
-			} else if (str.charAt(0) == '<' && str.charAt(1) == '#' && str.charAt(str.length-1) == '>') {
-				return str ; // Case: input is already a relative uri. Solution: return it as is
-			} else if (str.includes(":") || str.includes("<#")) {
-				return str; // Case: input is a curie. Solution: return it as is
-			} else if (str.charAt(0) == "?") {
-				return str ; // checks if input is a variable for deletion
-			} else if (str.charAt(0) == '<' && str.charAt(str.length-1) == '>') {
-					var newStr = str.slice(1,-1); // Case: input is quoted uri. Solution: must be unquotted to be recognize as a uri by regexp
-					return nonvalidatedObject(newStr) ;
-			} else if (str.includes('"') || str.includes("'") || str.indexOf(' ') >= 0) {
-				return formatLiteral(str) ; // Case: input is a quoted literal value
-			} else if (isBlankNode(str)){
+				if (regexp.test(str) && !isBlankNode(str)) {
+					return '<' + str + '>'; // Case: input is a uri. Solution: quote it
+				} else if (str.charAt(0) == "#") {
+					return '<' + str + '>'; // Case: input is an unquoted relative uri. Solution: quote it
+				} else if (str.charAt(0) == '<' && str.charAt(1) == '#' && str.charAt(str.length - 1) == '>') {
+					return str; // Case: input is already a relative uri. Solution: return it as is
+				} else if (str.includes(":") || str.includes("<#")) {
+					return str; // Case: input is a curie. Solution: return it as is
+				} else if (str.charAt(0) == "?") {
+					return str; // checks if input is a variable for deletion
+				} else if (str.charAt(0) == '<' && str.charAt(str.length - 1) == '>') {
+					var newStr = str.slice(1, -1); // Case: input is quoted uri. Solution: must be unquotted to be recognize as a uri by regexp
+					return nonvalidatedObject(newStr);
+				} else if (str.includes('"') || str.includes("'") || str.indexOf(' ') >= 0) {
+					return formatLiteral(str); // Case: input is a quoted literal value
+				} else if (isBlankNode(str)) {
 					return str; // Case : blank node
-			}
-			else {
-				return ':' + str ; // Case: input is not a uri or a blank node. Solution: make it a relative uri
 				}
-		}
-
-	</script>
-
-	<!-- These functions handle the data table -->
-	<script>
-
-		// update table and permalink on tab switch
-		$('.nav-tabs a').on('shown.bs.tab', function(event){
-			var currTab = $(event.target).text();
-			var prevTab = $(event.relatedTarget).text();
-			if (currTab != "About" && prevTab != "About") {
-				updateTable() ;
-				updatePermalink();
-			}
-		});
-
-		// This function allows hyperlinks to be used in the table
-		function tableFormat(str) {
-			// Regular Expression for URIs in table specifically
-			const tableexp = /(https|http|mailto|tel|dav|ftp|ftps)[:^/s]/i;
-			var graph = checkValue("docNameID", "docNameID2") ;
-			var strLabel = str ; // variable for what is show on screen in the href
-
-			if (document.getElementById("uriID").checked == true) { //if user wants short URIs
-				if (str.includes(graph)) { //if str is in fct format it still includes the docname
-					strLabel = strLabel.replace(graph, ""); //remove the docName from string
-				}
-				if (str.includes("https://linkeddata.uriburner.com/describe/?url=")) {// of str is in fct format
-					strLabel = strLabel.replace("https://linkeddata.uriburner.com/describe/?url=", "");
-					strLabel = strLabel.replace("%23", "#");
-				} else if (str.includes("nodeID://")) {
-					strLabel = strLabel.replace("nodeID://", "_:");
-				} else if (str.includes("#")) {
-					strLabel = str.split('#')[1];
-				} else if (str.includes("/")) {
-					var strList = str.split("/");
-					strLabel = strList.pop();
+				else {
+					return ':' + str; // Case: input is not a uri or a blank node. Solution: make it a relative uri
 				}
 			}
 
-			if (tableexp.test(str)) { // if str is an absolute or relative uri
-				str = '<a href="' + str + '">' + strLabel + '</a>'
-				return str
-			}
-			else {
-				return strLabel
-			}
-		}
+		</script>
 
-		// This function is used to referesh the table when view data is clicked
-		function refreshTable() {
-			var table = checkId("dbmsTableID", "fsTableID") ;
+		<!-- These functions handle the data table -->
+		<script>
 
-			for (var i = document.getElementById(table.id).rows.length; i > 0; i--) {
-				document.getElementById(table.id).deleteRow(i -1);
-			}
-		}
-
-		// This function is used to create header row of table
-		function createHeader() {
-			var table = checkId("dbmsTableID", "fsTableID") ;
-
-			var header = table.createTHead(); // creates empty tHead
-			var row = header.insertRow(0); // inserts row into tHead
-
-			var cell0 = row.insertCell(0); // inserts new cell at position 0 in the row
-			var cell1 = row.insertCell(1); // inserts new cell at position 1 in the row
-			var cell2 = row.insertCell(2); // inserts new cell at position 2 in the row
-
-			cell0.innerHTML = "<b>Subject</b>"; // adds bold text
-			cell1.innerHTML = "<b>Predicate</b>";
-			cell2.innerHTML = "<b>Object</b>";
-		}
-
-		var limit = Number("0") ;
-		var offset = Number("0") ;
-		var tableSize = Number(setTableSize()) ;
-		var resultMode = null ;
-
-		// This function sets the limit based on input and adjusts offset accordingly
-		function setLimit() { // reset offset when limit is changed
-			if (limit != document.getElementById("resultsID").value) {
-				offset = Number("0") ;
-			}
-			limit = Number(document.getElementById("resultsID").value) ;
-		}
-
-		// this function hides or shows buttons
-		function buttonDisplay() {
-			var firstButton = checkId("firstBtnID", "firstBtnID2") ;
-			var nextButton = checkId("nextBtnID", "nextBtnID2") ;
-			var prevButton = checkId("prevBtnID", "prevBtnID2") ;
-			var lastButton = checkId("lastBtnID", "lastBtnID2") ;
-			var remainder = tableSize - limit ;
-
-			if (offset < remainder) { // if there is a next page
-				if (nextButton.classList.contains('disabled')) { // show next button
-					nextButton.classList.remove('disabled') ;
+			// update table and permalink on tab switch
+			$('.nav-tabs a').on('shown.bs.tab', function (event) {
+				var currTab = $(event.target).text();
+				var prevTab = $(event.relatedTarget).text();
+				if (currTab != "About" && prevTab != "About") {
+					updateTable();
+					updatePermalink();
 				}
-				if (lastButton.classList.contains('disabled')) { // show last button
-					lastButton.classList.remove('disabled') ;
+			});
+
+			// This function allows hyperlinks to be used in the table
+			function tableFormat(str) {
+				// Regular Expression for URIs in table specifically
+				const tableexp = /(https|http|mailto|tel|dav|ftp|ftps)[:^/s]/i;
+				var graph = checkValue("docNameID", "docNameID2");
+				var strLabel = str; // variable for what is show on screen in the href
+
+				if (document.getElementById("uriID").checked == true) { //if user wants short URIs
+					if (str.includes(graph)) { //if str is in fct format it still includes the docname
+						strLabel = strLabel.replace(graph, ""); //remove the docName from string
+					}
+					if (str.includes("https://linkeddata.uriburner.com/describe/?url=")) {// of str is in fct format
+						strLabel = strLabel.replace("https://linkeddata.uriburner.com/describe/?url=", "");
+						strLabel = strLabel.replace("%23", "#");
+					} else if (str.includes("nodeID://")) {
+						strLabel = strLabel.replace("nodeID://", "_:");
+					} else if (str.includes("#")) {
+						strLabel = str.split('#')[1];
+					} else if (str.includes("/")) {
+						var strList = str.split("/");
+						strLabel = strList.pop();
+					}
 				}
-			} else { // if there is not a next page
-				if (!nextButton.classList.contains('disabled')) { // hide next button
-					nextButton.classList.add('disabled') ;
+
+				if (tableexp.test(str)) { // if str is an absolute or relative uri
+					str = '<a href="' + str + '">' + strLabel + '</a>'
+					return str
 				}
-				if (!lastButton.classList.contains('disabled')) { // hide last button
-					lastButton.classList.add('disabled') ;
+				else {
+					return strLabel
 				}
 			}
 
-			if (offset > 0) { // if there is a previous page
-				if (prevButton.classList.contains('disabled')) { // show prev button
-					prevButton.classList.remove('disabled') ;
-				}
-				if (firstButton.classList.contains('disabled')) { // show first button
-					firstButton.classList.remove('disabled') ;
-				}
-			} else { // if there is not a previous page
-				if (!prevButton.classList.contains('disabled')) { // hide prev button
-					prevButton.classList.add('disabled') ;
-				}
-				if (!firstButton.classList.contains('disabled')) { // hide first button
-					firstButton.classList.add('disabled') ;
+			// This function is used to referesh the table when view data is clicked
+			function refreshTable() {
+				var table = checkId("dbmsTableID", "fsTableID");
+
+				for (var i = document.getElementById(table.id).rows.length; i > 0; i--) {
+					document.getElementById(table.id).deleteRow(i - 1);
 				}
 			}
-		}
 
-		// This function goes to next page in table
-		function next() {
-			var nextButton = checkId("nextBtnID", "nextBtnID2") ;
-			var prevButton = checkId("prevBtnID", "prevBtnID2") ;
-			var remainder = tableSize - limit ;
+			// This function is used to create header row of table
+			function createHeader() {
+				var table = checkId("dbmsTableID", "fsTableID");
 
-			if (nextButton.classList.contains('disabled')) { // stop action if button is disabled
-				return false ;
+				var header = table.createTHead(); // creates empty tHead
+				var row = header.insertRow(0); // inserts row into tHead
+
+				var cell0 = row.insertCell(0); // inserts new cell at position 0 in the row
+				var cell1 = row.insertCell(1); // inserts new cell at position 1 in the row
+				var cell2 = row.insertCell(2); // inserts new cell at position 2 in the row
+
+				cell0.innerHTML = "<b>Subject</b>"; // adds bold text
+				cell1.innerHTML = "<b>Predicate</b>";
+				cell2.innerHTML = "<b>Object</b>";
 			}
 
-			if (offset < remainder) { // if there is a next page
-				offset += parseInt(limit) ;
-				buttonDisplay() ;
+			var limit = Number("0");
+			var offset = Number("0");
+			var tableSize = Number(setTableSize());
+			var resultMode = null;
+
+			// This function sets the limit based on input and adjusts offset accordingly
+			function setLimit() { // reset offset when limit is changed
+				if (limit != document.getElementById("resultsID").value) {
+					offset = Number("0");
+				}
+				limit = Number(document.getElementById("resultsID").value);
 			}
 
-			// refresh table
-			if (resultMode == "bn") {
-				bnQueryGen() ;
-			} else if (resultMode == "query") {
-				queryGen() ;
-			} else {
-				updateTable() ;
-			}
-		}
+			// this function hides or shows buttons
+			function buttonDisplay() {
+				var firstButton = checkId("firstBtnID", "firstBtnID2");
+				var nextButton = checkId("nextBtnID", "nextBtnID2");
+				var prevButton = checkId("prevBtnID", "prevBtnID2");
+				var lastButton = checkId("lastBtnID", "lastBtnID2");
+				var remainder = tableSize - limit;
 
-		// this function goes to previous page in table
-		function previous() {
-			var nextButton = checkId("nextBtnID", "nextBtnID2") ;
-			var prevButton = checkId("prevBtnID", "prevBtnID2") ;
-			var remainder = tableSize - limit ;
+				if (offset < remainder) { // if there is a next page
+					if (nextButton.classList.contains('disabled')) { // show next button
+						nextButton.classList.remove('disabled');
+					}
+					if (lastButton.classList.contains('disabled')) { // show last button
+						lastButton.classList.remove('disabled');
+					}
+				} else { // if there is not a next page
+					if (!nextButton.classList.contains('disabled')) { // hide next button
+						nextButton.classList.add('disabled');
+					}
+					if (!lastButton.classList.contains('disabled')) { // hide last button
+						lastButton.classList.add('disabled');
+					}
+				}
 
-			if (prevButton.classList.contains('disabled')) { // stop action if button is disabled
-				return false ;
-			}
-
-			if (offset > 0) { // if there is a previous page
-				offset -= parseInt(limit) ;
-				buttonDisplay() ;
-			}
-
-			// refresh table
-			if (resultMode == "bn") {
-				bnQueryGen() ;
-			} else if (resultMode == "query") {
-				queryGen() ;
-			} else {
-				updateTable() ;
-			}
-		}
-
-		// this function goes to the first page
-		function first() {
-			var firstButton = checkId("firstBtnID", "firstBtnID2") ;
-			var prevButton = checkId("prevBtnID", "prevBtnID2") ;
-
-			if (firstButton.classList.contains('disabled')) { // stop action if button is disabled
-				return false ;
+				if (offset > 0) { // if there is a previous page
+					if (prevButton.classList.contains('disabled')) { // show prev button
+						prevButton.classList.remove('disabled');
+					}
+					if (firstButton.classList.contains('disabled')) { // show first button
+						firstButton.classList.remove('disabled');
+					}
+				} else { // if there is not a previous page
+					if (!prevButton.classList.contains('disabled')) { // hide prev button
+						prevButton.classList.add('disabled');
+					}
+					if (!firstButton.classList.contains('disabled')) { // hide first button
+						firstButton.classList.add('disabled');
+					}
+				}
 			}
 
-			if (offset > 0) {
-				offset = Number("0") ;
+			// This function goes to next page in table
+			function next() {
+				var nextButton = checkId("nextBtnID", "nextBtnID2");
+				var prevButton = checkId("prevBtnID", "prevBtnID2");
+				var remainder = tableSize - limit;
+
+				if (nextButton.classList.contains('disabled')) { // stop action if button is disabled
+					return false;
+				}
+
+				if (offset < remainder) { // if there is a next page
+					offset += parseInt(limit);
+					buttonDisplay();
+				}
 
 				// refresh table
 				if (resultMode == "bn") {
-					bnQueryGen() ;
+					bnQueryGen();
 				} else if (resultMode == "query") {
-					queryGen() ;
+					queryGen();
 				} else {
-					updateTable() ;
-				}
-
-				buttonDisplay() ;
-			} else {
-				if (!firstButton.classList.contains('disabled')) { // hide first button
-					firstButton.classList.add('disabled') ;
+					updateTable();
 				}
 			}
-		}
 
-		function last() {
-			var lastButton = checkId("lastBtnID", "lastBtnID2") ;
-			var nextButton = checkId("nextBtnID", "nextBtnID2") ;
-			var div = Math.floor(tableSize / limit) ;
-			var mod = Math.floor(tableSize % limit) ;
+			// this function goes to previous page in table
+			function previous() {
+				var nextButton = checkId("nextBtnID", "nextBtnID2");
+				var prevButton = checkId("prevBtnID", "prevBtnID2");
+				var remainder = tableSize - limit;
 
-			if (lastButton.classList.contains('disabled')) { // stop action if button is disabled
-				return false ;
-			}
+				if (prevButton.classList.contains('disabled')) { // stop action if button is disabled
+					return false;
+				}
 
-			if (mod != 0) {
-				console.log("CASE 1")
-				var remainder = tableSize - mod ;
-			} else { // if limit even divides into tableSize
-				console.log("CASE 2")
-				var remainder = (div - 1) * limit
-			}
-
-			if (offset < remainder) {
-				offset = Number(remainder) ;
+				if (offset > 0) { // if there is a previous page
+					offset -= parseInt(limit);
+					buttonDisplay();
+				}
 
 				// refresh table
 				if (resultMode == "bn") {
-					bnQueryGen() ;
+					bnQueryGen();
 				} else if (resultMode == "query") {
-					queryGen() ;
+					queryGen();
 				} else {
-					updateTable() ;
-				}
-
-				buttonDisplay() ;
-			} else {
-				if (!lastButton.classList.contains('disabled')) { // hide last button
-					lastButton.classList.add('disabled') ;
+					updateTable();
 				}
 			}
-		}
 
-		// This sets the size of the current table
-	    async function setTableSize() {
-			var graph = checkValue("docNameID", "docNameID2") ;
+			// this function goes to the first page
+			function first() {
+				var firstButton = checkId("firstBtnID", "firstBtnID2");
+				var prevButton = checkId("prevBtnID", "prevBtnID2");
 
-			if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
-			    var query =
-				"SELECT DISTINCT COUNT(*) AS ?count FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
-			} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
-				// Use of Sponger Pragma to force document reload during query evaluation
-				var query =
-				"DEFINE get:refresh" + " " + '"clean"' + "\n"
-				+ "DEFINE get:soft" + " " + '"replace"' + "\n"
-				+ "SELECT DISTINCT COUNT(*) AS ?count FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
-			}
-
-			if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
-				query = "DEFINE input:same-as" + '"yes" \n' + query ;
-			} else if (document.getElementById("ruleNameID").checked == true) {
-				query = "DEFINE input:inference" + ' ' + "'" + document.getElementById("infRuleNameID").value + "'" + ' \n' + query ;
-			}
-
-            var endpoint = checkValue("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
-	        let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
-
-			if (document.getElementById("cmdID").checked == true) {
-		        console.log("Retrieving Table Length From: " + url);
-				console.log("Query: " + query);
-			}
-
-	        const options = {
-	                            method: 'GET',
-	                            headers: {
-	                                       'Content-type': 'application/sparql-results+json; charset=UTF-8',
-										 },
-	                            credentials: 'include',
-	                            mode: 'cors',
-	                            crossDomain: true,
-	                        };
-
-			try {
-		        var resp = await fetch(url,options)
-	            if (resp.ok && resp.status == 200) {
-	              var data = await resp.json();
-
-		          if (data.results.bindings.length > 0){
-					tableSize = Number(data.results.bindings[0].count.value) ;
-		          } else{
-					console.log("Table size is 0");
-		          }
-
-	            } else {
-	              var msg = await resp.text();
-	              hideSpinner();
-	              console.error("Error: "+msg)
-	              alert("Error: "+msg);
-	            }
-
-			} catch(e) {
-				hideSpinner() ;
-				console.error('Table Size Failed', e) ;
-				alert('Table Size Failed ' + e);
-			}
-	    }
-	</script>
-
-	<!-- These Functions Handle the Functionality of the Page -->
-	<script>
-		//updateTable(); //Table is always shown when page is loaded
-
-
-		//SPARQL INSERT SCRIPT
-	    async function recordGen() {
-			await setLimit() ;
-			showSpinner() ;
-		    var subject = validateSubject() ;
-			var predicate = validatePredicate() ;
-			var object = await validateObject() ; // insert function awaits object value before proceeding
-			var graph = document.getElementById("docNameID").value ;
-
-		    //SPARQL INSERT Query Generator
-		    var insert_cmd =
-			"PREFIX schema: <http://schema.org/>\n"
-			+ "PREFIX : <" + graph + "#>\n"
-			+ "PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n"
-			+ "INSERT INTO GRAPH <" +graph+ "> \n{\n"
-			+ subject + ' ' + predicate + ' ' + object + " . \n"
-			+ "}";
-
-			var endpoint = document.getElementById("endpointID").value ;
-	        let url = endpoint ;
-
-			if (document.getElementById("cmdID").checked == true) {
-		        console.log("endpoint for Target SPARUL Service: " + endpoint);
-		        console.log(insert_cmd);
-			}
-
-	        const options = {
-	                            method: 'POST',
-	                            headers: {
-	                                       'Content-type': 'application/sparql-update; charset=UTF-8',
-										 },
-	                            credentials: 'include',
-	                            mode: 'cors',
-	                            crossDomain: true,
-	                            body: insert_cmd,
-	        };
-
-			try {
-		        var resp = await fetch(url,options);
-				if (resp.status >= 200 && resp.status <= 300) {
-					console.log(resp.status + " - " + resp.statusText) ;
-					updateTable() ;
-					hideSpinner() ;
-				} else {
-					throw new Error("Error " + resp.status +" - " + resp.statusText) ;
-					hideSpinner() ;
+				if (firstButton.classList.contains('disabled')) { // stop action if button is disabled
+					return false;
 				}
-			} catch(e) {
-				hideSpinner() ;
-				console.error('Insert Failed', e) ;
-				alert('Insert Failed ' + e)
-			}
-			await setTableSize() ;
-			await buttonDisplay() ;
-		}
 
-     	//SPARQL DELETE SCRIPT
-	   	async function recordDel() {
-			await setLimit() ;
-			showSpinner() ;
-     	    var subject = validateSubject() ;
-     	    var predicate = validatePredicate() ;
-     		var object = nonvalidatedObject() ;
-     		var graph = document.getElementById("docNameID").value ;
+				if (offset > 0) {
+					offset = Number("0");
 
-     	    //SPARQL DELETE Query Generator
-    		var delete_cmd =
-   			"PREFIX : <" + graph + "#>\n"
-    		+ "DELETE { GRAPH <" + graph + "> {\n"
-    		+ subject + ' ' + predicate + ' ' + object + "."
-    		+ "\n }"
-   			+ "\n }"
-    		+ "WHERE { GRAPH <" + graph + "> { \n"
-    		+ subject + ' ' + predicate + ' ' + object + "."
-    		+ "} \n };"
-
-            var endpoint = document.getElementById("endpointID").value ;
-            let url = endpoint ;
-
-			if (document.getElementById("cmdID").checked == true) {
-	            console.log("endpoint for Target SPARUL Service: " + endpoint);
-	            console.log(delete_cmd);
-			}
-
-            const options = {
-                                method: 'POST',
-                                headers: {
-                                           'Content-type': 'application/sparql-update; charset=UTF-8',
-     									},
-                                credentials: 'include',
-                                mode: 'cors',
-                                crossDomain: true,
-                                body: delete_cmd,
-            };
-			try {
-				var resp = await fetch(url,options);
-				if (resp.status >= 200 && resp.status <= 300) {
-					console.log(resp.status + " - " + resp.statusText);
-					updateTable() ;
-					hideSpinner() ;
-				}
-				else {
-					throw new Error("Error " + resp.status +" - " + resp.statusText) ;
-					hideSpinner() ;
-				}
-			} catch(e) {
-				hideSpinner() ;
-				console.error('Delete Failed', e) ;
-				alert('Delete Failed ' + e)
-			}
-			await setTableSize() ;
-			await buttonDisplay() ;
-	   	}
-
-		// function used to return data as CSV or XML
-		function downloadResults() {
-			resultMode = "csv" ;
-			var graph = checkValue("docNameID", "docNameID2") ;
-
-			if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
-			    var data_query =
-				"SELECT DISTINCT * FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
-			} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
-				// Use of Sponger Pragma to force document reload during query evaluation
-				var data_query =
-				"DEFINE get:soft" + " " + '"soft"' + "\n" + "SELECT DISTINCT * FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
-			}
-
-			if (limit >= 1) { // if results per page is active
-				data_query = data_query + "\n" + "OFFSET " + offset + "\n" + "LIMIT " + limit ;
-			}
-
-			if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
-				data_query = "DEFINE input:same-as" + '"yes" \n' + data_query ;
-			} else if (document.getElementById("ruleNameID").checked == true) {
-				data_query = "DEFINE input:inference" + ' ' + "'" + document.getElementById("infRuleNameID").value + "'" + ' \n' + data_query ;
-			}
-
-            var endpoint = checkValue("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
-			if (document.getElementById("csvID").checked == true) {
-		        var downloadURL = endpoint + encodeURIComponent(data_query) + "&should-sponge=&format=text%2Fcsv" ;
-			} else if (document.getElementById("xmlID").checked == true) {
-				var downloadURL = endpoint + encodeURIComponent(data_query) + "&should-sponge=&format=application%2Fsparql-results%2Bxml" ;
-			}
-
-
-			if (document.getElementById("cmdID").checked == true) {
-		        console.log("Retrieving CSV From: " + downloadURL);
-				console.log("Query: " + data_query);
-			}
-
-			window.open(downloadURL) ;
-		}
-
-		/* Generates blank node queries and displays table reflecting them.
-		This function is required because blank node queries can
-		require n number of columns. */
-		async function bnQueryGen() {
-			resultMode = "bn" ;
-			await setLimit() ;
-			showSpinner() ;
-		    var subject = validateSubject() ;
-			var predicate = validatePredicate() ;
-			var object = nonvalidatedObject() ;
-			var graph = checkValue("docNameID", "docNameID2") ;
-
-
-			if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
-			    var query =
-				"PREFIX : <" + graph + "#>\n"
-				+ "SELECT DISTINCT * \n"
-				+ "FROM <" + graph + "> \n"
-				+ "WHERE {" + " " + subject + " " + predicate + " " + object + " " + "}"
-			} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
-			    var query =
-				"DEFINE get:soft" + " " + '"soft"' + "\n"
-				+ "PREFIX : <" + graph + "#>\n"
-				+ "SELECT DISTINCT * \n"
-				+ "FROM <" + graph + "> \n"
-				+ "WHERE {" + " " + subject + " " + predicate + " " + object + " " + "}"
-			}
-
-			if (limit >= 1) { // if results per page is active
-				query = query + "\n" + "OFFSET " + offset + "\n" + "LIMIT " + limit ;
-			}
-
-			if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
-				query = "DEFINE input:same-as" + '"yes" \n' + query ;
-			} else if (document.getElementById("ruleNameID").checked == true) {
-				query = "DEFINE input:inference" + ' ' + "'" + document.getElementById("infRuleNameID").value + "'" + ' \n' + query ;
-			}
-
-			// CSV download
-			if (document.getElementById("csvID").checked == true || document.getElementById("xmlID").checked == true) {
-		        await downloadResults() ;
-			}
-
-			var endpoint = checkValue("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
-	        let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
-
-			if (document.getElementById("cmdID").checked == true) {
-		        console.log("SPARQL Query: " + query);
-				console.log("Query URL: " + url)
-			}
-
-	        const options = {
-	                            method: 'GET',
-	                            headers: {
-	                                       'Content-type': 'application/sparql-results+json; charset=UTF-8',
-										 },
-	                            credentials: 'include',
-	                            mode: 'cors',
-	                            crossDomain: true,
-	                        };
-			try {
-		        var resp = await fetch(url,options)
-	            if (resp.ok && resp.status == 200) {
-	              var data = await resp.json();
-
-				  refreshTable();
-
-				  /*
-                    Dynamic Table for processing JSON Structured Data (via "application/sparql-results+json" document content type)
-                    that enables INSERT to be handled via a 3-tuple subject, predicate, object graph (relation) while query results
-                    are handled via an N-Tuple structured table (relation).
-                  */
-		          if (data.results.bindings.length > 0){
-					var table = checkId("dbmsTableID", "fsTableID") ; // creates table for header
-					var header = table.createTHead(); // creates empty tHead
-					var headRow = header.insertRow(0); // inserts row into tHead
-					var bindings = data.results.bindings;
-					for (var col = 0; col < data.head.vars.length; col++) { // for each column
-						var headCell = headRow.insertCell(col); // inserts new cell at position i in thead
-						headCell.innerHTML = "<b>" + data.head.vars[col] + "</b>"; // adds bold text to thead cell
-						}
-					for (i in bindings) {
-						var curr = 0 ; // curr is used to keep track of correct cell position
-						var binding = bindings[i];
-						var bodyRow = table.insertRow(-1); // create new row
-						for (n in binding) {
-							var bodyCell = bodyRow.insertCell(curr); // create new cell in row
-							bodyCell.innerHTML = tableFormat(binding[n].value); // set value of cell
-							curr += 1 ;
-						}
+					// refresh table
+					if (resultMode == "bn") {
+						bnQueryGen();
+					} else if (resultMode == "query") {
+						queryGen();
+					} else {
+						updateTable();
 					}
-					hideSpinner() ;
-		          }
-		          else{
-					hideSpinner() ;
-					console.log("No data returned by query");
-		          }
 
-	            } else {
-	              var msg = await resp.text();
-	              hideSpinner();
-				  console.error('Query Failed', msg) ;
-				  alert('Query Failed ' + msg)
-	            }
-
-			} catch(e) {
-				hideSpinner() ;
-				console.error('Query Failed', e) ;
-				alert('Query Failed ' + e)
-			}
-			await setTableSize() ;
-			await buttonDisplay() ;
-		}
-
-		// This function updates table to show results of a query
-		async function queryGen() {
-			resultMode = "query" ;
-			await setLimit() ;
-			showSpinner() ;
-		    var subject = validateSubject() ;
-			var predicate = validatePredicate() ;
-			var object = nonvalidatedObject() ;
-			var graph = checkValue("docNameID", "docNameID2") ;
-
-			if (isBlankNode(subject) || isBlankNode(object)) {
-				bnQueryGen(); // if query includes blank node call bnQueryGen function
-				return false ; // returns false so the queryGen function stops executing
+					buttonDisplay();
+				} else {
+					if (!firstButton.classList.contains('disabled')) { // hide first button
+						firstButton.classList.add('disabled');
+					}
+				}
 			}
 
-			if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
-			    var query =
-				"PREFIX : <" + graph + "#>\n"
-				+ "SELECT DISTINCT" + " " + subject + " AS ?subject" + " " + predicate + " AS ?predicate" + " " + object + " AS ?object \n"
-				+ "FROM <" + graph + "> \n"
-				+ "WHERE {" + " " + subject + " " + predicate + " " + object + " " + "}"
-			} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
-				var query =
-				"DEFINE get:refresh" + " " + '"clean"' + "\n"
-				+ "DEFINE get:soft" + " " + '"replace"' + "\n"
-				+ "PREFIX : <" + graph + "#>\n"
-				+ "SELECT DISTINCT" + " " + subject + " AS ?subject" + " " + predicate + " AS ?predicate" + " " + object + " AS ?object \n"
-				+ "FROM <" + graph + "> \n"
-				+ "WHERE {" + " " + subject + " " + predicate + " " + object + " " + "}"
+			function last() {
+				var lastButton = checkId("lastBtnID", "lastBtnID2");
+				var nextButton = checkId("nextBtnID", "nextBtnID2");
+				var div = Math.floor(tableSize / limit);
+				var mod = Math.floor(tableSize % limit);
+
+				if (lastButton.classList.contains('disabled')) { // stop action if button is disabled
+					return false;
+				}
+
+				if (mod != 0) {
+					console.log("CASE 1")
+					var remainder = tableSize - mod;
+				} else { // if limit even divides into tableSize
+					console.log("CASE 2")
+					var remainder = (div - 1) * limit
+				}
+
+				if (offset < remainder) {
+					offset = Number(remainder);
+
+					// refresh table
+					if (resultMode == "bn") {
+						bnQueryGen();
+					} else if (resultMode == "query") {
+						queryGen();
+					} else {
+						updateTable();
+					}
+
+					buttonDisplay();
+				} else {
+					if (!lastButton.classList.contains('disabled')) { // hide last button
+						lastButton.classList.add('disabled');
+					}
+				}
 			}
 
-			if (limit >= 1) { // if results per page is active
-				query = query + "\n" + "OFFSET " + offset + "\n" + "LIMIT " + limit ;
-			}
+			// This sets the size of the current table
+			async function setTableSize() {
+				var graph = checkValue("docNameID", "docNameID2");
 
-			if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
-				query = "DEFINE input:same-as" + '"yes" \n' + query ;
-			} else if (document.getElementById("ruleNameID").checked == true) {
-				query = "DEFINE input:inference" + ' ' + "'" + document.getElementById("infRuleNameID").value + "'" + ' \n' + query ;
-			}
+				if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
+					var query =
+						"SELECT DISTINCT COUNT(*) AS ?count FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
+				} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
+					// Use of Sponger Pragma to force document reload during query evaluation
+					var query =
+						"DEFINE get:refresh" + " " + '"clean"' + "\n"
+						+ "DEFINE get:soft" + " " + '"replace"' + "\n"
+						+ "SELECT DISTINCT COUNT(*) AS ?count FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
+				}
 
-			// CSV download
-			if (document.getElementById("csvID").checked == true || document.getElementById("xmlID").checked == true) {
-		        await downloadResults() ;
-			}
+				if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
+					query = "DEFINE input:same-as" + '"yes" \n' + query;
+				} else if (document.getElementById("ruleNameID").checked == true) {
+					query = "DEFINE input:inference" + ' ' + "'" + document.getElementById("infRuleNameID").value + "'" + ' \n' + query;
+				}
 
-			var endpoint = checkValue("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
-	        let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
+				var endpoint = checkValue("endpointID", "endpointID2") + "?default-graph-uri=&query=";
+				let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson";
 
-			if (document.getElementById("cmdID").checked == true) {
-		        console.log("SPARQL Query: " + query);
-				console.log("Query URL: " + url);
-			}
+				if (document.getElementById("cmdID").checked == true) {
+					console.log("Retrieving Table Length From: " + url);
+					console.log("Query: " + query);
+				}
 
-	        const options = {
-	                            method: 'GET',
-	                            headers: {
-	                                       'Content-type': 'application/sparql-results+json; charset=UTF-8',
-										 },
-	                            credentials: 'include',
-	                            mode: 'cors',
-	                            crossDomain: true,
-	                        };
-			try {
-		        var resp = await fetch(url,options)
+				const options = {
+					method: 'GET',
+					headers: {
+						'Content-type': 'application/sparql-results+json; charset=UTF-8',
+					},
+					credentials: 'include',
+					mode: 'cors',
+					crossDomain: true,
+				};
 
-	            if (resp.ok && resp.status == 200) {
-	              var data = await resp.json();
+				try {
+					var resp = await fetch(url, options)
+					if (resp.ok && resp.status == 200) {
+						var data = await resp.json();
 
-				  refreshTable();
-				  createHeader();
-
-		          if (data.results.bindings.length > 0){
-					var table = checkId("dbmsTableID", "fsTableID") ;
-					var object = nonvalidatedObject() ;
-					for (var i = 0; i < data.results.bindings.length; i++) {
-						var subject = data.results.bindings[i].subject.value ;
-						var predicate = data.results.bindings[i].predicate.value ;
-						var object = data.results.bindings[i].object.value ;
-						if (document.getElementById("fctID").checked == true) { //if fct checkbox is checked
-							if (subject.includes(graph) || regexp.test(subject)) { //if subject is not a literal value
-								subject = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].subject.value ;
-								subject = subject.replace("#", "%23"); // replaces # with %23 for fct results
-							}
-
-							if (predicate.includes(graph) || regexp.test(predicate)) { //if subject is not a literal value
-								predicate = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].predicate.value ;
-								predicate = predicate.replace("#", "%23");
-							}
-
-							if (object.includes(graph) || regexp.test(object)) {
-								object = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].object.value ;
-								object = object.replace("#", "%23");
-							} else { //if object is literal value
-								object = data.results.bindings[i].object.value ;
-							}
-
+						if (data.results.bindings.length > 0) {
+							tableSize = Number(data.results.bindings[0].count.value);
 						} else {
-							subject = data.results.bindings[i].subject.value ;
-							predicate = data.results.bindings[i].predicate.value ;
-							object = data.results.bindings[i].object.value ;
+							console.log("Table size is 0");
 						}
 
-
-						var row = table.insertRow(-1);
-					    var cell1 = row.insertCell(0);
-					    var cell2 = row.insertCell(1);
-					    var cell3 = row.insertCell(2);
-
-					    cell1.innerHTML = tableFormat(subject);
-					    cell2.innerHTML = tableFormat(predicate);
-					    cell3.innerHTML = tableFormat(object);
+					} else {
+						var msg = await resp.text();
+						hideSpinner();
+						console.error("Error: " + msg)
+						alert("Error: " + msg);
 					}
-					hideSpinner() ;
-		          }
-		          else{
-					hideSpinner() ;
-					console.log("No data returned by query");
-		          }
 
-	            } else {
-	              var msg = await resp.text();
-	              hideSpinner();
-				  console.error('Query Failed', msg) ;
-				  alert('Query Failed ' + msg)
-	            }
-
-			} catch(e) {
-				hideSpinner() ;
-				console.error('Query Failed', e) ;
-				alert('Query Failed ' + e)
+				} catch (e) {
+					hideSpinner();
+					console.error('Table Size Failed', e);
+					alert('Table Size Failed ' + e);
+				}
 			}
-			await setTableSize() ;
-			await buttonDisplay() ;
-		}
+		</script>
 
-		// This function fetches the query results and returns them in json
-	    async function updateTable() {
-			resultMode = "all" ;
-			await setLimit() ;
-			showSpinner() ;
-			var graph = checkValue("docNameID", "docNameID2") ;
+		<!-- These Functions Handle the Functionality of the Page -->
+		<script>
+			//updateTable(); //Table is always shown when page is loaded
 
-			if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
-			    var data_query =
-				"SELECT DISTINCT * FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
-			} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
-				// Use of Sponger Pragma to force document reload during query evaluation
-				var data_query =
-				"DEFINE get:refresh" + " " + '"clean"' + "\n"
-				+ "DEFINE get:soft" + " " + '"replace"' + "\n"
- 				+ "SELECT DISTINCT * FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
+
+			//SPARQL INSERT SCRIPT
+			async function recordGen() {
+				await setLimit();
+				showSpinner();
+				var subject = validateSubject();
+				var predicate = validatePredicate();
+				var object = await validateObject(); // insert function awaits object value before proceeding
+				var graph = document.getElementById("docNameID").value;
+
+				//SPARQL INSERT Query Generator
+				var insert_cmd =
+					"PREFIX schema: <http://schema.org/>\n"
+					+ "PREFIX : <" + graph + "#>\n"
+					+ "PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n"
+					+ "INSERT INTO GRAPH <" + graph + "> \n{\n"
+					+ subject + ' ' + predicate + ' ' + object + " . \n"
+					+ "}";
+
+				var endpoint = document.getElementById("endpointID").value;
+				let url = endpoint;
+
+				if (document.getElementById("cmdID").checked == true) {
+					console.log("endpoint for Target SPARUL Service: " + endpoint);
+					console.log(insert_cmd);
+				}
+
+				const options = {
+					method: 'POST',
+					headers: {
+						'Content-type': 'application/sparql-update; charset=UTF-8',
+					},
+					credentials: 'include',
+					mode: 'cors',
+					crossDomain: true,
+					body: insert_cmd,
+				};
+
+				try {
+					var resp = await fetch(url, options);
+					if (resp.status >= 200 && resp.status <= 300) {
+						console.log(resp.status + " - " + resp.statusText);
+						updateTable();
+						hideSpinner();
+					} else {
+						throw new Error("Error " + resp.status + " - " + resp.statusText);
+						hideSpinner();
+					}
+				} catch (e) {
+					hideSpinner();
+					console.error('Insert Failed', e);
+					alert('Insert Failed ' + e)
+				}
+				await setTableSize();
+				await buttonDisplay();
 			}
 
-			if (limit >= 1) { // if results per page is active
-				data_query = data_query + "\n" + "OFFSET " + offset + "\n" + "LIMIT " + limit ;
+			//SPARQL DELETE SCRIPT
+			async function recordDel() {
+				await setLimit();
+				showSpinner();
+				var subject = validateSubject();
+				var predicate = validatePredicate();
+				var object = nonvalidatedObject();
+				var graph = document.getElementById("docNameID").value;
+
+				//SPARQL DELETE Query Generator
+				var delete_cmd =
+					"PREFIX : <" + graph + "#>\n"
+					+ "DELETE { GRAPH <" + graph + "> {\n"
+					+ subject + ' ' + predicate + ' ' + object + "."
+					+ "\n }"
+					+ "\n }"
+					+ "WHERE { GRAPH <" + graph + "> { \n"
+					+ subject + ' ' + predicate + ' ' + object + "."
+					+ "} \n };"
+
+				var endpoint = document.getElementById("endpointID").value;
+				let url = endpoint;
+
+				if (document.getElementById("cmdID").checked == true) {
+					console.log("endpoint for Target SPARUL Service: " + endpoint);
+					console.log(delete_cmd);
+				}
+
+				const options = {
+					method: 'POST',
+					headers: {
+						'Content-type': 'application/sparql-update; charset=UTF-8',
+					},
+					credentials: 'include',
+					mode: 'cors',
+					crossDomain: true,
+					body: delete_cmd,
+				};
+				try {
+					var resp = await fetch(url, options);
+					if (resp.status >= 200 && resp.status <= 300) {
+						console.log(resp.status + " - " + resp.statusText);
+						updateTable();
+						hideSpinner();
+					}
+					else {
+						throw new Error("Error " + resp.status + " - " + resp.statusText);
+						hideSpinner();
+					}
+				} catch (e) {
+					hideSpinner();
+					console.error('Delete Failed', e);
+					alert('Delete Failed ' + e)
+				}
+				await setTableSize();
+				await buttonDisplay();
 			}
 
-			if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
-				data_query = "DEFINE input:same-as" + '"yes" \n' + data_query ;
-			} else if (document.getElementById("ruleNameID").checked == true) {
-				data_query = "DEFINE input:inference" + ' ' + "'" + document.getElementById("infRuleNameID").value + "'" + ' \n' + data_query ;
+			// function used to return data as CSV or XML
+			function downloadResults() {
+				resultMode = "csv";
+				var graph = checkValue("docNameID", "docNameID2");
+
+				if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
+					var data_query =
+						"SELECT DISTINCT * FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
+				} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
+					// Use of Sponger Pragma to force document reload during query evaluation
+					var data_query =
+						"DEFINE get:soft" + " " + '"soft"' + "\n" + "SELECT DISTINCT * FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
+				}
+
+				if (limit >= 1) { // if results per page is active
+					data_query = data_query + "\n" + "OFFSET " + offset + "\n" + "LIMIT " + limit;
+				}
+
+				if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
+					data_query = "DEFINE input:same-as" + '"yes" \n' + data_query;
+				} else if (document.getElementById("ruleNameID").checked == true) {
+					data_query = "DEFINE input:inference" + ' ' + "'" + document.getElementById("infRuleNameID").value + "'" + ' \n' + data_query;
+				}
+
+				var endpoint = checkValue("endpointID", "endpointID2") + "?default-graph-uri=&query=";
+				if (document.getElementById("csvID").checked == true) {
+					var downloadURL = endpoint + encodeURIComponent(data_query) + "&should-sponge=&format=text%2Fcsv";
+				} else if (document.getElementById("xmlID").checked == true) {
+					var downloadURL = endpoint + encodeURIComponent(data_query) + "&should-sponge=&format=application%2Fsparql-results%2Bxml";
+				}
+
+
+				if (document.getElementById("cmdID").checked == true) {
+					console.log("Retrieving CSV From: " + downloadURL);
+					console.log("Query: " + data_query);
+				}
+
+				window.open(downloadURL);
 			}
 
-			// CSV download
-			if (document.getElementById("csvID").checked == true || document.getElementById("xmlID").checked == true) {
-		        await downloadResults() ;
-			}
+			/* Generates blank node queries and displays table reflecting them.
+			This function is required because blank node queries can
+			require n number of columns. */
+			async function bnQueryGen() {
+				resultMode = "bn";
+				await setLimit();
+				showSpinner();
+				var subject = validateSubject();
+				var predicate = validatePredicate();
+				var object = nonvalidatedObject();
+				var graph = checkValue("docNameID", "docNameID2");
 
-            var endpoint = checkValue("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
-	        let url = endpoint + encodeURIComponent(data_query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
 
-			if (document.getElementById("cmdID").checked == true) {
-		        console.log("Retrieving Table Data From: " + url);
-				console.log("Query: " + data_query);
-			}
+				if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
+					var query =
+						"PREFIX : <" + graph + "#>\n"
+						+ "SELECT DISTINCT * \n"
+						+ "FROM <" + graph + "> \n"
+						+ "WHERE {" + " " + subject + " " + predicate + " " + object + " " + "}"
+				} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
+					var query =
+						"DEFINE get:soft" + " " + '"soft"' + "\n"
+						+ "PREFIX : <" + graph + "#>\n"
+						+ "SELECT DISTINCT * \n"
+						+ "FROM <" + graph + "> \n"
+						+ "WHERE {" + " " + subject + " " + predicate + " " + object + " " + "}"
+				}
 
+				if (limit >= 1) { // if results per page is active
+					query = query + "\n" + "OFFSET " + offset + "\n" + "LIMIT " + limit;
+				}
 
-	        const options = {
-	                            method: 'GET',
-	                            headers: {
-	                                       'Content-type': 'application/sparql-results+json; charset=UTF-8',
-										 },
-	                            credentials: 'include',
-	                            mode: 'cors',
-	                            crossDomain: true,
-	                        };
+				if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
+					query = "DEFINE input:same-as" + '"yes" \n' + query;
+				} else if (document.getElementById("ruleNameID").checked == true) {
+					query = "DEFINE input:inference" + ' ' + "'" + document.getElementById("infRuleNameID").value + "'" + ' \n' + query;
+				}
 
-			try {
-		        var resp = await fetch(url,options)
+				// CSV download
+				if (document.getElementById("csvID").checked == true || document.getElementById("xmlID").checked == true) {
+					await downloadResults();
+				}
 
-	            if (resp.ok && resp.status == 200) {
-	              var data = await resp.json();
+				var endpoint = checkValue("endpointID", "endpointID2") + "?default-graph-uri=&query=";
+				let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson";
 
-				  refreshTable();
-				  createHeader();
-				  var table = checkId("dbmsTableID", "fsTableID") ;
+				if (document.getElementById("cmdID").checked == true) {
+					console.log("SPARQL Query: " + query);
+					console.log("Query URL: " + url)
+				}
 
-		          if (data.results.bindings.length > 0){
-					for (var i = 0; i < data.results.bindings.length; i++) {
-						var subject = data.results.bindings[i].subject.value ;
-						var predicate = data.results.bindings[i].predicate.value ;
-						var object = data.results.bindings[i].object.value ;
-						if (document.getElementById("fctID").checked == true) { //if fct checkbox is checked
-							if (subject.includes(graph) || regexp.test(subject)) { //if subject is not a literal value
-								subject = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].subject.value ;
-								subject = subject.replace("#", "%23"); // replaces # with %23 for fct results
+				const options = {
+					method: 'GET',
+					headers: {
+						'Content-type': 'application/sparql-results+json; charset=UTF-8',
+					},
+					credentials: 'include',
+					mode: 'cors',
+					crossDomain: true,
+				};
+				try {
+					var resp = await fetch(url, options)
+					if (resp.ok && resp.status == 200) {
+						var data = await resp.json();
+
+						refreshTable();
+
+						/*
+						  Dynamic Table for processing JSON Structured Data (via "application/sparql-results+json" document content type)
+						  that enables INSERT to be handled via a 3-tuple subject, predicate, object graph (relation) while query results
+						  are handled via an N-Tuple structured table (relation).
+						*/
+						if (data.results.bindings.length > 0) {
+							var table = checkId("dbmsTableID", "fsTableID"); // creates table for header
+							var header = table.createTHead(); // creates empty tHead
+							var headRow = header.insertRow(0); // inserts row into tHead
+							var bindings = data.results.bindings;
+							for (var col = 0; col < data.head.vars.length; col++) { // for each column
+								var headCell = headRow.insertCell(col); // inserts new cell at position i in thead
+								headCell.innerHTML = "<b>" + data.head.vars[col] + "</b>"; // adds bold text to thead cell
 							}
-
-							if (predicate.includes(graph) || regexp.test(predicate)) { //if subject is not a literal value
-								predicate = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].predicate.value ;
-								predicate = predicate.replace("#", "%23");
+							for (i in bindings) {
+								var curr = 0; // curr is used to keep track of correct cell position
+								var binding = bindings[i];
+								var bodyRow = table.insertRow(-1); // create new row
+								for (n in binding) {
+									var bodyCell = bodyRow.insertCell(curr); // create new cell in row
+									bodyCell.innerHTML = tableFormat(binding[n].value); // set value of cell
+									curr += 1;
+								}
 							}
+							hideSpinner();
+						}
+						else {
+							hideSpinner();
+							console.log("No data returned by query");
+						}
 
-							if (object.includes(graph) || regexp.test(object)) {
-								object = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].object.value ;
-								object = object.replace("#", "%23");
-							} else { //if object is literal value
-								object = data.results.bindings[i].object.value ;
+					} else {
+						var msg = await resp.text();
+						hideSpinner();
+						console.error('Query Failed', msg);
+						alert('Query Failed ' + msg)
+					}
+
+				} catch (e) {
+					hideSpinner();
+					console.error('Query Failed', e);
+					alert('Query Failed ' + e)
+				}
+				await setTableSize();
+				await buttonDisplay();
+			}
+
+			// This function updates table to show results of a query
+			async function queryGen() {
+				resultMode = "query";
+				await setLimit();
+				showSpinner();
+				var subject = validateSubject();
+				var predicate = validatePredicate();
+				var object = nonvalidatedObject();
+				var graph = checkValue("docNameID", "docNameID2");
+
+				if (isBlankNode(subject) || isBlankNode(object)) {
+					bnQueryGen(); // if query includes blank node call bnQueryGen function
+					return false; // returns false so the queryGen function stops executing
+				}
+
+				if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
+					var query =
+						"PREFIX : <" + graph + "#>\n"
+						+ "SELECT DISTINCT" + " " + subject + " AS ?subject" + " " + predicate + " AS ?predicate" + " " + object + " AS ?object \n"
+						+ "FROM <" + graph + "> \n"
+						+ "WHERE {" + " " + subject + " " + predicate + " " + object + " " + "}"
+				} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
+					var query =
+						"DEFINE get:refresh" + " " + '"clean"' + "\n"
+						+ "DEFINE get:soft" + " " + '"replace"' + "\n"
+						+ "PREFIX : <" + graph + "#>\n"
+						+ "SELECT DISTINCT" + " " + subject + " AS ?subject" + " " + predicate + " AS ?predicate" + " " + object + " AS ?object \n"
+						+ "FROM <" + graph + "> \n"
+						+ "WHERE {" + " " + subject + " " + predicate + " " + object + " " + "}"
+				}
+
+				if (limit >= 1) { // if results per page is active
+					query = query + "\n" + "OFFSET " + offset + "\n" + "LIMIT " + limit;
+				}
+
+				if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
+					query = "DEFINE input:same-as" + '"yes" \n' + query;
+				} else if (document.getElementById("ruleNameID").checked == true) {
+					query = "DEFINE input:inference" + ' ' + "'" + document.getElementById("infRuleNameID").value + "'" + ' \n' + query;
+				}
+
+				// CSV download
+				if (document.getElementById("csvID").checked == true || document.getElementById("xmlID").checked == true) {
+					await downloadResults();
+				}
+
+				var endpoint = checkValue("endpointID", "endpointID2") + "?default-graph-uri=&query=";
+				let url = endpoint + encodeURIComponent(query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson";
+
+				if (document.getElementById("cmdID").checked == true) {
+					console.log("SPARQL Query: " + query);
+					console.log("Query URL: " + url);
+				}
+
+				const options = {
+					method: 'GET',
+					headers: {
+						'Content-type': 'application/sparql-results+json; charset=UTF-8',
+					},
+					credentials: 'include',
+					mode: 'cors',
+					crossDomain: true,
+				};
+				try {
+					var resp = await fetch(url, options)
+
+					if (resp.ok && resp.status == 200) {
+						var data = await resp.json();
+
+						refreshTable();
+						createHeader();
+
+						if (data.results.bindings.length > 0) {
+							var table = checkId("dbmsTableID", "fsTableID");
+							var object = nonvalidatedObject();
+							for (var i = 0; i < data.results.bindings.length; i++) {
+								var subject = data.results.bindings[i].subject.value;
+								var predicate = data.results.bindings[i].predicate.value;
+								var object = data.results.bindings[i].object.value;
+								if (document.getElementById("fctID").checked == true) { //if fct checkbox is checked
+									if (subject.includes(graph) || regexp.test(subject)) { //if subject is not a literal value
+										subject = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].subject.value;
+										subject = subject.replace("#", "%23"); // replaces # with %23 for fct results
+									}
+
+									if (predicate.includes(graph) || regexp.test(predicate)) { //if subject is not a literal value
+										predicate = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].predicate.value;
+										predicate = predicate.replace("#", "%23");
+									}
+
+									if (object.includes(graph) || regexp.test(object)) {
+										object = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].object.value;
+										object = object.replace("#", "%23");
+									} else { //if object is literal value
+										object = data.results.bindings[i].object.value;
+									}
+
+								} else {
+									subject = data.results.bindings[i].subject.value;
+									predicate = data.results.bindings[i].predicate.value;
+									object = data.results.bindings[i].object.value;
+								}
+
+
+								var row = table.insertRow(-1);
+								var cell1 = row.insertCell(0);
+								var cell2 = row.insertCell(1);
+								var cell3 = row.insertCell(2);
+
+								cell1.innerHTML = tableFormat(subject);
+								cell2.innerHTML = tableFormat(predicate);
+								cell3.innerHTML = tableFormat(object);
 							}
+							hideSpinner();
+						}
+						else {
+							hideSpinner();
+							console.log("No data returned by query");
+						}
 
+					} else {
+						var msg = await resp.text();
+						hideSpinner();
+						console.error('Query Failed', msg);
+						alert('Query Failed ' + msg)
+					}
+
+				} catch (e) {
+					hideSpinner();
+					console.error('Query Failed', e);
+					alert('Query Failed ' + e)
+				}
+				await setTableSize();
+				await buttonDisplay();
+			}
+
+			// This function fetches the query results and returns them in json
+			async function updateTable() {
+				resultMode = "all";
+				await setLimit();
+				showSpinner();
+				var graph = checkValue("docNameID", "docNameID2");
+
+				if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
+					var data_query =
+						"SELECT DISTINCT * FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
+				} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
+					// Use of Sponger Pragma to force document reload during query evaluation
+					var data_query =
+						"DEFINE get:refresh" + " " + '"clean"' + "\n"
+						+ "DEFINE get:soft" + " " + '"replace"' + "\n"
+						+ "SELECT DISTINCT * FROM <" + graph + "> WHERE {?subject ?predicate ?object}"
+				}
+
+				if (limit >= 1) { // if results per page is active
+					data_query = data_query + "\n" + "OFFSET " + offset + "\n" + "LIMIT " + limit;
+				}
+
+				if (document.getElementById("riID").checked == true) {// if reasoning and inference is on
+					data_query = "DEFINE input:same-as" + '"yes" \n' + data_query;
+				} else if (document.getElementById("ruleNameID").checked == true) {
+					data_query = "DEFINE input:inference" + ' ' + "'" + document.getElementById("infRuleNameID").value + "'" + ' \n' + data_query;
+				}
+
+				// CSV download
+				if (document.getElementById("csvID").checked == true || document.getElementById("xmlID").checked == true) {
+					await downloadResults();
+				}
+
+				var endpoint = checkValue("endpointID", "endpointID2") + "?default-graph-uri=&query=";
+				let url = endpoint + encodeURIComponent(data_query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson";
+
+				if (document.getElementById("cmdID").checked == true) {
+					console.log("Retrieving Table Data From: " + url);
+					console.log("Query: " + data_query);
+				}
+
+
+				const options = {
+					method: 'GET',
+					headers: {
+						'Content-type': 'application/sparql-results+json; charset=UTF-8',
+					},
+					credentials: 'include',
+					mode: 'cors',
+					crossDomain: true,
+				};
+
+				try {
+					var resp = await fetch(url, options)
+
+					if (resp.ok && resp.status == 200) {
+						var data = await resp.json();
+
+						refreshTable();
+						createHeader();
+						var table = checkId("dbmsTableID", "fsTableID");
+
+						if (data.results.bindings.length > 0) {
+							for (var i = 0; i < data.results.bindings.length; i++) {
+								var subject = data.results.bindings[i].subject.value;
+								var predicate = data.results.bindings[i].predicate.value;
+								var object = data.results.bindings[i].object.value;
+								if (document.getElementById("fctID").checked == true) { //if fct checkbox is checked
+									if (subject.includes(graph) || regexp.test(subject)) { //if subject is not a literal value
+										subject = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].subject.value;
+										subject = subject.replace("#", "%23"); // replaces # with %23 for fct results
+									}
+
+									if (predicate.includes(graph) || regexp.test(predicate)) { //if subject is not a literal value
+										predicate = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].predicate.value;
+										predicate = predicate.replace("#", "%23");
+									}
+
+									if (object.includes(graph) || regexp.test(object)) {
+										object = "https://linkeddata.uriburner.com/describe/?url=" + data.results.bindings[i].object.value;
+										object = object.replace("#", "%23");
+									} else { //if object is literal value
+										object = data.results.bindings[i].object.value;
+									}
+
+								} else {
+									subject = data.results.bindings[i].subject.value;
+									predicate = data.results.bindings[i].predicate.value;
+									object = data.results.bindings[i].object.value;
+								}
+
+								var row = table.insertRow(-1);
+								var cell1 = row.insertCell(0);
+								var cell2 = row.insertCell(1);
+								var cell3 = row.insertCell(2);
+
+								cell1.innerHTML = tableFormat(subject);
+								cell2.innerHTML = tableFormat(predicate);
+								cell3.innerHTML = tableFormat(object);
+							}
+							hideSpinner();
 						} else {
-							subject = data.results.bindings[i].subject.value ;
-							predicate = data.results.bindings[i].predicate.value ;
-							object = data.results.bindings[i].object.value ;
+							hideSpinner();
+							console.log("No data returned by query");
 						}
 
-						var row = table.insertRow(-1);
-					    var cell1 = row.insertCell(0);
-					    var cell2 = row.insertCell(1);
-					    var cell3 = row.insertCell(2);
-
-					    cell1.innerHTML = tableFormat(subject);
-					    cell2.innerHTML = tableFormat(predicate);
-					    cell3.innerHTML = tableFormat(object);
+					} else {
+						var msg = await resp.text();
+						hideSpinner();
+						console.error('Table Refresh Failed', msg);
+						alert('Table Refresh Failed ' + msg);
 					}
-					hideSpinner() ;
-		          } else{
-					hideSpinner() ;
-					console.log("No data returned by query");
-		          }
 
-	            } else {
-	              var msg = await resp.text();
-	              hideSpinner();
-				  console.error('Table Refresh Failed', msg) ;
-				  alert('Table Refresh Failed ' + msg);
-	            }
-
-			} catch(e) {
-				hideSpinner() ;
-				console.error('Table Refresh Failed', e) ;
-				alert('Table Refresh Failed ' + e);
-			}
-			await setTableSize() ;
-			await buttonDisplay() ;
-	    }
-
-		// This function gets the range of the predicate to determine if object is a literal or a reference
-		async function predicateRange() {
-			var predicate = validatePredicate() ;
-			var graph = checkValue("docNameID", "docNameID2") ;
-
-		    var range_query =
-			"PREFIX : <" + graph + "#>\n"
-			+ "ASK \n"
-			+ "WHERE \n"
-			+ "{ \n"
-			+ predicate + ' ' + "rdfs:range ?range .\n"
-			+ "filter (?range in (rdfs:Literal, xsd:string, xsd:decimal, xsd:integer, xsd:boolean, xsd:date, xsd:time))\n"
-			+"}"
-
-            var endpoint = checkValue("endpointID", "endpointID2") + "?default-graph-uri=&query=" ;
-			// This sets the url for retrieving the json
-	        let url = endpoint + encodeURIComponent(range_query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson" ;
-
-			if (document.getElementById("cmdID").checked == true) {
-		        console.log("Recieving Predicate Range From: " + url);
-				console.log("Query" + range_query);
-			}
-
-
-	        const options = {
-	                            method: 'GET',
-	                            headers: {
-	                                       'Content-type': 'application/sparql-results+json; charset=UTF-8',
-										 },
-	                            credentials: 'include',
-	                            mode: 'cors',
-	                            crossDomain: true,
-	        };
-
-			try {
-				const resp = await fetch(url,options); // resp awaits completion of fetch
-
-				if (resp.status >= 200 && resp.status <= 300) {
-					console.log(resp.status + " - " + resp.statusText);
-				} else {
-					throw new Error("Error " + resp.status +" - " + resp.statusText) ;
+				} catch (e) {
+					hideSpinner();
+					console.error('Table Refresh Failed', e);
+					alert('Table Refresh Failed ' + e);
 				}
-				const json = await resp.json(); // constant awaits resp before being assigned (so it isn't assigned as a promise)
-				return (json.boolean) ; // returns true or false returned by query after awaiting results
-			} catch(e) {
-				console.error('Predicate Range Lookup Failed', e) ;
-				alert('Predicate Range Lookup Failed ' + e)
-			}
-		}
-
-		async function turtleGen() {
-			await setLimit() ;
-			showSpinner() ;
-		    var subject = validateSubject() ;
-			var predicate = validatePredicate() ;
-			var object = await validateObject() ; // insert function awaits object value before proceeding
-			var docName = document.getElementById("docNameID2").value ;
-			console.log("subject: " + subject)
-
-			var turtle_cmd =
-			"" + "INSERT DATA {@prefix : <" + docName + "#> ." + ' ' + subject + ' ' + predicate + ' ' + object + ' ' + ".}" + ""
-
-			let url = docName ;
-
-			if (document.getElementById("fctID").checked == true) {
-				console.log("Insert Command:" + turtle_cmd);
+				await setTableSize();
+				await buttonDisplay();
 			}
 
+			// This function gets the range of the predicate to determine if object is a literal or a reference
+			async function predicateRange() {
+				var predicate = validatePredicate();
+				var graph = checkValue("docNameID", "docNameID2");
 
-	        const options = {
-	                            method: 'PATCH',
-	                            headers: {
-	                                       'Content-type': 'application/sparql-update; charset=UTF-8',
-										 },
-	                            credentials: 'include',
-	                            mode: 'cors',
-	                            crossDomain: true,
-	                            body: turtle_cmd,
-	        };
+				var range_query =
+					"PREFIX : <" + graph + "#>\n"
+					+ "ASK \n"
+					+ "WHERE \n"
+					+ "{ \n"
+					+ predicate + ' ' + "rdfs:range ?range .\n"
+					+ "filter (?range in (rdfs:Literal, xsd:string, xsd:decimal, xsd:integer, xsd:boolean, xsd:date, xsd:time))\n"
+					+ "}"
 
-			try {
-		        var resp = await solid.auth.fetch(url,options);
-				if (resp.status >= 200 && resp.status <= 300) {
-					hideSpinner() ;
-					console.log(resp.status + " - " + resp.statusText);
-					updateTable() ;
+				var endpoint = checkValue("endpointID", "endpointID2") + "?default-graph-uri=&query=";
+				// This sets the url for retrieving the json
+				let url = endpoint + encodeURIComponent(range_query) + "&should-sponge=&format=application%2Fsparql-results%2Bjson";
+
+				if (document.getElementById("cmdID").checked == true) {
+					console.log("Recieving Predicate Range From: " + url);
+					console.log("Query" + range_query);
 				}
-				else {
-					hideSpinner() ;
-					throw new Error("Error " + resp.status +" - " + resp.statusText) ;
+
+
+				const options = {
+					method: 'GET',
+					headers: {
+						'Content-type': 'application/sparql-results+json; charset=UTF-8',
+					},
+					credentials: 'include',
+					mode: 'cors',
+					crossDomain: true,
+				};
+
+				try {
+					const resp = await fetch(url, options); // resp awaits completion of fetch
+
+					if (resp.status >= 200 && resp.status <= 300) {
+						console.log(resp.status + " - " + resp.statusText);
+					} else {
+						throw new Error("Error " + resp.status + " - " + resp.statusText);
+					}
+					const json = await resp.json(); // constant awaits resp before being assigned (so it isn't assigned as a promise)
+					return (json.boolean); // returns true or false returned by query after awaiting results
+				} catch (e) {
+					console.error('Predicate Range Lookup Failed', e);
+					alert('Predicate Range Lookup Failed ' + e)
 				}
-			} catch (e) {
-				hideSpinner() ;
-				console.error('Insert Failed ' + e) ;
-				alert('Insert Failed ' + e)
-			}
-			await setTableSize() ;
-			await buttonDisplay() ;
-		}
-
-		async function turtleDel() {
-			await setLimit() ;
-			showSpinner() ;
-		    var subject = validateSubject() ;
-			var predicate = validatePredicate() ;
-			var object = nonvalidatedObject() ; // insert function awaits object value before proceeding
-			var docName = document.getElementById("docNameID2").value ;
-
-			var del_cmd =
-			"" + "PREFIX : <" + docName + "#> DELETE DATA" + ' ' + "{" + subject + ' ' + predicate + ' ' + object + ' ' + ".}" + ""
-
-			let url = docName ;
-			if (document.getElementById("fctID").checked == true) {
-				console.log("Delete Command:" + del_cmd);
 			}
 
+			async function turtleGen() {
+				await setLimit();
+				showSpinner();
 
-	        const options = {
-	                            method: 'PATCH',
-	                            headers: {
-	                                       'Content-type': 'application/sparql-update; charset=UTF-8',
-										 },
-	                            credentials: 'include',
-	                            mode: 'cors',
-	                            crossDomain: true,
-	                            body: del_cmd,
-	        };
+				const session = await authClient.currentSession()
+				var _fetch = (session && session.hasCredentials()) ? session.fetch : fetch;
 
-			try {
-		        var resp = await solid.auth.fetch(url,options);
-				if (resp.status >= 200 && resp.status <= 300) {
-					hideSpinner() ;
-					console.log(resp.status + " - " + resp.statusText);
-					updateTable() ;
+				var subject = validateSubject();
+				var predicate = validatePredicate();
+				var object = await validateObject(); // insert function awaits object value before proceeding
+				var docName = document.getElementById("docNameID2").value;
+				console.log("subject: " + subject)
+
+				var turtle_cmd =
+					"" + "INSERT DATA {@prefix : <" + docName + "#> ." + ' ' + subject + ' ' + predicate + ' ' + object + ' ' + ".}" + ""
+
+				let url = docName;
+
+				if (document.getElementById("fctID").checked == true) {
+					console.log("Insert Command:" + turtle_cmd);
 				}
-				else {
-					hideSpinner() ;
-					throw new Error("Error " + resp.status +" - " + resp.statusText) ;
+
+
+				const options = {
+					method: 'PATCH',
+					headers: {
+						'Content-type': 'application/sparql-update; charset=UTF-8',
+					},
+					credentials: 'include',
+					mode: 'cors',
+					crossDomain: true,
+					body: turtle_cmd,
+				};
+
+				try {
+					var resp = await _fetch(url, options);
+					if (resp.status >= 200 && resp.status <= 300) {
+						hideSpinner();
+						console.log(resp.status + " - " + resp.statusText);
+						updateTable();
+					}
+					else {
+						hideSpinner();
+						throw new Error("Error " + resp.status + " - " + resp.statusText);
+					}
+				} catch (e) {
+					hideSpinner();
+					console.error('Insert Failed ' + e);
+					alert('Insert Failed ' + e)
 				}
-			} catch (e) {
-				hideSpinner() ;
-				console.error('Request Failed ' + e) ;
-				alert('Delete Failed ' + e)
-			}
-			await setTableSize() ;
-			await buttonDisplay() ;
-		}
-
-                function resetPermalink () {
-                       permalink = document.getElementById("permalinkID");
-                       permalink.href = window.location.href;
-                }
-
-                function updatePermalink () {
-
-                       var permalink = document.getElementById("permalinkID");
-                       var subject = checkId("subjectID", "subjectID2");
-                       var predicate = checkId("predicateID", "predicateID2");
-                       var object = checkId("objectID", "objectID2");
-                       var documentName = checkId("docNameID", "docNameID2");
-                       var endpoint = checkId("endpointID", "endpointID2");
-                       var tab = "";
-
-			if (document.getElementById('dbmsTabID').getAttribute('class') == "active"){
-				tab = "dbms";
-			} else if (document.getElementById('fsTabID').getAttribute('class') == "active"){
-				tab = "fs";
+				await setTableSize();
+				await buttonDisplay();
 			}
 
-                       permalink.href = window.location.origin + window.location.pathname;
-                       permalink.href = permalink.href + "?setInputs=true&";
-                       permalink.href = permalink.href + "tab=" + encodeURIComponent(tab) + "&";
-                       permalink.href = permalink.href + "subject=" + encodeURIComponent(subject.value) + "&";
-                       permalink.href = permalink.href + "predicate=" +  encodeURIComponent(predicate.value) + "&";
-                       permalink.href = permalink.href + "object=" +  encodeURIComponent(object.value) + "&";
-                       permalink.href = permalink.href + "documentName=" +  encodeURIComponent(documentName.value) + "&";
-                       permalink.href = permalink.href + "endpoint=" +  encodeURIComponent(endpoint.value);
-                }
-	</script>
+			async function turtleDel() {
+				await setLimit();
+				showSpinner();
 
-	<!-- These functions are used for Authentication -->
-	<script>
-        async function fetchProfile(webId) {
-           try {
-             var rc = await loadProfile(webId);
+				const session = await authClient.currentSession()
+				var _fetch = (session && session.hasCredentials()) ? session.fetch : fetch;
 
-             var uriObj = new URL(webId)
-             uriObj.hash = uriObj.search = uriObj.query = '';
+				var subject = validateSubject();
+				var predicate = validatePredicate();
+				var object = nonvalidatedObject(); // insert function awaits object value before proceeding
+				var docName = document.getElementById("docNameID2").value;
 
-             var base = uriObj.toString()
-             const kb = $rdf.graph()
+				var del_cmd =
+					"" + "PREFIX : <" + docName + "#> DELETE DATA" + ' ' + "{" + subject + ' ' + predicate + ' ' + object + ' ' + ".}" + ""
 
-             $rdf.parse(rc.profile, kb, base, rc.content_type);
+				let url = docName;
+				if (document.getElementById("fctID").checked == true) {
+					console.log("Delete Command:" + del_cmd);
+				}
 
-             const LDP = $rdf.Namespace("http://www.w3.org/ns/ldp#");
-             const PIM = $rdf.Namespace("http://www.w3.org/ns/pim/space#");
 
-             const s_webId = $rdf.sym(webId)
+				const options = {
+					method: 'PATCH',
+					headers: {
+						'Content-type': 'application/sparql-update; charset=UTF-8',
+					},
+					credentials: 'include',
+					mode: 'cors',
+					crossDomain: true,
+					body: del_cmd,
+				};
 
-             uriObj.pathname = '/';
-             var ret = uriObj.toString();
+				try {
+					var resp = await _fetch(url, options);
+					if (resp.status >= 200 && resp.status <= 300) {
+						hideSpinner();
+						console.log(resp.status + " - " + resp.statusText);
+						updateTable();
+					}
+					else {
+						hideSpinner();
+						throw new Error("Error " + resp.status + " - " + resp.statusText);
+					}
+				} catch (e) {
+					hideSpinner();
+					console.error('Request Failed ' + e);
+					alert('Delete Failed ' + e)
+				}
+				await setTableSize();
+				await buttonDisplay();
+			}
 
-             var store = kb.any(s_webId, PIM('storage'));
-             var inbox = kb.any(s_webId, LDP('inbox'));
-             if (inbox)
-               ret = inbox.value;
-             else if (store)
-               ret = store.value;
+			function resetPermalink() {
+				permalink = document.getElementById("permalinkID");
+				permalink.href = window.location.href;
+			}
 
-             return ret;
-           } catch(e) {
-			   console.error('Error', e)
-			   alert('Error ', e)
-			   return null;
-           }
-        }
+			function updatePermalink() {
 
-        async function loadProfile(url) {
-           const options = {
-                             method: 'GET',
-                             headers: {'Accept': 'text/turtle, application/ld+json'},
-                             credentials: 'include',
-                             mode: 'cors',
-                             crossDomain: true,
-                         };
-           try {
-               var resp = await solid.auth.fetch(url,options);
-               if (resp.ok) {
- 		  var body = await resp.text();
- 		  var contentType = resp.headers.get('content-type');
- 		  return {profile: body, contentType};
-               }
- 	      else {
- 	        console.log("Error " + resp.status +" - " + resp.statusText)
-               }
-           }
- 	  catch(e) {
-		  console.error('Request failed', e)
-		  alert('Request failed ', e)
-           }
-        }
+				var permalink = document.getElementById("permalinkID");
+				var subject = checkId("subjectID", "subjectID2");
+				var predicate = checkId("predicateID", "predicateID2");
+				var object = checkId("objectID", "objectID2");
+				var documentName = checkId("docNameID", "docNameID2");
+				var endpoint = checkId("endpointID", "endpointID2");
+				var tab = "";
 
-        async function authLogin() {
-            const popupUri = './common/popup.html'
+				if (document.getElementById('dbmsTabID').getAttribute('class') == "active") {
+					tab = "dbms";
+				} else if (document.getElementById('fsTabID').getAttribute('class') == "active") {
+					tab = "fs";
+				}
 
-            const session = await solid.auth.popupLogin({ popupUri })
-            if (session) {
-                // Make authenticated request to the server to establish a session cookie
-               const {status} = await solid.auth.fetch(location, { method: 'HEAD' })
+				permalink.href = window.location.origin + window.location.pathname;
+				permalink.href = permalink.href + "?setInputs=true&";
+				permalink.href = permalink.href + "tab=" + encodeURIComponent(tab) + "&";
+				permalink.href = permalink.href + "subject=" + encodeURIComponent(subject.value) + "&";
+				permalink.href = permalink.href + "predicate=" + encodeURIComponent(predicate.value) + "&";
+				permalink.href = permalink.href + "object=" + encodeURIComponent(object.value) + "&";
+				permalink.href = permalink.href + "documentName=" + encodeURIComponent(documentName.value) + "&";
+				permalink.href = permalink.href + "endpoint=" + encodeURIComponent(endpoint.value);
+			}
+		</script>
 
-               if (status === 401) {
-                   alert(`Invalid login.\n\nDid you set ${session.idp} as your OIDC provider in your profile ${session.webId}?`)
-                   await solid.auth.logout()
-               }
-               // Now that we have a cookie, reload to display the authenticated page
-               location.reload()
-            }
-        }
+		<!-- These functions are used for Authentication -->
+		<script>
 
-        async function authLogout () {
-            await solid.auth.logout()
-            location.reload()
-        }
+			async function fetchProfile(webId) {
+				try {
+					var rc = await loadProfile(webId);
 
-	</script>
-  </body>
+					var uriObj = new URL(webId)
+					uriObj.hash = uriObj.search = uriObj.query = '';
+
+					var base = uriObj.toString()
+					const kb = $rdf.graph()
+
+					$rdf.parse(rc.profile, kb, base, rc.content_type);
+
+					const LDP = $rdf.Namespace("http://www.w3.org/ns/ldp#");
+					const PIM = $rdf.Namespace("http://www.w3.org/ns/pim/space#");
+
+					const s_webId = $rdf.sym(webId)
+
+					uriObj.pathname = '/';
+					var ret = uriObj.toString();
+
+					var store = kb.any(s_webId, PIM('storage'));
+					var inbox = kb.any(s_webId, LDP('inbox'));
+					if (inbox)
+						ret = inbox.value;
+					else if (store)
+						ret = store.value;
+
+					return ret;
+				} catch (e) {
+					console.error('Error', e)
+					alert('Error ', e)
+					return null;
+				}
+			}
+
+			async function loadProfile(url) {
+				const session = await authClient.currentSession()
+				var _fetch = (session && session.hasCredentials()) ? session.fetch : fetch;
+
+				const options = {
+					method: 'GET',
+					headers: { 'Accept': 'text/turtle, application/ld+json' },
+					credentials: 'include',
+					mode: 'cors',
+					crossDomain: true,
+				};
+				try {
+					var resp = await _fetch(url, options);
+					if (resp.ok) {
+						var body = await resp.text();
+						var contentType = resp.headers.get('content-type');
+						return { profile: body, contentType };
+					}
+					else {
+						console.log("Error " + resp.status + " - " + resp.statusText)
+					}
+				}
+				catch (e) {
+					console.error('Request failed', e)
+					alert('Request failed ', e)
+				}
+			}
+
+			async function authLogin() {
+				const url = "./oidc_web/login.html#relogin";
+				const width = 650;
+				const height = 400;
+				const left = window.screenX + (window.innerWidth - width) / 2;
+				const top = window.screenY + (window.innerHeight - height) / 2;
+				const settings = `width=${width},height=${height},left=${left},top=${top}`;
+				var win = window.open(url, 'Login', settings);
+			}
+
+			async function authLogout() {
+				await authClient.logout()
+				location.reload()
+			}
+
+		</script>
+</body>
+
 </html>
