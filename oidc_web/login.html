@@ -189,7 +189,9 @@
     document.getElementById('custom-idp').value = provider;
 
     try {
-      session = await authClient.login({mode:'redirect', provider})
+      session = await authClient.login({mode:'redirect', 
+                                    provider,
+                                    redirect_uri:callback})
     } catch (error) {
       console.log('Error logging in:')
       console.error(error)
