@@ -1157,7 +1157,7 @@
 				} catch (e) {
 					hideSpinner();
 					console.error('Table Size Failed', e);
-					//alert('Table Size Failed ' + e);
+					alert('Table Size Failed ' + e);
 				}
 			}
 		</script>
@@ -1747,9 +1747,6 @@
 				await setLimit();
 				showSpinner();
 
-				const session = await authClient.currentSession()
-				var _fetch = (session && session.hasCredentials()) ? session.fetch : fetch;
-
 				var subject = validateSubject();
 				var predicate = validatePredicate();
 				var object = await validateObject(); // insert function awaits object value before proceeding
@@ -1778,7 +1775,7 @@
 				};
 
 				try {
-					var resp = await _fetch(url, options);
+					var resp = await authClient.authFetch(url, options);
 					if (resp.status >= 200 && resp.status <= 300) {
 						hideSpinner();
 						console.log(resp.status + " - " + resp.statusText);
@@ -1800,9 +1797,6 @@
 			async function turtleDel() {
 				await setLimit();
 				showSpinner();
-
-				const session = await authClient.currentSession()
-				var _fetch = (session && session.hasCredentials()) ? session.fetch : fetch;
 
 				var subject = validateSubject();
 				var predicate = validatePredicate();
@@ -1830,7 +1824,7 @@
 				};
 
 				try {
-					var resp = await _fetch(url, options);
+					var resp = await authClient.authFetch(url, options);
 					if (resp.status >= 200 && resp.status <= 300) {
 						hideSpinner();
 						console.log(resp.status + " - " + resp.statusText);
@@ -1920,9 +1914,6 @@
 			}
 
 			async function loadProfile(url) {
-				const session = await authClient.currentSession()
-				var _fetch = (session && session.hasCredentials()) ? session.fetch : fetch;
-
 				const options = {
 					method: 'GET',
 					headers: { 'Accept': 'text/turtle, application/ld+json' },
@@ -1931,7 +1922,7 @@
 					crossDomain: true,
 				};
 				try {
-					var resp = await _fetch(url, options);
+					var resp = await authClient.authFetch(url, options);
 					if (resp.ok) {
 						var body = await resp.text();
 						var contentType = resp.headers.get('content-type');
