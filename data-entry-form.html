@@ -443,6 +443,12 @@
 
 			  
 			  updatePermalink() {
+				if (DOC.iSel('dbmsTabID').getAttribute('class') === "active") {
+					this.lastState.tab = tab = "dbms";
+				} else if (DOC.iSel('fsTabID').getAttribute('class') === "active") {
+					this.lastState.tab = tab = "fs";
+				}
+
 				var permalink = DOC.iSel("permalinkID");
 				var subject = this.checkId("subjectID", "subjectID2");
 				var predicate = this.checkId("predicateID", "predicateID2");
@@ -450,12 +456,6 @@
 				var documentName = this.checkId("docNameID", "docNameID2");
 				var endpoint = this.checkId("endpointID", "endpointID2");
 				var tab = "";
-
-				if (DOC.iSel('dbmsTabID').getAttribute('class') === "active") {
-					this.lastState.tab = tab = "dbms";
-				} else if (DOC.iSel('fsTabID').getAttribute('class') === "active") {
-					this.lastState.tab = tab = "fs";
-				}
 
 				this.lastState.documentName = documentName.value;
 				sessionStorage.setItem('lastState', JSON.stringify(this.lastState));
@@ -594,8 +594,13 @@
 						loggedHref.title = webid
 
 						var rc = await fetchProfile(webid);
-						this.solid_storage = rc.store;
-						this.is_solid_server = rc.is_solid_server;
+						if (rc) {
+						  this.solid_storage = rc.store;
+						  this.is_solid_server = rc.is_solid_server;
+						} else {
+						  this.solid_storage = null;
+						  this.is_solid_server = false;
+						}
 						sessionStorage.setItem('solid_storage', this.solid_storage);
 						this.docNameValue()
 					}
@@ -2037,7 +2042,7 @@
 
 				} catch (e) {
 					console.error('Error', e)
-					alert('Error ', e)
+//					alert('Error ', e)
 					return null;
 				}
 			}
