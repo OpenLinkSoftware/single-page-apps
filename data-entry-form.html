@@ -379,6 +379,7 @@
 			class State {
 			  constructor() {
 			    this.solid_storage = null;
+			    this.is_solid_server = false;
 				this.initialTab = "";
 			    this.initialSubject = "";
 			    this.initialPredicate = "";
@@ -592,7 +593,9 @@
 						loggedHref.href = webid
 						loggedHref.title = webid
 
-						this.solid_storage = await fetchProfile(webid);
+						var rc = await fetchProfile(webid);
+						this.solid_storage = rc.store;
+						this.is_solid_server = rc.is_solid_server;
 						sessionStorage.setItem('solid_storage', this.solid_storage);
 						this.docNameValue()
 					}
@@ -602,6 +605,7 @@
 					loggedHref.href = ''
 					loggedHref.title = ''
 					this.solid_storage = null;
+					this.is_solid_server = false;
 					sessionStorage.removeItem('solid_storage');
 				}
 				updateTable();
@@ -1895,7 +1899,7 @@
 				console.log("subject: " + subject)
 
 				var turtle_cmd =
-					"" + "INSERT DATA {@prefix : <" + docName + "#> ." + ' ' + subject + ' ' + predicate + ' ' + object + ' ' + ".}" + ""
+					`INSERT DATA {@prefix : <${docName}#> . ${subject}  ${predicate}  ${object} . } `
 
 				let url = docName;
 
@@ -1943,11 +1947,15 @@
 				var predicate = validatePredicate();
 				var object = nonvalidatedObject(); // insert function awaits object value before proceeding
 				var docName = DOC.iSel("docNameID2").value;
+				var del_cmd;
 
-				var del_cmd =
-					`DELETE DATA {@prefix : <${docName}#> . ${subject}  ${predicate}  ${object} . } `
-//				var del_cmd =
-//					`PREFIX : <${docName}#> DELETE { GRAPH <${docName}> { ${subject} ${predicate} ${object} . } }`;
+				if (state.is_solid_server)
+					del_cmd =
+						`DELETE DATA {@prefix : <${docName}#> . ${subject}  ${predicate}  ${object} . } `
+				else
+					del_cmd =
+						`DELETE DATA {@prefix : <${docName}#> . GRAPH <${docName}> { ${subject} ${predicate} ${object} . } }`;
+//						`PREFIX : <${docName}#> DELETE { GRAPH <${docName}> { ${subject} ${predicate} ${object} . } }`;
 
 				let url = docName;
 				if (DOC.iSel("fctID").checked == true) {
@@ -2006,6 +2014,7 @@
 
 					const LDP = $rdf.Namespace("http://www.w3.org/ns/ldp#");
 					const PIM = $rdf.Namespace("http://www.w3.org/ns/pim/space#");
+					const SOLID = $rdf.Namespace("http://www.w3.org/ns/solid/terms#");
 
 					const s_webId = $rdf.sym(webId)
 
@@ -2014,12 +2023,18 @@
 
 					var store = kb.any(s_webId, PIM('storage'));
 					var inbox = kb.any(s_webId, LDP('inbox'));
-					if (inbox)
-						ret = inbox.value;
-					else if (store)
-						ret = store.value;
 
-					return ret;
+					var s_issuer = kb.any(s_webId, SOLID('oidcIssuer'));
+					var s_account = kb.any(s_webId, SOLID('account'));
+					var s_pubIndex = kb.any(s_webId, SOLID('publicTypeIndex'));
+
+					var is_solid_server = (s_issuer || s_account || s_pubIndex) ? true : false;
+
+					if (inbox)
+						return {store: inbox.value, is_solid_server};
+					else if (store)
+						return {store: store.value, is_solid_server};
+
 				} catch (e) {
 					console.error('Error', e)
 					alert('Error ', e)
