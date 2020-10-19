@@ -2008,6 +2008,8 @@
 			async function fetchProfile(webId) {
 				try {
 					var rc = await loadProfile(webId);
+					if (!rc)
+					  return null;
 
 					var uriObj = new URL(webId)
 					uriObj.hash = uriObj.search = uriObj.query = '';
@@ -2042,12 +2044,15 @@
 
 				} catch (e) {
 					console.error('Error', e)
-//					alert('Error ', e)
+					alert('Error ', e)
 					return null;
 				}
 			}
 
 			async function loadProfile(url) {
+			    if (!url.startsWith('https://'))
+			      return null;
+
 				const options = {
 					method: 'GET',
 					headers: { 'Accept': 'text/turtle, application/ld+json' },
@@ -2069,6 +2074,7 @@
 				catch (e) {
 					console.error('Request failed', e)
 					alert('Request failed ', e)
+					return null;
 				}
 			}
 
