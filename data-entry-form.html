@@ -1346,7 +1346,7 @@
 
 				var resp;
 				try {
-					resp = await fetch(url, options)
+					resp = await authClient.authFetch(url, options)
 					
 					if (resp.ok && resp.status == 200) {
 						var data = await resp.json();
@@ -1416,7 +1416,7 @@
 
 				var resp;
 				try {
-					resp = await fetch(url, options);
+					resp = await authClient.authFetch(url, options);
 					if (resp.status >= 200 && resp.status <= 300) {
 						console.log(resp.status + " - " + resp.statusText);
 						updateTable();
@@ -1475,7 +1475,7 @@
 
 				var resp;
 				try {
-					resp = await fetch(url, options);
+					resp = await authClient.authFetch(url, options);
 					if (resp.status >= 200 && resp.status <= 300) {
 						console.log(resp.status + " - " + resp.statusText);
 						updateTable();
@@ -1597,7 +1597,7 @@
 
 				var resp;
 				try {
-					resp = await fetch(url, options)
+					resp = await authClient.authFetch(url, options)
 					if (resp.ok && resp.status == 200) {
 						var data = await resp.json();
 
@@ -1721,7 +1721,7 @@
 
 				var resp;
 				try {
-					resp = await fetch(url, options)
+					resp = await authClient.authFetch(url, options)
 
 					if (resp.ok && resp.status == 200) {
 						var data = await resp.json();
@@ -1859,7 +1859,7 @@
 
 				var resp;
 				try {
-					resp = await fetch(url, options)
+					resp = await authClient.authFetch(url, options)
 
 					if (resp.ok && resp.status == 200) {
 						var data = await resp.json();
@@ -1966,7 +1966,7 @@
 
 				var resp;
 				try {
-					resp = await fetch(url, options); // resp awaits completion of fetch
+					resp = await authClient.authFetch(url, options); // resp awaits completion of fetch
 
 					if (resp.status >= 200 && resp.status <= 300) {
 						console.log(resp.status + " - " + resp.statusText);
