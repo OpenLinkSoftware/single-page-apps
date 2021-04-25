@@ -1083,19 +1083,22 @@
 				var graph = state.checkValue("docNameID", "docNameID2");
 				var strLabel = str; // variable for what is show on screen in the href
 
+				if (str.includes("https://linkeddata.uriburner.com/describe/?url=")) {// of str is in fct format
+					strLabel = strLabel.replace("https://linkeddata.uriburner.com/describe/?url=", "");
+					strLabel = strLabel.replace("%23", "#");
+				}
+
+
 				if (DOC.iSel("uriID").checked == true) { //if user wants short URIs
-					if (str.includes(graph)) { //if str is in fct format it still includes the docname
+					if (strLabel.includes(graph)) { //if str is in fct format it still includes the docname
 						strLabel = strLabel.replace(graph, ""); //remove the docName from string
 					}
-					if (str.includes("https://linkeddata.uriburner.com/describe/?url=")) {// of str is in fct format
-						strLabel = strLabel.replace("https://linkeddata.uriburner.com/describe/?url=", "");
-						strLabel = strLabel.replace("%23", "#");
-					} else if (str.includes("nodeID://")) {
+					if (strLabel.includes("nodeID://")) {
 						strLabel = strLabel.replace("nodeID://", "_:");
-					} else if (str.includes("#")) {
-						strLabel = str.split('#')[1];
-					} else if (str.includes("/")) {
-						var strList = str.split("/");
+					} else if (strLabel.includes("#")) {
+						strLabel = strLabel.split('#')[1];
+					} else if (strLabel.includes("/")) {
+						var strList = strLabel.split("/");
 						strLabel = strList.pop();
 					}
 				}
